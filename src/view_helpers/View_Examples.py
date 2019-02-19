@@ -1,6 +1,8 @@
 from browser.Render_Page import Render_Page
 from utils.Dev import Dev
 from utils.Files import Files
+from utils.Unzip_File import Unzip_File
+from utils.Zip_Folder import Zip_Folder
 
 
 class View_Examples:
@@ -19,10 +21,23 @@ class View_Examples:
         file = '{0}{1}{2}'.format(self.path_views, '/examples/',filename)
         return self.render_page.screenshot_file(file, self.tmp_img, self.clip)
 
-    def hello_world__html(self): return self._open_file_and_get_html('hello-world.html')
+    def set_clip (self, clip):
+        self.clip = clip
+        return self
 
-    def hello_world      (self): return self._open_file_and_take_screenshot('hello-world.html')
-    def bootstrap_cdn    (self): return self._open_file_and_take_screenshot('bootstrap-cdn.html')
+    def render_file_from_zip(self, target):
+        with Zip_Folder(self.path_views) as zip_file:
+            with Unzip_File(zip_file,'/tmp/test_render_from_zip', True) as web_root:
+                return self.render_page.screenshot_file_in_folder(web_root, target, self.tmp_img)
 
-    def zipped_views(self):
-        return Files.zip_folder(self.path_views)
+
+    def hello_world__html(self): return self._open_file_and_get_html        ('hello-world.html')
+    def hello_world      (self): return self._open_file_and_take_screenshot ('hello-world.html')
+    def bootstrap_cdn    (self): return self._open_file_and_take_screenshot ('bootstrap-cdn.html')
+    def bootstrap_local  (self): return self.render_file_from_zip           ('/examples/bootstrap-local.html')
+    def folder_root      (self): return self.render_page.screenshot_folder  (self.path_views, self.tmp_img)
+
+
+
+    #def zipped_views(self):
+    #    return Files.zip_folder(self.path_views)

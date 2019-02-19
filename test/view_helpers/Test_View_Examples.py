@@ -5,25 +5,22 @@ from browser.Render_Page import Render_Page
 from src.view_helpers.View_Examples import View_Examples
 from utils.Dev import Dev
 from utils.Misc import Misc
+from utils.Zip_Folder import Zip_Folder
 
 
-class Test_Render_Page(TestCase):
+class Test_View_Examples(TestCase):
     def setUp(self):
-        self.render_page = View_Examples('/tmp/test_screenshot_html.png')
+        self.view_examples = View_Examples('/tmp/test_screenshot_html.png')
+        self.clip          = {'x': 1, 'y': 1, 'width': 220, 'height': 50}
 
     def test_hello_world(self):
-        result = self.render_page.hello_world__html()
+        result = self.view_examples.hello_world__html()
         assert '<h1>Hello World.....</h1>' in result.html()
 
-    def test_hello_world(self):
+    def test_hello_world    (self): self.view_examples.set_clip(self.clip).hello_world()
+    def test_bootstrap_cdn  (self): self.view_examples.bootstrap_cdn()
+    def test_bootstrap_local(self): self.view_examples.bootstrap_local()
+    def test_folder_root    (self): self.view_examples.folder_root()
 
-        self.render_page.clip = {'x': 1, 'y': 1, 'width': 220, 'height': 50}
-        self.render_page.hello_world()
-
-    def test_bootstrap_cdn(self):
-        self.render_page.bootstrap_cdn()
-
-    def test_zipped_views(self):
-        zip_file = self.render_page.zipped_views()
-        Dev.pprint(zip_file)
-        os.remove(zip_file)
+    def test_render_file_from_zip(self):
+        self.view_examples.render_file_from_zip('/examples/hello-world.html')
