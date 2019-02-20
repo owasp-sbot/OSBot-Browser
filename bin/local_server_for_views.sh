@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-cd ../views
+cd ./src/web_root
 python -m SimpleHTTPServer 12345

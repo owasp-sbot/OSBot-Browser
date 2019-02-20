@@ -9,7 +9,7 @@ class View_Examples:
 
     def __init__(self,tmp_img=None, clip=None):
         self.render_page = Render_Page()
-        self.path_views  = Files.path_combine('.','../../views')
+        self.path_views  = Files.path_combine('.','../../src/web_root')
         self.tmp_img     = tmp_img
         self.clip        = clip
 
