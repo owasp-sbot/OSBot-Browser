@@ -1,0 +1,22 @@
+<html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="icon" href="data:;base64,=">
+    </head>
+    <body>
+        <div id="md_html"></div>
+
+<div id='md_code' style="display:none">{{Markdown}}</div>
+
+    <script>
+        function convert(text)
+        {
+            var converter = new showdown.Converter()
+            html      = converter.makeHtml(text);
+            document.getElementById('md_html').innerHTML = html
+        }
+        convert('# hello, markdown!\nfrom lambda')
+    </script>
+    </body>
+</html>

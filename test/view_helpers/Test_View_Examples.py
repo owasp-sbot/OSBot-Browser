@@ -6,6 +6,7 @@ from src.view_helpers.View_Examples import View_Examples
 from utils.Dev import Dev
 from utils.Misc import Misc
 from utils.Zip_Folder import Zip_Folder
+from utils.aws.Lambdas import Lambdas
 
 
 class Test_View_Examples(TestCase):
@@ -24,3 +25,15 @@ class Test_View_Examples(TestCase):
     def test_visjs_simnple  (self): self.view_examples.render_file_from_zip('/examples/vis-js.html')
 
     def test_render_file_from_zip(self): self.view_examples.render_file_from_zip('/examples/hello-world.html')
+
+    def test_open_file_in_browser__markdown(self):
+        result = self.view_examples.open_file_in_browser('/examples/markdown.html')
+        Dev.pprint(result)
+
+    def test_open_file_in_browser__markdown_with_js(self):
+        js_code= { 'name': 'convert', 'params' : '# aaaa \n 123 \n - bullet point \n - another one ![](http://visjs.org/images/gettingstartedSlide.png)'}
+        result = self.view_examples.open_file_in_browser('/examples/markdown.html',js_code)
+        Dev.print(result('#md_html').html())
+
+    def test_update_lambda(self):
+        Lambdas('browser.lambda_browser').update_with_src()
