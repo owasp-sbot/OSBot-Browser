@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+  <title>Wardley Map</title>
+  <link rel="icon" href="data:;base64,=">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+  <script src="/js/browser-compiler-coffeescript.js"></script>
+
+  <style type="text/css">
+    #vis_js {
+      top      : 5px;
+      bottom   : 5px;
+      left     : 5px;
+      right    : 5px;
+      position : fixed;
+      border:  1px solid lightgray;
+    }
+
+    #mynetwork {
+      width: 880px;
+      height: 600px;
+
+      border:  1px solid lightgray;
+    }
+  </style>
+</head>
+<body>
+<div id="vis_js"></div>
+<script type="text/javascript">
+  // create an array with nodes
+  var nodes = new vis.DataSet([]);
+  var edges = new vis.DataSet([]);
+
+  var container = document.getElementById('vis_js');
+  var data = {
+    nodes: nodes,
+    edges: edges
+  };
+  var options = {};
+
+  var network = new vis.Network(container, data, options);
+
+</script>
+
+    <script type="text/coffeescript" src="./Canvas_Draw.coffee"></script>
+    <script type="text/coffeescript" src="./Api_VisJs.coffee"></script>
+</body>
+</html>

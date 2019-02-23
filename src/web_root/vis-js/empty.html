@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+  <title>Vis js graph</title>
+  <link rel="icon" href="data:;base64,=">
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css" />
+
+  <style type="text/css">
+    #_vis_js {
+      width: 500px;
+      height: 400px;
+      border: 1px solid lightgray;
+    }
+    #vis_js {
+      top      : 5px;
+      bottom   : 5px;
+      left     : 5px;
+      right    : 5px;
+      position : fixed;
+      border:  1px solid lightgray;
+    }
+  </style>
+</head>
+<body>
+
+<div id="vis_js"></div>
+
+<script type="text/javascript">
+
+  var container = document.getElementById('vis_js');
+  var data = {
+    nodes: [],
+    edges: []
+  };
+  var options = {};
+  var network = new vis.Network(container, data, options);
+</script>
+
+
+</body>
+</html>
