@@ -35,5 +35,9 @@ class Test_View_Examples(TestCase):
         result = self.view_examples.open_file_in_browser('/examples/markdown.html',js_code)
         Dev.print(result('#md_html').html())
 
+    def test_open_file_in_browser__r1_and_r2(self):
+        result = self.view_examples.open_file_in_browser('/gs/risk/r1-and-r2.html')
+        Dev.pprint(result)
+
     def test_update_lambda(self):
         Lambdas('browser.lambda_browser').update_with_src()
