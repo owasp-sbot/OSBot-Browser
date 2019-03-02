@@ -4,6 +4,7 @@ class R1_and_R2
 
   create_table: ()=>
     $('.risks_table thead tr').html('') # clear existing table
+    $('.risks_table tbody').html('')
     for i in [1..@.cells]
       header = $("<th id='r#{i}' >")
       $('.risks_table thead tr').append(header)

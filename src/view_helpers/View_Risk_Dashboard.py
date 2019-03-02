@@ -1,3 +1,5 @@
+import json
+
 from browser.Render_Page import Render_Page
 from utils.Dev import Dev
 from utils.Files import Files
@@ -16,6 +18,17 @@ class Risk_Dashboard:
     def get_dashboard_data(self, path):
         json_file = Files.parent_folder_combine(__file__, path)
         return Json.load_json(json_file)
+
+    def get_test_params(self,cells, rows):
+        params = {'cells': cells, 'rows': rows, 'data_R1s': {}, 'data_R2s': {}}
+        for i in range(1, params.get('cells') + 1):
+            header_id = 'r{0}'.format(i)
+            params['data_R1s'][header_id] = header_id
+        for j in range(1, params.get('cells') + 1):
+            for i in range(1, params.get('rows') + 1):
+                header_id = 'r{0}_{1}'.format(j, i)
+                params['data_R1s'][header_id] = header_id
+        return params
 
     def show_chrome(self):
         self.render_page.api_browser.headless   = False
@@ -36,3 +49,11 @@ class Risk_Dashboard:
 
     def js_eval(self, js_code):
         return self.browser().sync__js_execute(js_code)
+
+    def js_apply_css_color(self, js_codes, r2_id, index):
+        color   = '#{0}{0}{1}{1}00'.format('FEDCBA9876543210'[index], 'FEDCBA9876543210'[16 - index])
+        css     = {'background-color': color}
+        js_code = "$('#{0}').css({1})".format(r2_id, json.dumps(css))
+        #self.js_eval(js_code)
+        js_codes.append(js_code)
+        return self
