@@ -1,15 +1,6 @@
-import base64
-import json
 from unittest import TestCase
-
-from syncer import sync
-
-from src.view_helpers.View_Examples import View_Examples
-from src.view_helpers.View_Risk_Dashboard import Risk_Dashboard
+from view_helpers.Risk_Dashboard import Risk_Dashboard
 from utils.Dev import Dev
-from utils.Files import Files
-from utils.Json import Json
-
 
 class Test_risk_dashboard(TestCase):
     def setUp(self):
@@ -41,16 +32,10 @@ class Test_risk_dashboard(TestCase):
         params = self.risk_dashboard.get_test_params(1,10)
         self.risk_dashboard.execute('create_risk_table', params)
 
-    def test_set_r2_color(self):
-        self.test_set_table_values__random_data()
+    def test_create_dashboard_with_test_data(self):
+        result = self.risk_dashboard.create_dashboard_with_test_data()
+        Dev.pprint(result)
 
-        row = 1
-        js_codes = []
-        for i in range(1,11):
-            r2_id = "r{0}_{1}".format(row, i)
-            self.risk_dashboard.js_apply_css_color( js_codes, r2_id, i)
-
-        self.risk_dashboard.js_eval(js_codes)
 
 
 
