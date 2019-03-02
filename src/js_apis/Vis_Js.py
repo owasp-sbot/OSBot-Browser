@@ -11,16 +11,20 @@ class Vis_Js:
         #window.api_visjs
         self.browser        = None
 
+    def add_edge__js_code(self, from_node, to_node):
+        edge = {'from': str(from_node), 'to': str(to_node)}
+        return 'network.body.data.edges.add({0});'.format(json.dumps(edge))
+
     def add_edge(self, from_node, to_node):
-        edge = {'from': str(from_node), 'to': str(to_node) }
-        js_code = 'network.body.data.edges.add({0});'.format(json.dumps(edge))
-        self.exec_js(js_code)
+        self.exec_js(self.add_edge__js_code(from_node,to_node))
         return self
 
+    def add_node__js_code(self, node_id, node_label, shape='box', color=None):
+        node = {'id': str(node_id), 'label': str(node_label), 'shape': shape, 'color': color}
+        return 'network.body.data.nodes.add({0});'.format(json.dumps(node))
+
     def add_node(self,node_id, node_label, shape='box',color=None):
-        node = {'id': str(node_id), 'label': str(node_label), 'shape': shape , 'color': color }
-        js_code = 'network.body.data.nodes.add({0});'.format(json.dumps(node))
-        self.exec_js(js_code)
+        self.exec_js(self.add_node__js_code(node_id, node_label, shape, color))
         return self
 
     def exec_js(self,js_code):
@@ -32,3 +36,6 @@ class Vis_Js:
         self.browser.open_local_file(self.base_html_file)
         return self
 
+
+    #def create_screenshot(self):
+    #    return self.browser().sync__screenshot()

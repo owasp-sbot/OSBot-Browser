@@ -54,12 +54,16 @@ class Risk_Dashboard:
         return self.browser().sync__js_execute(js_code)
 
     def js_apply_css_color(self, js_codes, r2_id, index):
-        if index < 1:                                           # min value is 1
-            index = 1                                           # since we start the rows on 1
-        if index > 15:                                          # max value can be bigger than 16
-            index = 16                                          # since that is the size of the Hex digits
-        hex_values = 'FEDCBA9876543210'
-        color   = '#{0}{0}{1}{1}00'.format(hex_values[index - 1], hex_values[16 - index])   # get the color changing the RGB values (R = Red , G = Green)
+        # if index < 1:                                           # min value is 1
+        #     index = 1                                           # since we start the rows on 1
+        # if index > 15:                                          # max value can be bigger than 16
+        #     index = 16                                          # since that is the size of the Hex digits
+        # hex_values = 'FEDCBA9876543210'
+        # color   = '#{0}{0}{1}{1}00'.format(hex_values[index - 1], hex_values[16 - index])   # get the color changing the RGB values (R = Red , G = Green)
+        if index < 1 : index = 1
+        if index > 5 : index = 5
+        colors = ['darkred','red','orange','darkgreen','green']
+        color  = colors[index - 1]
         css     = {'background-color': color}
         js_code = "if ($('#{0}').text() != '') {{ $('#{0}').css({1}) }}".format(r2_id, json.dumps(css))
         js_codes.append(js_code)
@@ -71,7 +75,7 @@ class Risk_Dashboard:
         return Browser_Lamdba_Helper().send_png_file_to_slack(team_id, channel, 'risk dashboard', png_file)
 
     def create_dashboard_screenshot(self):
-        clip = {'x': 1, 'y': 1, 'width': 915, 'height': 435}
+        clip = {'x': 1, 'y': 1, 'width': 945, 'height': 465}
         return self.browser().sync__screenshot(clip=clip)
 
     def create_dashboard_with_test_data(self):
@@ -96,7 +100,7 @@ class Risk_Dashboard:
         for i in range(1, cells + 1):
             for j in range(1, rows + 1):
                 r2_id = "r{0}_{1}".format(i, j)
-                color = Misc.random_number(0, 11)
+                color = Misc.random_number(1, 5)
                 #color = j
                 self.js_apply_css_color(js_codes, r2_id, color)
 

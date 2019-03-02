@@ -12,6 +12,11 @@ class Test_Vis_Js(TestCase):
         self.vis_js  = Vis_Js().setup()
         self.browser = self.vis_js.browser
 
+    def tearDown(self):
+        png_data = self.browser.get_screenshot_png()
+        self.browser.save_png_data(png_data)
+
+
     def test_add_node(self):
         (
             self.vis_js.add_node('1','first node')
@@ -21,11 +26,15 @@ class Test_Vis_Js(TestCase):
 
     def test_add_node__100_nodes(self):
         colors = ['#9999FF','lightred','lightgreen']
-        self.vis_js.add_node('root', 'root_node','box')
-        for i in range(0,100):
+        js_codes = []
+        js_codes.append(self.vis_js.add_node__js_code('root', 'root_node','box'))
+
+        for i in range(0,50):
             color = colors[i % 3]
-            self.vis_js.add_node(i,i, color=color)      \
-                       .add_edge('root', i)
+            js_codes.append(self.vis_js.add_node__js_code(i,i, color=color))
+            js_codes.append(self.vis_js.add_edge__js_code('root', i))
+
+        self.vis_js.exec_js(js_codes)
 
     #def test_set_nodes
 
