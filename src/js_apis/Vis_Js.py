@@ -1,15 +1,49 @@
+import base64
 import json
 
+from browser.API_Browser import API_Browser
 from browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
+from browser.Render_Page import Render_Page
 from utils.Dev import Dev
+from utils.Files import Files
+from utils.Local_Cache import use_local_cache_if_available
+from utils.aws.Lambdas import Lambdas
 
 
 class Vis_Js:
     def __init__(self):
-        #self.base_html_file = '/vis-js/empty.html'
-        self.base_html_file = '/vis-js/simple.html'
-        #window.api_visjs
-        self.browser        = None
+        self.web_page    = '/vis-js/simple.html'
+        self.web_root    = Files.path_combine(Files.parent_folder(__file__), '../web_root')
+        self.api_browser = API_Browser().sync__setup_browser()
+        self.render_page = Render_Page(api_browser=self.api_browser, web_root=self.web_root)
+
+
+
+        # #self.base_html_file = '/vis-js/empty.html'
+        # self.base_html_file = '/vis-js/simple.html'
+        # #window.api_visjs
+        # self.headless       = False
+        # self.browser        = None
+
+    # common methods (move to base class)
+    def browser(self):
+        return self.api_browser
+
+    def load_page(self,reload=False):
+        if reload or self.web_page not in self.browser().sync__url():
+            self.render_page.open_file_in_browser(self.web_page)
+        return self
+
+    def create_dashboard_screenshot(self):
+        #clip = {'x': 1, 'y': 1, 'width': 945, 'height': 465}
+        clip = None
+        return self.browser().sync__screenshot(clip=clip)
+
+    def send_screenshot_to_slack(self, team_id, channel):
+        png_file = self.create_dashboard_screenshot()
+        return Browser_Lamdba_Helper().send_png_file_to_slack(team_id, channel, 'risk dashboard', png_file)
+
+    # Vis js specific
 
     def add_edge__js_code(self, from_node, to_node):
         edge = {'from': str(from_node), 'to': str(to_node)}
@@ -27,15 +61,74 @@ class Vis_Js:
         self.exec_js(self.add_node__js_code(node_id, node_label, shape, color))
         return self
 
-    def exec_js(self,js_code):
-        return self.browser.api_browser.sync__js_execute(js_code)
+    def create_graph(self, nodes = [] ,edges = [],options = None):
+        if options is None:
+            options = self.get_default_options()
 
-    def setup(self):
-        self.browser = Browser_Lamdba_Helper().setup()
-        #self.browser.open_local_file(, js_code)
-        self.browser.open_local_file(self.base_html_file)
+        data = {'nodes': nodes, 'edges': edges}
+        base64_data = base64.b64encode(json.dumps(data).encode()).decode()
+        base64_options = base64.b64encode(json.dumps(options).encode()).decode()
+        js_code = "window.network = new vis.Network(container, JSON.parse(atob('{0}')), JSON.parse(atob('{1}')));".format(
+            base64_data, base64_options)
+        #self.browser().sync__browser_width(400, 400)
+        self.exec_js(js_code)
+        #js_code = "$('#vis_js').css({ top      : '5px', bottom   : '5px', left     : '5px', right    : '5px', position : 'fixed', border:  '1px solid lightgray'})"
         return self
 
+    def exec_js(self,js_code):
+        return self.browser().sync__js_execute(js_code)
 
-    #def create_screenshot(self):
-    #    return self.browser().sync__screenshot()
+
+    def get_default_options(self):
+        options = {
+                'nodes'  : { 'font': { 'face' : 'Arial', 'size': 20                       },
+                             'shape' : 'box'                                              },
+                'edges'  : { 'smooth': False, 'arrows': 'to', 'color': {'color': 'black'}, 'font': { 'size': 10 } },
+
+                'layout' : { 'randomSeed': 0                                              },
+                'physics': { 'barnesHut': { 'gravitationalConstant': -700     ,    # (-2000
+                                            'centralGravity'       :  0.1    ,    # (0.01) no central gravity since we don't need that
+                                            'springLength'         :  50      ,    # (100) this value is also set by the anchor edges
+                                            'springConstant'       :  0.0015  ,      # (0.08) this is how hard the spring is
+                                            'damping'              :  0.4     ,    # (0.4
+                                            'avoidOverlap'         :  0/2                   },
+                            'maxVelocity' : 10,                       # (50) keep this low so that the nodes don'y move too far from each other
+                            'minVelocity' : 1,                        # (0.1)
+                            'solver'      : 'barnesHut',              #       other good option is forceAtlas2Based',
+                            'timestep'    : 1.35,                     # (0.5) this value can be used to slow down the animation (for ex 0.015)
+                            'stabilization': {
+                                'enabled'       : True,
+                                'iterations'    : 2000,
+                                'updateInterval': 100
+                            }
+
+                },
+                'interaction': { 'dragNodes': True ,
+                                 'zoomView' : True ,
+                                 'dragView' : True  } }
+        return options
+
+    #@use_local_cache_if_available
+    def get_graph_data(self, graph_name):
+        params = {'params': ['raw_data', graph_name, 'details'], 'data': {}}
+        return Lambdas('gs.lambda_graph').invoke(params)
+
+    def show_jira_graph(self, graph_name, label_key='Summary'):
+        self.load_page(False)
+        graph_data = self.get_graph_data(graph_name)
+        if graph_data:
+            nodes = []
+            edges = []
+            for key,value in graph_data.get('nodes').items():
+                nodes.append({ 'id' : key , 'label': value.get(label_key)})
+                #print(key,value)
+
+            for edge in graph_data.get('edges'):
+                from_node = edge[0]
+                link_type = edge[1]
+                to_node   = edge[2]
+                edges.append({'from' : from_node , 'to': to_node , 'label' : link_type})
+
+            self.create_graph(nodes,edges)
+
+        return graph_data
