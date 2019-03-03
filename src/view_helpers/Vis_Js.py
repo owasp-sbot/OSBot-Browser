@@ -79,7 +79,7 @@ class Vis_Js:
         js_code = "window.network = new vis.Network(container, JSON.parse(atob('{0}')), JSON.parse(atob('{1}')));".format(base64_data, base64_options)
 
         #self.browser().sync__browser_width(500, 400)
-        #self.browser().sync__browser_width(2000)
+        self.browser().sync__browser_width(2000)
 
         self.exec_js(js_code)
         #js_code = [
@@ -89,11 +89,15 @@ class Vis_Js:
         #    "network.on('stabilized', function(data) {console.log('stabilized', data) })"]
         #self.exec_js(js_code)
 
-        # need to handle the case when rendering happens very quickly
-        if len(nodes) > 10:
-            js_code = "network.on('stabilizationIterationsDone', function(data){ $('body').append('<span id=stabilizationIterationsDone />') })"
-            self.exec_js(js_code)
+        js_code = "network.on('stabilizationIterationsDone', function(data){ $('body').append('<span id=stabilizationIterationsDone />') })"
+        self.exec_js(js_code)
+        if self.exec_js("network.physics.ready") is False:
             self.browser().sync__await_for_element('#stabilizationIterationsDone', 20000)
+        #self.exec_js("network.on('stabilizationIterationsDone', function(data){console.log('stabilizationIterationsDone', data) })")
+        #Dev.print(self.exec_js("network.physics.ready"))
+        # need to handle the case when rendering happens very quickly
+        #if len(nodes) > 10:
+
 
         #js_code = "$('#vis_js').css({ top      : '5px', bottom   : '5px', left     : '5px', right    : '5px', position : 'fixed', border:  '1px solid lightgray'})"
         return self

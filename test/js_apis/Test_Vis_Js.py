@@ -9,7 +9,7 @@ from utils.Dev import Dev
 
 class Test_Vis_Js(TestCase):
     def setUp(self):
-        self.headless = True
+        self.headless = False
         self.vis_js   = Vis_Js(self.headless)
         self.browser  = self.vis_js.browser()
 
@@ -85,8 +85,8 @@ class Test_Vis_Js(TestCase):
         label_key = 'Issue Type'
         label_key = 'Summary'
         #graph_name = 'graph_MKF'
-        #graph_name = 'graph_YT4'
-        graph_name = 'graph_XKW'
+        graph_name = 'graph_YT4'
+        #graph_name = 'graph_XKW'
         result = self.vis_js.show_jira_graph(graph_name, label_key=label_key)
         #result = self.vis_js.send_screenshot_to_slack(None, None)
         Dev.print(result)

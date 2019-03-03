@@ -28,8 +28,10 @@ class Test_Vis_Js_Views(TestCase):
         #self.png_data = Vis_Js_Views.no_labels(params=['aaaa__bbbb'])
 
     def test_node_label(self):
-        self.graph_name = ['graph_DEQ']
+        self.graph_name = ['graph_VKN']
         label_key       = 'Summary'
+        #label_key       = 'Issue Type'
+
         self.png_data = Vis_Js_Views.node_label(params=[self.graph_name, label_key])
         #Dev.pprint(self.png_data)
 

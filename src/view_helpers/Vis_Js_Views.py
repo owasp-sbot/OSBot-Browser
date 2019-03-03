@@ -51,11 +51,13 @@ class Vis_Js_Views:
     @staticmethod
     def node_label(team_id=None, channel=None, params=None):
 
-        if len(params) != 2:
+        if len(params) < 2:
             return "':red_circle: Hi, for the `node_label` view, you need to provide the label field name. Try: `Key`, `Summary`, `Rating`, `Status`"
 
         #graph_name = params[0]
-        label_key  = params[1]
+        label_key  = ' '.join(params[1:])
+        #label_key = params[1]
+
         (nodes, edges, graph_data,vis_js) = Vis_Js_Views.default(params=params, no_render=True)
 
         issues = graph_data.get('nodes')
@@ -68,6 +70,7 @@ class Vis_Js_Views:
         for edge in edges:
             del edge['label']
 
-        options = { 'nodes': {'shape' : 'box'} }
-
+        options = { 'nodes': {'shape' : 'box' },
+                    'edges': {'arrows': 'to'  }}
+        options = None
         return vis_js.create_graph_and_send_screenshot_to_slack(nodes,edges, options, team_id, channel)
