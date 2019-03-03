@@ -84,8 +84,8 @@ class Test_Vis_Js(TestCase):
     def test_show_jira_graph(self):
         label_key = 'Issue Type'
         label_key = 'Summary'
-        #graph_name = 'graph_MKF'
-        graph_name = 'graph_YT4'
+        graph_name = 'graph_MKF'
+        #graph_name = 'graph_YT4'
         #graph_name = 'graph_XKW'
         result = self.vis_js.show_jira_graph(graph_name, label_key=label_key)
         #result = self.vis_js.send_screenshot_to_slack(None, None)

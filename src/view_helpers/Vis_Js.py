@@ -79,7 +79,8 @@ class Vis_Js:
         js_code = "window.network = new vis.Network(container, JSON.parse(atob('{0}')), JSON.parse(atob('{1}')));".format(base64_data, base64_options)
 
         #self.browser().sync__browser_width(500, 400)
-        self.browser().sync__browser_width(2000)
+        if len(nodes) > 40:
+            self.browser().sync__browser_width(2000)
 
         self.exec_js(js_code)
         #js_code = [
@@ -138,12 +139,14 @@ class Vis_Js:
     #@use_local_cache_if_available
     def get_graph_data(self, graph_name):
         params = {'params': ['raw_data', graph_name, 'details'], 'data': {}}
-        s3_key = Lambdas('gs.lambda_graph').invoke(params)
-        if type(s3_key) is str:
+        data   = Lambdas('gs.lambda_graph').invoke(params)
+        if type(data) is str:
+            s3_key = data
             s3_bucket = 'gs-lambda-tests'
             tmp_file = S3().file_download_and_delete(s3_bucket,s3_key)
             data = Json.load_json_and_delete(tmp_file)
             return data
+        return data
 
     def show_jira_graph(self, graph_name, label_key='Summary'):
         self.load_page(False)
