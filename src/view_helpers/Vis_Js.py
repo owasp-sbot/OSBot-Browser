@@ -31,6 +31,10 @@ class Vis_Js:
     def browser(self):
         return self.api_browser
 
+    def browser_width(self,value):
+        self.browser().sync__browser_width(value)
+        return self
+
     def load_page(self,reload=False):
         if reload or self.web_page not in self.browser().sync__url():
             self.render_page.open_file_in_browser(self.web_page)
@@ -79,7 +83,7 @@ class Vis_Js:
         js_code = "window.network = new vis.Network(container, JSON.parse(atob('{0}')), JSON.parse(atob('{1}')));".format(base64_data, base64_options)
 
         #self.browser().sync__browser_width(500, 400)
-        if len(nodes) > 40:
+        if len(nodes) > 30:
             self.browser().sync__browser_width(2000)
 
         self.exec_js(js_code)
@@ -106,8 +110,12 @@ class Vis_Js:
     def exec_js(self,js_code):
         return self.browser().sync__js_execute(js_code)
 
-
     def get_default_options(self):
+        return {    'nodes': {'shape': 'box'},
+                    'edges': {'arrows': 'to'},
+                    'physics': { 'barnesHut': { 'avoidOverlap': 0.1 }, }}
+
+    def get_advanced_options(self):
         options = {
                 'nodes'  : { 'font': { 'face' : 'Arial', 'size': 20                       },
                              'shape' : 'box'                                              },

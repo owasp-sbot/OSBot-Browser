@@ -13,7 +13,8 @@ class Test_Vis_Js_Views(TestCase):
         self.png_data   = None
 
     def tearDown(self):
-        Browser_Lamdba_Helper().save_png_data(self.png_data)
+        if self.png_data:
+            Browser_Lamdba_Helper().save_png_data(self.png_data)
 
     def test_default(self):
         graph_name = 'graph_XKW'    # (7 nodes)
@@ -35,6 +36,15 @@ class Test_Vis_Js_Views(TestCase):
         self.png_data = Vis_Js_Views.node_label(params=[self.graph_name, label_key])
         #Dev.pprint(self.png_data)
 
+    def test_r0_r1_r2(self):
+        self.graph_name = 'graph_YXF'
+        self.png_data = Vis_Js_Views.r0_r1_r2(params=[self.graph_name])
+        #Dev.pprint(self.png_data)
+        self.png_data = None
+
+    def test_by_status(self):
+        self.png_data = Vis_Js_Views.by_status(params=['graph_YXF'])
+        self.png_data = None
 
     def test_update_lambda(self):
         Lambdas('browser.lambda_browser').update_with_src()
