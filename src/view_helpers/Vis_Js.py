@@ -45,6 +45,11 @@ class Vis_Js:
         png_file = self.create_dashboard_screenshot()
         return Browser_Lamdba_Helper().send_png_file_to_slack(team_id, channel, 'risk dashboard', png_file)
 
+    def create_graph_and_send_screenshot_to_slack(self,nodes, edges,options, team_id, channel):
+        if len(nodes) >0:
+            self.create_graph(nodes, edges,options)
+            return self.send_screenshot_to_slack(team_id, channel)
+
     # Vis js specific
 
     def add_edge__js_code(self, from_node, to_node):
@@ -71,9 +76,11 @@ class Vis_Js:
         data = {'nodes': nodes, 'edges': edges}
         base64_data = base64.b64encode(json.dumps(data).encode()).decode()
         base64_options = base64.b64encode(json.dumps(options).encode()).decode()
-        js_code = "window.network = new vis.Network(container, JSON.parse(atob('{0}')), JSON.parse(atob('{1}')));".format(
-            base64_data, base64_options)
-        self.browser().sync__browser_width(500, 400)
+        js_code = "window.network = new vis.Network(container, JSON.parse(atob('{0}')), JSON.parse(atob('{1}')));".format(base64_data, base64_options)
+
+        #self.browser().sync__browser_width(500, 400)
+        #self.browser().sync__browser_width(2000)
+
         self.exec_js(js_code)
         #js_code = [
         #    "network.on('startStabilizing'          , function(data){console.log('startStabilizing', data)})",
@@ -82,10 +89,11 @@ class Vis_Js:
         #    "network.on('stabilized', function(data) {console.log('stabilized', data) })"]
         #self.exec_js(js_code)
 
-        #js_code = "network.on('stabilizationIterationsDone', function(data){ console.log('done') ; $('body').append('<span id=stabilizationIterationsDone />') })"
-        #self.exec_js(js_code)
-
-        #self.browser().sync__await_for_element('#stabilizationIterationsDone', 60000)
+        # need to handle the case when rendering happens very quickly
+        if len(nodes) > 10:
+            js_code = "network.on('stabilizationIterationsDone', function(data){ $('body').append('<span id=stabilizationIterationsDone />') })"
+            self.exec_js(js_code)
+            self.browser().sync__await_for_element('#stabilizationIterationsDone', 20000)
 
         #js_code = "$('#vis_js').css({ top      : '5px', bottom   : '5px', left     : '5px', right    : '5px', position : 'fixed', border:  '1px solid lightgray'})"
         return self
@@ -127,10 +135,11 @@ class Vis_Js:
     def get_graph_data(self, graph_name):
         params = {'params': ['raw_data', graph_name, 'details'], 'data': {}}
         s3_key = Lambdas('gs.lambda_graph').invoke(params)
-        s3_bucket = 'gs-lambda-tests'
-        tmp_file = S3().file_download_and_delete(s3_bucket,s3_key)
-        data = Json.load_json_and_delete(tmp_file)
-        return data
+        if type(s3_key) is str:
+            s3_bucket = 'gs-lambda-tests'
+            tmp_file = S3().file_download_and_delete(s3_bucket,s3_key)
+            data = Json.load_json_and_delete(tmp_file)
+            return data
 
     def show_jira_graph(self, graph_name, label_key='Summary'):
         self.load_page(False)
