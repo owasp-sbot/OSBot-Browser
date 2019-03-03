@@ -6,15 +6,17 @@ from browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 from browser.Render_Page import Render_Page
 from utils.Dev import Dev
 from utils.Files import Files
+from utils.Json import Json
 from utils.Local_Cache import use_local_cache_if_available
 from utils.aws.Lambdas import Lambdas
+from utils.aws.s3 import S3
 
 
 class Vis_Js:
-    def __init__(self):
+    def __init__(self, headless=True):
         self.web_page    = '/vis-js/simple.html'
         self.web_root    = Files.path_combine(Files.parent_folder(__file__), '../web_root')
-        self.api_browser = API_Browser().sync__setup_browser()
+        self.api_browser = API_Browser(headless=headless,auto_close=headless).sync__setup_browser()
         self.render_page = Render_Page(api_browser=self.api_browser, web_root=self.web_root)
 
 
@@ -62,7 +64,8 @@ class Vis_Js:
         return self
 
     def create_graph(self, nodes = [] ,edges = [],options = None):
-        if options is None:
+        self.load_page(True)
+        if options is None or options == {}:
             options = self.get_default_options()
 
         data = {'nodes': nodes, 'edges': edges}
@@ -70,8 +73,20 @@ class Vis_Js:
         base64_options = base64.b64encode(json.dumps(options).encode()).decode()
         js_code = "window.network = new vis.Network(container, JSON.parse(atob('{0}')), JSON.parse(atob('{1}')));".format(
             base64_data, base64_options)
-        #self.browser().sync__browser_width(400, 400)
+        self.browser().sync__browser_width(500, 400)
         self.exec_js(js_code)
+        #js_code = [
+        #    "network.on('startStabilizing'          , function(data){console.log('startStabilizing', data)})",
+        #    "network.on('stabilizationProgress'     , function(data){console.log('stabilizationProgress', data)})",
+        #    "network.on('stabilizationIterationsDone', function(data){console.log('stabilizationIterationsDone', data) })",
+        #    "network.on('stabilized', function(data) {console.log('stabilized', data) })"]
+        #self.exec_js(js_code)
+
+        #js_code = "network.on('stabilizationIterationsDone', function(data){ console.log('done') ; $('body').append('<span id=stabilizationIterationsDone />') })"
+        #self.exec_js(js_code)
+
+        #self.browser().sync__await_for_element('#stabilizationIterationsDone', 60000)
+
         #js_code = "$('#vis_js').css({ top      : '5px', bottom   : '5px', left     : '5px', right    : '5px', position : 'fixed', border:  '1px solid lightgray'})"
         return self
 
@@ -87,11 +102,11 @@ class Vis_Js:
 
                 'layout' : { 'randomSeed': 0                                              },
                 'physics': { 'barnesHut': { 'gravitationalConstant': -700     ,    # (-2000
-                                            'centralGravity'       :  0.1    ,    # (0.01) no central gravity since we don't need that
+                                            'centralGravity'       :  0.01    ,    # (0.01) no central gravity since we don't need that
                                             'springLength'         :  50      ,    # (100) this value is also set by the anchor edges
                                             'springConstant'       :  0.0015  ,      # (0.08) this is how hard the spring is
                                             'damping'              :  0.4     ,    # (0.4
-                                            'avoidOverlap'         :  0/2                   },
+                                            'avoidOverlap'         :  0.3                   },
                             'maxVelocity' : 10,                       # (50) keep this low so that the nodes don'y move too far from each other
                             'minVelocity' : 1,                        # (0.1)
                             'solver'      : 'barnesHut',              #       other good option is forceAtlas2Based',
@@ -111,7 +126,11 @@ class Vis_Js:
     #@use_local_cache_if_available
     def get_graph_data(self, graph_name):
         params = {'params': ['raw_data', graph_name, 'details'], 'data': {}}
-        return Lambdas('gs.lambda_graph').invoke(params)
+        s3_key = Lambdas('gs.lambda_graph').invoke(params)
+        s3_bucket = 'gs-lambda-tests'
+        tmp_file = S3().file_download_and_delete(s3_bucket,s3_key)
+        data = Json.load_json_and_delete(tmp_file)
+        return data
 
     def show_jira_graph(self, graph_name, label_key='Summary'):
         self.load_page(False)
@@ -119,9 +138,12 @@ class Vis_Js:
         if graph_data:
             nodes = []
             edges = []
-            for key,value in graph_data.get('nodes').items():
-                nodes.append({ 'id' : key , 'label': value.get(label_key)})
-                #print(key,value)
+            for key, issue in graph_data.get('nodes').items():
+
+                #label = "{0} \n \n{1}".format(issue.get(label_key),issue.get('Labels'))
+                label = key
+                nodes.append({ 'id' : key , 'label': label})
+                #Dev.pprint(issue)
 
             for edge in graph_data.get('edges'):
                 from_node = edge[0]
