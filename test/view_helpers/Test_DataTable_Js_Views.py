@@ -19,6 +19,7 @@ class Test_DataTable_Js_Views(TestCase):
         #graph_name = 'graph_YT4'   # (199 nodes, 236 edges)
         #graph_name = 'graph_VZ5'   # (367 nodes, 653 edges)
         graph_name  = 'graph_W4T'   # R1 Labels (from search results)
+        graph_name = 'graph_9CP'
         self.png_data = DataTable_Js_Views.graph(params=[graph_name])
 
     def test_graph_all_fields(self):

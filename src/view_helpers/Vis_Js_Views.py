@@ -1,6 +1,7 @@
 from utils.Dev import Dev
 from utils.Misc import Misc
 from utils.aws.Lambdas import load_dependencies
+from view_helpers.Edge_Format import Edge_Format
 from view_helpers.Node_Format import Node_Format
 
 
@@ -79,7 +80,7 @@ class Vis_Js_Views:
     # Issues layouts
 
     @staticmethod
-    def by_status(team_id=None, channel=None, params=None):
+    def by_rating(team_id=None, channel=None, params=None):
         (nodes, edges, graph_data, vis_js) = Vis_Js_Views.default(params=params, no_render=True)
         issues = graph_data.get('nodes')
         options ={}
@@ -88,8 +89,8 @@ class Vis_Js_Views:
             (
                     Node_Format .rating_color(node, issue)
                                 .size_by_r123(node, issue)
-                                .set_Label   (node, issue, 'Summary')
-                                .only_highs  (node, issue)
+                                #.set_Label   (node, issue, 'Summary')
+                                #.only_highs  (node, issue)
                                 #.add_Key_to_Label(node)
             )
 
@@ -100,6 +101,90 @@ class Vis_Js_Views:
                           .create_graph(nodes, edges, options)
                           .browser_width(3000)
                           .send_screenshot_to_slack(team_id, channel) )
+
+    def by_status(team_id=None, channel=None, params=None):
+        (nodes, edges, graph_data, vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+        issues = graph_data.get('nodes')
+
+        for node in nodes:
+            issue = issues.get(node.get('id'))
+            (
+                    Node_Format .status_color    (node, issue)
+                                .size_by_r123    (node, issue, False)
+                                .set_label       (node, issue, 'Summary')
+                                #.only_highs     (node, issue)
+                                .add_key_to_label(node)
+                                .add_status_to_label(node, issue)
+                                #.no_label       (node)
+                                #.set_r1_positions(node)
+            )
+
+        for edge in edges:
+            edge['label'] = ''
+
+        #edges = []
+        options = {}
+        return (    vis_js.load_page(True)
+                          .create_graph(nodes, edges, options)
+                          .browser_width(2000)
+                          .send_screenshot_to_slack(team_id, channel) )
+
+    @staticmethod
+    def by_issue_type(team_id=None, channel=None, params=None):
+        (nodes, edges, graph_data, vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+        issues = graph_data.get('nodes')
+        options = {}
+        for node in list(nodes):
+            issue_id = node.get('id')
+
+            #if issue_id =='GSSP-115': nodes.remove(node)
+
+            issue = issues.get(issue_id)
+            (
+                Node_Format .issue_type_color       (node, issue, True)
+                            .size_by_r123           (node, issue, False)
+                            .set_label              (node, issue, 'Summary')
+                            .add_issue_type_to_label(node, issue)
+                            #.no_label        (node)
+                            #.add_Key_to_Label (node)
+            )
+
+        Edge_Format.no_labels(edges)
+
+        return (vis_js.load_page(True)
+                .create_graph(nodes, edges, options)
+                .browser_width(2000)
+                .send_screenshot_to_slack(team_id, channel))
+
+    @staticmethod
+    def r1_pinned(team_id=None, channel=None, params=None):
+        (nodes, edges, graph_data, vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+        issues = graph_data.get('nodes')
+        options = {}
+        for node in list(nodes):
+            issue_id = node.get('id')
+
+            #if issue_id =='GSSP-115': nodes.remove(node)
+
+            issue = issues.get(issue_id)
+            (
+                Node_Format .issue_type_color       (node, issue, True)
+                            .size_by_r123           (node, issue, False)
+                            .set_label              (node, issue, 'Summary')
+                            .add_issue_type_to_label(node, issue)
+                            .no_label_for_issue_type(node, issue,'Vulnerability')
+                            #.no_label        (node)
+                            .add_Key_to_Label (node)
+            )
+
+        Edge_Format.no_labels(edges)
+
+        return (vis_js.load_page(True)
+                .create_graph(nodes, edges, options)
+                .browser_width(2500)
+                .set_fixed_r1_nodes()
+                .wait_n_seconds(3)
+                .send_screenshot_to_slack(team_id, channel))
 
     @staticmethod
     def r0_r1_r2(team_id=None, channel=None, params=None):
@@ -119,7 +204,7 @@ class Vis_Js_Views:
             issue = graph_data.get('nodes').get(node.get('id'))
             if issue:
                 node['label'] = Misc.word_wrap(issue.get('Summary'),20)
-                node['label'] = issue.get('Rating')
+                #node['label'] = issue.get('Rating')
                 labels = issue.get('Labels')
                 if 'R0' in labels:
                     #node['label'] = issue.get('Summary')
@@ -140,15 +225,17 @@ class Vis_Js_Views:
                     #node['mass'] = 1
                     return node
 
-                #if 'R3' in labels:
-                #    node['color'] = '#FFDDDD'
-                return node
+                if 'R3' in labels:
+                    node['color'] = '#FFDDDD'
+
+                    return node
                 #Dev.pprint(issue)
 
         fixed_nodes = []
         for node in nodes:
             fixed_node = format_node(node)
             if fixed_node:
+                Node_Format.add_key_to_label(fixed_node)
                 fixed_nodes.append(fixed_node)
 
         for edge in edges:
@@ -157,7 +244,7 @@ class Vis_Js_Views:
         #edges = []
         vis_js.load_page(True)
         vis_js.create_graph(fixed_nodes, edges, options)
-        vis_js.browser().sync__browser_width(400)
+        vis_js.browser().sync__browser_width(2000)
         return vis_js.send_screenshot_to_slack(team_id, channel)
         #return vis_js.create_graph_and_send_screenshot_to_slack(fixed_nodes, edges, options, team_id, channel)
 

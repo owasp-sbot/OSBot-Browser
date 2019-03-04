@@ -1,5 +1,6 @@
 import base64
 import json
+from time import sleep
 
 from browser.API_Browser import API_Browser
 from browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
@@ -76,6 +77,7 @@ class Vis_Js:
         self.load_page(True)
         if options is None or options == {}:
             options = self.get_default_options()
+            #options = self.get_advanced_options()
 
         data = {'nodes': nodes, 'edges': edges}
         base64_data = base64.b64encode(json.dumps(data).encode()).decode()
@@ -97,7 +99,7 @@ class Vis_Js:
         js_code = "network.on('stabilizationIterationsDone', function(data){ $('body').append('<span id=stabilizationIterationsDone />') })"
         self.exec_js(js_code)
         if self.exec_js("network.physics.ready") is False:
-            self.browser().sync__await_for_element('#stabilizationIterationsDone', 20000)
+            self.browser().sync__await_for_element('#stabilizationIterationsDone', 40000)
         #self.exec_js("network.on('stabilizationIterationsDone', function(data){console.log('stabilizationIterationsDone', data) })")
         #Dev.print(self.exec_js("network.physics.ready"))
         # need to handle the case when rendering happens very quickly
@@ -109,6 +111,10 @@ class Vis_Js:
 
     def exec_js(self,js_code):
         return self.browser().sync__js_execute(js_code)
+
+    def invoke_js(self, name, params):
+        return self.browser().sync_js_invoke_function(name,params)
+
 
     def get_default_options(self):
         return {    'nodes': {'shape': 'box'},
@@ -178,3 +184,27 @@ class Vis_Js:
             self.create_graph(nodes,edges)
 
         return graph_data
+
+    def wait_n_seconds(self,seconds):
+        sleep(seconds)
+        return self
+
+    def set_fixed_r1_nodes(self):
+        r1s = {
+                'RISK-1498': {'x': -1000  , 'y': -1000  },  # 1
+                'RISK-1496': {'x':    0   , 'y': -1000  },  # 2
+                'RISK-1495': {'x': 1000   , 'y': -1000  }, # 3
+                'RISK-1494': {'x': -1000  , 'y':  1000  }, # 4
+                'RISK-1534': {'x': 0      , 'y':  1000  }, # 5
+                'RISK-1592': {'x': 1000   , 'y':  1000 }} # 6
+        for key, value in r1s.items():
+            data = {'id': key, 'x':value['x'],'y':value['y'], 'fixed': True, 'mass': 5}
+            self.invoke_js('network.body.data.nodes.update', data)
+
+        options = {
+            'position': {'x': 0, 'y': 0},
+            'offset'  : {'x': 100, 'y': -50},
+            'scale'   : 1.0 }
+
+        self.invoke_js('network.moveTo', options)
+        return self
