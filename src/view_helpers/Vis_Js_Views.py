@@ -160,6 +160,8 @@ class Vis_Js_Views:
     def r1_pinned(team_id=None, channel=None, params=None):
         (nodes, edges, graph_data, vis_js) = Vis_Js_Views.default(params=params, no_render=True)
         issues = graph_data.get('nodes')
+        Edge_Format.removed_non_risk_edge_sinks(edges,nodes)
+
         options = {}
         for node in list(nodes):
             issue_id = node.get('id')
@@ -174,8 +176,10 @@ class Vis_Js_Views:
                             .add_issue_type_to_label(node, issue)
                             .no_label_for_issue_type(node, issue,'Vulnerability')
                             #.no_label        (node)
-                            .add_Key_to_Label (node)
+                            .add_key_to_label (node)
             )
+
+        Node_Format.remove_fixed_and_fp(nodes,issues)
 
         Edge_Format.no_labels(edges)
 

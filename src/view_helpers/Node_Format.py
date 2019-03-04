@@ -101,7 +101,11 @@ class Node_Format:
 
     @staticmethod
     def add_key_to_label(node):
-        node['label'] += '\n({0})'.format(node.get('id'))
+        if node['label'] != '':
+            node['label'] += '\n({0})'.format(node.get('id'))
+        else:
+            node['label'] = node.get('id')
+            node['font' ] = {'size' : 6}
         return Node_Format
 
     @staticmethod
@@ -138,4 +142,17 @@ class Node_Format:
     def set_label(node, issue, key):
         if issue:
             node['label'] = Misc.word_wrap(issue.get(key), 20)
+        return Node_Format
+
+
+    # Nodes issues
+    @staticmethod
+    def remove_fixed_and_fp(nodes, issues):
+        for node in list(nodes):
+            issue = issues.get(node.get('id'))
+            if issue:
+                status = issue.get('Status')
+                if status in ['Fixed','False Positive / Not issue']:
+                    nodes.remove(node)
+
         return Node_Format

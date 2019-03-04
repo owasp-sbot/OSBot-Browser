@@ -43,7 +43,7 @@ class Test_Vis_Js_Views(TestCase):
         self.png_data = None
 
     def test_by_status(self):
-        graph_name = 'graph_1Q5' #'graph_9CP'#
+        graph_name = 'graph_LGK' #'graph_9CP'#
         self.png_data = Vis_Js_Views.by_status(params=[graph_name])
         self.png_data = None
 
@@ -59,7 +59,8 @@ class Test_Vis_Js_Views(TestCase):
 
     def test_r1_pinned(self):
         # graph_RKR # large graph (r0 with 4 levels)
-        graph_name = 'graph_1Q5' #'graph_LGK' #'graph_1Q5'  #
+        graph_name = 'graph_DGK' #'graph_LGK' #'graph_1Q5'  #
+
         self.png_data = Vis_Js_Views.r1_pinned(params=[graph_name])
         #self.png_data = None
 
