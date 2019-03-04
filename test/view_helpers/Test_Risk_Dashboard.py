@@ -36,7 +36,24 @@ class Test_risk_dashboard(TestCase):
         result = self.risk_dashboard.create_dashboard_with_test_data()
         Dev.pprint(result)
 
+    def test_create_dashboard_for_graph(self):
+        graph_name = 'graph_DGK'
+        root_node = 'GSSP-6'
+        #graph_name = 'graph_DAS'
+        #root_node = 'GSSP-29'
+        #graph_name = 'graph_GSA'
+        #root_node ='GSSP-112'
+        graph_name = 'graph_OBY'
+        root_node ='GSSP-119'
 
+        result = self.risk_dashboard.create_dashboard_for_graph(graph_name, root_node)
+        Dev.pprint(result)
+
+    def test_create_dashboard_for_jira_key(self):
+        jira_key = 'GSSP-118'
+        result = self.risk_dashboard.create_dashboard_for_jira_key(jira_key)
+        self.risk_dashboard.send_screenshot_to_slack(None,None)
+        Dev.pprint(result)
 
 
 

@@ -105,7 +105,7 @@ class Node_Format:
             node['label'] += '\n({0})'.format(node.get('id'))
         else:
             node['label'] = node.get('id')
-            node['font' ] = {'size' : 6}
+            node['font' ] = {'size' : 8 }
         return Node_Format
 
     @staticmethod
