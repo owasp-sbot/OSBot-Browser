@@ -1,8 +1,11 @@
 from unittest import TestCase
+
+from browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 from view_helpers.Risk_Dashboard import Risk_Dashboard
 from utils.Dev import Dev
 
 class Test_risk_dashboard(TestCase):
+
     def setUp(self):
         self.reload_page    = False
         self.risk_dashboard = Risk_Dashboard().show_chrome().load_page(self.reload_page)
@@ -32,8 +35,30 @@ class Test_risk_dashboard(TestCase):
         params = self.risk_dashboard.get_test_params(1,10)
         self.risk_dashboard.execute('create_risk_table', params)
 
+
+    def test_create_dashboard_with_scores_1(self):
+        scores = {'r1_1': 1, 'r2_1': 4, 'r3_1': 9 , 'r4_1': 4, 'r5_1': 1 , 'r6_1': 6 ,
+                  'r1_2': 2, 'r2_2': 5 ,'r3_2': 10, 'r4_2': 5, 'r5_2': 2 , 'r6_2': 7 ,
+                  'r1_3': 3, 'r2_3': 6, 'r3_3': 0 , 'r4_3': 6, 'r5_3': 3 , 'r6_3': 8 ,
+                             'r2_4': 7, 'r3_4': 1 , 'r4_4': 7, 'r5_4': 4 , 'r6_4': 9 ,
+                             'r2_5': 8, 'r3_5': 2 , 'r4_5': 8, 'r5_5': 5 ,
+                                        'r3_6': 3 , 'r4_6': 9,                      }
+        self.risk_dashboard.create_dashboard_with_scores(scores)
+        png_data = self.risk_dashboard.send_screenshot_to_slack()
+        #Dev.pprint(png_data)
+        result = Browser_Lamdba_Helper().save_png_data(png_data)
+
+
     def test_create_dashboard_with_test_data(self):
         result = self.risk_dashboard.create_dashboard_with_test_data()
+        png_data = self.risk_dashboard.send_screenshot_to_slack()
+        result = Browser_Lamdba_Helper().save_png_data(png_data)
+        Dev.pprint(result)
+
+    def test_create_dashboard_with_test_data(self):
+        result = self.risk_dashboard.create_dashboard_with_test_data()
+        png_data = self.risk_dashboard.send_screenshot_to_slack()
+        result = Browser_Lamdba_Helper().save_png_data(png_data)
         Dev.pprint(result)
 
     def test_create_dashboard_for_graph(self):
@@ -41,18 +66,19 @@ class Test_risk_dashboard(TestCase):
         root_node = 'GSSP-6'
         #graph_name = 'graph_DAS'
         #root_node = 'GSSP-29'
-        #graph_name = 'graph_GSA'
-        #root_node ='GSSP-112'
-        graph_name = 'graph_OBY'
-        root_node ='GSSP-119'
-
+        graph_name = 'graph_GSA'
+        root_node ='GSSP-112'
+        #graph_name = 'graph_OBY'
+        #root_node ='GSSP-119'
+        graph_name = 'graph_JIE'
+        root_node = 'GSP-92'
         result = self.risk_dashboard.create_dashboard_for_graph(graph_name, root_node)
         Dev.pprint(result)
 
     def test_create_dashboard_for_jira_key(self):
         jira_key = 'GSSP-118'
         result = self.risk_dashboard.create_dashboard_for_jira_key(jira_key)
-        self.risk_dashboard.send_screenshot_to_slack(None,None)
+        result = self.risk_dashboard.send_screenshot_to_slack(None,None)
         Dev.pprint(result)
 
 

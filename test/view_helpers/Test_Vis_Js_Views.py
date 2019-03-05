@@ -48,7 +48,7 @@ class Test_Vis_Js_Views(TestCase):
         self.png_data = None
 
     def test_by_rating(self):
-        self.png_data = Vis_Js_Views.by_rating(params=['graph_9CP'])
+        self.png_data = Vis_Js_Views.by_rating(params=['graph_07B'])
         self.png_data = None
 
     def test_by_issue_type(self):
@@ -60,7 +60,7 @@ class Test_Vis_Js_Views(TestCase):
     def test_r1_pinned(self):
         # graph_RKR # large graph (r0 with 4 levels)
         graph_name = 'graph_DGK' #'graph_LGK' #'graph_1Q5'  #
-        graph_name ='graph_DAS'
+        #graph_name ='graph_DAS'
         self.png_data = Vis_Js_Views.r1_pinned(params=[graph_name])
         #self.png_data = None
 

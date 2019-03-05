@@ -66,8 +66,8 @@ class Risk_Dashboard:
         # color   = '#{0}{0}{1}{1}00'.format(hex_values[index - 1], hex_values[16 - index])   # get the color changing the RGB values (R = Red , G = Green)
         if index is None : index = 1
         if index < 1     : index = 1
-        if index > 5     : index = 5
-        colors = ['darkred','red','orange','darkgreen','green']
+        if index > 9     : index = 9
+        colors = ['darkred','#DE4108','#F7794B','#E49712','FAAE28','#FBC668','darkgreen','green','#4F9329']
         color  = colors[index - 1]
         css     = {'background-color': color}
         js_code = "if ($('#{0}').text() != '') {{ $('#{0}').css({1}) }}".format(r2_id, json.dumps(css))
@@ -75,7 +75,7 @@ class Risk_Dashboard:
         return self
 
 
-    def send_screenshot_to_slack(self, team_id, channel):
+    def send_screenshot_to_slack(self, team_id=None, channel=None):
         png_file = self.create_dashboard_screenshot()
         return Browser_Lamdba_Helper().send_png_file_to_slack(team_id, channel, 'risk dashboard', png_file)
 
@@ -88,6 +88,26 @@ class Risk_Dashboard:
     def create_dashboard_screenshot(self):
         clip = {'x': 1, 'y': 1, 'width': 945, 'height': 465}
         return self.browser().sync__screenshot(clip=clip)
+
+
+    def create_dashboard_with_scores(self,scores):
+        self.create_dashboard_with_R1_R2()
+        rows = 6
+        cells = 6
+
+
+        js_codes = []
+        for i in range(1, cells + 1):
+            for j in range(1, rows + 1):
+                r2_id = "r{0}_{1}".format(i, j)
+                if scores.get(r2_id):
+                    color = scores.get(r2_id)
+                else:
+                    color = 1
+                self.js_apply_css_color(js_codes, r2_id, color)
+
+        self.js_eval(js_codes)
+        return self
 
     def create_dashboard_with_R1_R2(self):
         self.load_page(False)
