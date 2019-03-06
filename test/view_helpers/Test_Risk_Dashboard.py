@@ -36,17 +36,38 @@ class Test_risk_dashboard(TestCase):
         self.risk_dashboard.execute('create_risk_table', params)
 
 
-    def test_create_dashboard_with_scores_1(self):
-        scores = {'r1_1': 1, 'r2_1': 4, 'r3_1': 9 , 'r4_1': 4, 'r5_1': 1 , 'r6_1': 6 ,
-                  'r1_2': 2, 'r2_2': 5 ,'r3_2': 10, 'r4_2': 5, 'r5_2': 2 , 'r6_2': 7 ,
-                  'r1_3': 3, 'r2_3': 6, 'r3_3': 0 , 'r4_3': 6, 'r5_3': 3 , 'r6_3': 8 ,
-                             'r2_4': 7, 'r3_4': 1 , 'r4_4': 7, 'r5_4': 4 , 'r6_4': 9 ,
-                             'r2_5': 8, 'r3_5': 2 , 'r4_5': 8, 'r5_5': 5 ,
-                                        'r3_6': 3 , 'r4_6': 9,                      }
+    def test_create_dashboard_with_scores(self):
+        scores = {'r1_1': 1, 'r2_1': 2, 'r3_1': 3 , 'r4_1': None, 'r5_1': 5 , 'r6_1': 6 ,
+                  'r1_2': 4, 'r2_2': 5 ,'r3_2': 6 , 'r4_2': None, 'r5_2': 2 , 'r6_2': 7 ,
+                  'r1_3': 7, 'r2_3': 8 , 'r3_3': 9 , 'r4_3': None, 'r5_3': 3 , 'r6_3': 8 ,
+                             'r2_4': None, 'r3_4': None , 'r4_4': None, 'r5_4': 4 , 'r6_4': 9 ,
+                             'r2_5': None, 'r3_5': None , 'r4_5': None, 'r5_5': 5 ,
+                                        'r3_6': None , 'r4_6': None,                      }
+
         self.risk_dashboard.create_dashboard_with_scores(scores)
         png_data = self.risk_dashboard.send_screenshot_to_slack()
-        #Dev.pprint(png_data)
-        result = Browser_Lamdba_Helper().save_png_data(png_data)
+        Browser_Lamdba_Helper().save_png_data(png_data)
+
+    def test_create_dashboard_with_scores__with_diff(self):
+        scores = {'r1_1': 1, 'r2_1': 2, 'r3_1': 3 , 'r4_1': 0, 'r5_1': 5 , 'r6_1': 6 ,
+                  'r1_2': 4, 'r2_2': 5 ,'r3_2': 6 , 'r4_2': 0, 'r5_2': 2 , 'r6_2': 7 ,
+                  'r1_3': 7, 'r2_3': 8, 'r3_3': 9 , 'r4_3': 0, 'r5_3': 3 , 'r6_3': 8 ,
+                             'r2_4': 0, 'r3_4': 0 , 'r4_4': 0, 'r5_4': 4 , 'r6_4': 9 ,
+                             'r2_5': 8, 'r3_5': 2 , 'r4_5': 8, 'r5_5': 5 ,
+                                        'r3_6': 3 , 'r4_6': 9,                      }
+
+        scores_B = {'r1_1': 1, 'r2_1': 1, 'r3_1': 1, 'r4_1': 4, 'r5_1': 1, 'r6_1': 6,
+                    'r1_2': 5, 'r2_2': 2, 'r3_2': 4, 'r4_2': 5, 'r5_2': 2, 'r6_2': 7,
+                    'r1_3': 4, 'r2_3': 0, 'r3_3': 1, 'r4_3': 6, 'r5_3': 3, 'r6_3': 8,
+                               'r2_4': 2, 'r3_4': 1, 'r4_4': 1, 'r5_4': 4, 'r6_4': 9,
+                               'r2_5': 1, 'r3_5': 1, 'r4_5': 1, 'r5_5': 5,
+                                          'r3_6': 1, 'r4_6': 1,  }
+
+        #scores = scores_B
+        #scores_B = None
+        self.risk_dashboard.create_dashboard_with_scores(scores,scores_B)
+        png_data = self.risk_dashboard.send_screenshot_to_slack()
+        Browser_Lamdba_Helper().save_png_data(png_data)
 
 
     def test_create_dashboard_with_test_data(self):

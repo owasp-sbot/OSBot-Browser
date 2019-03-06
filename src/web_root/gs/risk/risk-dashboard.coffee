@@ -42,8 +42,8 @@ class R1_and_R2
   set_risks: ()=>
     @.colors =  { '2' : 'darkred' ,'1': 'darkorange' , '0': 'black'}
     for key,value of @.risks
-      console.log(key,value)
       $("##{key}").css({'background-color': @.colors[value]})
+
 
   create_risk_table:(params)=>
     @.set_params(params)
