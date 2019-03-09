@@ -227,3 +227,17 @@ class Risk_Dashboard:
         graph_name       = graph_data.get('graph_name')
         sleep(1.0)      # to give time for ELK to index
         return self.create_dashboard_for_graph(graph_name,jira_key)
+
+
+    def calculate_score(self,scores, title):
+        size = len(scores)
+        min = size
+        max = size * 8
+        #print(min, max)
+        score = 0
+        for value in scores.values():
+            score += value
+            #print(value, score)
+        score = int((score - size) / max * 100)
+        print("The score for {0:23} {1:3} / 100".format(title, score))
+        return score, size

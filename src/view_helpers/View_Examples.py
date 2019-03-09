@@ -48,8 +48,7 @@ class View_Examples:
     def bootstrap_local  (self): return self.render_file_from_zip           ('/examples/bootstrap-local.html')
     def folder_root      (self): return self.render_page.screenshot_folder  (self.path_views, self.tmp_img)
 
-
-        #self.render_page.screenshot_file_in_folder(web_root, target, self.tmp_img)
+    #self.render_page.screenshot_file_in_folder(web_root, target, self.tmp_img)
 
 
     #def zipped_views(self):
