@@ -8,6 +8,8 @@ from utils.Misc import Misc
 from utils.Zip_Folder import Zip_Folder
 from utils.aws.Lambdas import Lambdas
 
+#
+#<script src="https://cdnjs.cloudflare.com/ajax/libs/vivagraphjs/0.10.1/vivagraph.min.js"></script>
 
 class Test_View_Examples(TestCase):
     def setUp(self):

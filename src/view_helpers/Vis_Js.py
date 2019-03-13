@@ -56,6 +56,18 @@ class Vis_Js:
             self.create_graph(nodes, edges,options,graph_name)
             return self.send_screenshot_to_slack(team_id, channel)
 
+    # @use_local_cache_if_available
+    def get_graph_data(self, graph_name):
+        params = {'params': ['raw_data', graph_name, 'details'], 'data': {}}
+        data = Lambdas('gsbot.gsbot_graph').invoke(params)
+        if type(data) is str:
+            s3_key = data
+            s3_bucket = 'gs-lambda-tests'
+            tmp_file = S3().file_download_and_delete(s3_bucket, s3_key)
+            data = Json.load_json_and_delete(tmp_file)
+            return data
+        return data
+
     # Vis js specific
 
     def add_edge__js_code(self, from_node, to_node):
@@ -189,17 +201,7 @@ class Vis_Js:
                                  'dragView' : True  } }
         return options
 
-    #@use_local_cache_if_available
-    def get_graph_data(self, graph_name):
-        params = {'params': ['raw_data', graph_name, 'details'], 'data': {}}
-        data   = Lambdas('gsbot.gsbot_graph').invoke(params)
-        if type(data) is str:
-            s3_key = data
-            s3_bucket = 'gs-lambda-tests'
-            tmp_file = S3().file_download_and_delete(s3_bucket,s3_key)
-            data = Json.load_json_and_delete(tmp_file)
-            return data
-        return data
+
 
     def show_jira_graph(self, graph_name, label_key='Summary'):
         self.load_page(False)
