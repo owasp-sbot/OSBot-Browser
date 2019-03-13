@@ -1,4 +1,5 @@
 import base64
+import datetime
 import json
 from time import sleep
 
@@ -8,7 +9,7 @@ from browser.Render_Page import Render_Page
 from utils.Dev import Dev
 from utils.Files import Files
 from utils.Json import Json
-from utils.Local_Cache import use_local_cache_if_available
+#from utils.Local_Cache import use_local_cache_if_available
 from utils.aws.Lambdas import Lambdas
 from utils.aws.s3 import S3
 
@@ -50,9 +51,9 @@ class Vis_Js:
         png_file = self.create_dashboard_screenshot()
         return Browser_Lamdba_Helper().send_png_file_to_slack(team_id, channel, 'risk dashboard', png_file)
 
-    def create_graph_and_send_screenshot_to_slack(self,nodes, edges,options, team_id, channel):
+    def create_graph_and_send_screenshot_to_slack(self,graph_name, nodes, edges,options, team_id, channel):
         if len(nodes) >0:
-            self.create_graph(nodes, edges,options)
+            self.create_graph(nodes, edges,options,graph_name)
             return self.send_screenshot_to_slack(team_id, channel)
 
     # Vis js specific
@@ -73,7 +74,16 @@ class Vis_Js:
         self.exec_js(self.add_node__js_code(node_id, node_label, shape, color))
         return self
 
-    def create_graph(self, nodes = [] ,edges = [],options = None):
+    def create_graph(self, nodes = [] ,edges = [],options = None, graph_name=None):
+
+        def show_debug_message(graph_name):
+            if graph_name is None:
+                graph_name = ''
+            today = datetime.date.today().strftime('%d %b %Y')
+            self.exec_js("$('#message').html('{0} | {1} nodes {2} edges | created on {3} | by GSBot')".format(graph_name, len(nodes), len(edges), today))
+
+            self.exec_js("$('#status').html('Loading Graph')")
+
         self.load_page(True)
         if options is None or options == {}:
             options = self.get_default_options()
@@ -82,24 +92,53 @@ class Vis_Js:
         data = {'nodes': nodes, 'edges': edges}
         base64_data = base64.b64encode(json.dumps(data).encode()).decode()
         base64_options = base64.b64encode(json.dumps(options).encode()).decode()
+
         js_code = "window.network = new vis.Network(container, JSON.parse(atob('{0}')), JSON.parse(atob('{1}')));".format(base64_data, base64_options)
+        self.exec_js(js_code)
 
         #self.browser().sync__browser_width(500, 400)
         if len(nodes) > 30:
             self.browser().sync__browser_width(2000)
 
+        show_debug_message(graph_name)
+
+        js_code = "network.on('stabilizationIterationsDone', function(data){ $('body').append('<span style=\"display:none\" id=stabilizationIterationsDone>....done...</span') })"
         self.exec_js(js_code)
-        #js_code = [
+
+        if self.exec_js("network.physics.ready") is False:
+
+            wait_timeout = 10000
+            self.browser().sync__await_for_element('#stabilizationIterationsDone', wait_timeout)
+
+            # attempts = 10
+            # for i in range(1,attempts):
+            #     self.exec_js("$('#status').html('waiting #{0}')".format(i))
+            #
+            #     #wait_timeout = 1000
+            #     result = self.exec_js("$('#stabilizationIterationsDone').html()")
+            #     if result == '....done...':
+            #         Dev.pprint(">>>> done")
+            #         break
+            #     #if self.browser().sync__await_for_element('#stabilizationIterationsDone', wait_timeout):
+            #     #
+            #     #    break
+            #     Dev.pprint("attempt: {0}".format(i))
+            #     sleep(1)
+
+            self.exec_js('network.stopSimulation()')
+
+        self.exec_js("$('#status').html('')")
+                    #break
+            #Dev.pprint('dont')
+            #
+
+        # js_code = [
         #    "network.on('startStabilizing'          , function(data){console.log('startStabilizing', data)})",
         #    "network.on('stabilizationProgress'     , function(data){console.log('stabilizationProgress', data)})",
         #    "network.on('stabilizationIterationsDone', function(data){console.log('stabilizationIterationsDone', data) })",
         #    "network.on('stabilized', function(data) {console.log('stabilized', data) })"]
-        #self.exec_js(js_code)
+        # self.exec_js(js_code)
 
-        js_code = "network.on('stabilizationIterationsDone', function(data){ $('body').append('<span id=stabilizationIterationsDone />') })"
-        self.exec_js(js_code)
-        if self.exec_js("network.physics.ready") is False:
-            self.browser().sync__await_for_element('#stabilizationIterationsDone', 40000)
         #self.exec_js("network.on('stabilizationIterationsDone', function(data){console.log('stabilizationIterationsDone', data) })")
         #Dev.print(self.exec_js("network.physics.ready"))
         # need to handle the case when rendering happens very quickly
@@ -153,7 +192,7 @@ class Vis_Js:
     #@use_local_cache_if_available
     def get_graph_data(self, graph_name):
         params = {'params': ['raw_data', graph_name, 'details'], 'data': {}}
-        data   = Lambdas('gs.lambda_graph').invoke(params)
+        data   = Lambdas('gsbot.gsbot_graph').invoke(params)
         if type(data) is str:
             s3_key = data
             s3_bucket = 'gs-lambda-tests'

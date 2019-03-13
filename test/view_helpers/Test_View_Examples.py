@@ -39,5 +39,9 @@ class Test_View_Examples(TestCase):
         result = self.view_examples.open_file_in_browser('/gs/risk/r1-and-r2.html')
         Dev.pprint(result)
 
+    def test_open_file_in_browser__vivagraph(self):
+        result = self.view_examples.open_file_in_browser('/vivagraph/first-test.html')
+        Dev.pprint(result)
+
     def test_update_lambda(self):
         Lambdas('browser.lambda_browser').update_with_src()

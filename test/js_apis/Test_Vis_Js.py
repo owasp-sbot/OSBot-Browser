@@ -76,7 +76,7 @@ class Test_Vis_Js(TestCase):
 
     def test_get_graph_data(self):
         graph_name = 'graph_MKF'             # small          ( 20 nodes,  27 edges)
-        graph_name = 'graph_YT4'            # large one      (199 nodes, 236 edges)
+        #graph_name = 'graph_YT4'            # large one      (199 nodes, 236 edges)
         #graph_name = 'graph_VZ5'            # very large one (367 nodes, 653 edges)
         result = self.vis_js.get_graph_data(graph_name)
         Dev.pprint("{0} nodes, {1} edges".format(len(result.get('nodes')), len(result.get('edges'))))

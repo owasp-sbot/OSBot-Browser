@@ -8,9 +8,9 @@ from utils.Zip_Folder import Zip_Folder
 class View_Examples:
 
     def __init__(self,tmp_img=None, clip=None):
-
+        self.headless    = True
         self.path_views  = Files.path_combine(Files.parent_folder(__file__),'../../src/web_root')
-        self.render_page = Render_Page(headless=False, auto_close=False, web_root=self.path_views)
+        self.render_page = Render_Page(headless=self.headless, auto_close=self.headless, web_root=self.path_views)
         self.tmp_img     = tmp_img
         self.clip        = clip
 

@@ -219,7 +219,7 @@ class Risk_Dashboard:
 
         from utils.aws.Lambdas import Lambdas
 
-        lambda_graph = Lambdas('gs.lambda_graph')
+        lambda_graph = Lambdas('gsbot.gsbot_graph')
 
         payload = { 'data': {}, "params": ['expand', jira_key, 9, 'delivered by,risks_up']}
         result           = lambda_graph.invoke(payload)

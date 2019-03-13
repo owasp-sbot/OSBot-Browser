@@ -13,12 +13,14 @@ class Vis_Js_Views:
         load_dependencies(['syncer', 'requests']) ; from view_helpers.Vis_Js import Vis_Js
 
         graph_name = params.pop(0)
-        vis_js = Vis_Js()
+        vis_js = Vis_Js(headless=True)                               # will start browser
         graph_data = vis_js.get_graph_data(graph_name)
+
         nodes = []
         edges = []
         vis_js.load_page(False)
         if graph_data:
+            graph_name = graph_data.get('graph_name')
             for key, issue in graph_data.get('nodes').items():
                 nodes.append({'id': key, 'label': key})
                 # Dev.pprint(issue)
@@ -30,17 +32,18 @@ class Vis_Js_Views:
                 edges.append({'from': from_node, 'to': to_node, 'label': link_type})
 
             if no_render is False:
-                vis_js.create_graph(nodes, edges)
+                vis_js.create_graph(nodes, edges, {}, graph_name)
 
         if no_render is True:
-            return (nodes, edges, graph_data,vis_js)
+            return (graph_name,nodes, edges, graph_data,vis_js)
 
         return vis_js.send_screenshot_to_slack(team_id, channel)
 
     @staticmethod
     def no_labels(team_id=None, channel=None, params=None):
 
-        (nodes, edges, graph_data,vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+        (graph_name,nodes, edges, graph_data,vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+        graph_name += ' | no_labels'
 
         for node in nodes:
             del node['label']
@@ -48,19 +51,17 @@ class Vis_Js_Views:
         for edge in edges:
             del edge['label']
 
-        return vis_js.create_graph_and_send_screenshot_to_slack(nodes,edges, None, team_id, channel)
+        return vis_js.create_graph_and_send_screenshot_to_slack(graph_name, nodes,edges, None, team_id, channel)
 
     @staticmethod
     def node_label(team_id=None, channel=None, params=None):
-
         if len(params) < 2:
             return "':red_circle: Hi, for the `node_label` view, you need to provide the label field name. Try: `Key`, `Summary`, `Rating`, `Status`"
 
-        #graph_name = params[0]
         label_key  = ' '.join(params[1:])
-        #label_key = params[1]
 
-        (nodes, edges, graph_data,vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+        (graph_name,nodes, edges, graph_data,vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+        graph_name += ' | node_label | ' + label_key
 
         issues = graph_data.get('nodes')
         for node in nodes:
@@ -75,13 +76,14 @@ class Vis_Js_Views:
         options = { 'nodes': {'shape' : 'box' },
                     'edges': {'arrows': 'to'  }}
         options = None
-        return vis_js.create_graph_and_send_screenshot_to_slack(nodes,edges, options, team_id, channel)
+        return vis_js.create_graph_and_send_screenshot_to_slack(graph_name, nodes,edges, options, team_id, channel)
 
     # Issues layouts
 
     @staticmethod
     def by_rating(team_id=None, channel=None, params=None):
-        (nodes, edges, graph_data, vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+        (graph_name,nodes, edges, graph_data,vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+        graph_name += ' | by_rating'
         issues = graph_data.get('nodes')
         options ={}
         for node in nodes:
@@ -98,12 +100,13 @@ class Vis_Js_Views:
             edge['label'] = ''
 
         return (    vis_js.load_page(True)
-                          .create_graph(nodes, edges, options)
+                          .create_graph(nodes, edges, options, graph_name)
                           .browser_width(3000)
                           .send_screenshot_to_slack(team_id, channel) )
 
     def by_status(team_id=None, channel=None, params=None):
-        (nodes, edges, graph_data, vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+        (graph_name,nodes, edges, graph_data,vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+        graph_name += ' | by_status'
         issues = graph_data.get('nodes')
 
         for node in nodes:
@@ -125,13 +128,15 @@ class Vis_Js_Views:
         #edges = []
         options = {}
         return (    vis_js.load_page(True)
-                          .create_graph(nodes, edges, options)
+                          .create_graph(nodes, edges, options, graph_name)
                           .browser_width(2000)
                           .send_screenshot_to_slack(team_id, channel) )
 
     @staticmethod
     def by_issue_type(team_id=None, channel=None, params=None):
-        (nodes, edges, graph_data, vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+        (graph_name,nodes, edges, graph_data,vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+        graph_name += ' | by_issue_type'
+
         issues = graph_data.get('nodes')
         options = {}
         for node in list(nodes):
@@ -152,13 +157,15 @@ class Vis_Js_Views:
         Edge_Format.no_labels(edges)
 
         return (vis_js.load_page(True)
-                .create_graph(nodes, edges, options)
+                .create_graph(nodes, edges, options, graph_name)
                 .browser_width(2000)
                 .send_screenshot_to_slack(team_id, channel))
 
     @staticmethod
     def r1_pinned(team_id=None, channel=None, params=None):
-        (nodes, edges, graph_data, vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+        (graph_name,nodes, edges, graph_data,vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+        graph_name += ' | r1_pinned'
+
         issues = graph_data.get('nodes')
         Edge_Format.removed_non_risk_edge_sinks(edges,nodes)
 
@@ -184,14 +191,14 @@ class Vis_Js_Views:
         Edge_Format.no_labels(edges)
 
         return (vis_js.load_page(True)
-                .create_graph(nodes, edges, options)
+                .create_graph(nodes, edges, options, graph_name)
                 .browser_width(2500)
                 .set_fixed_r1_nodes()
                 .wait_n_seconds(3)
                 .send_screenshot_to_slack(team_id, channel))
 
     @staticmethod
-    def r0_r1_r2(team_id=None, channel=None, params=None):
+    def r1_r4(team_id=None, channel=None, params=None):
 
         options = {
             'nodes': { 'shape' : 'box'},
@@ -202,7 +209,7 @@ class Vis_Js_Views:
                 },
             }}
 
-        (nodes, edges, graph_data, vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+        (graph_name,nodes, edges, graph_data,vis_js) = Vis_Js_Views.default(params=params, no_render=True)
 
         def format_node(node):
             issue = graph_data.get('nodes').get(node.get('id'))
@@ -233,6 +240,11 @@ class Vis_Js_Views:
                     node['color'] = '#FFDDDD'
 
                     return node
+
+                if 'R4' in labels:
+                    node['color'] = '#00DDDD'
+
+                    return node
                 #Dev.pprint(issue)
 
         fixed_nodes = []
@@ -247,7 +259,7 @@ class Vis_Js_Views:
 
         #edges = []
         vis_js.load_page(True)
-        vis_js.create_graph(fixed_nodes, edges, options)
+        vis_js.create_graph(fixed_nodes, edges, options,graph_name)
         vis_js.browser().sync__browser_width(2000)
         return vis_js.send_screenshot_to_slack(team_id, channel)
         #return vis_js.create_graph_and_send_screenshot_to_slack(fixed_nodes, edges, options, team_id, channel)
