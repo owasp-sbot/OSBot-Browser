@@ -11,6 +11,7 @@ from utils.Dev import Dev
 from utils.Files import Files
 from utils.Json import Json
 #from utils.Local_Cache import use_local_cache_if_available
+from utils.Misc import Misc
 from utils.aws.Lambdas import Lambdas
 from utils.aws.s3 import S3
 
@@ -53,11 +54,6 @@ class VivaGraph_Js:
         png_file = self.create_dashboard_screenshot()
         return Browser_Lamdba_Helper().send_png_file_to_slack(team_id, channel, 'risk dashboard', png_file)
 
-    def create_graph_and_send_screenshot_to_slack(self,graph_name, nodes, edges,options, team_id, channel):
-        if len(nodes) >0:
-            self.create_graph(nodes, edges,options,graph_name)
-            return self.send_screenshot_to_slack(team_id, channel)
-
     def get_graph_data(self, graph_name):
         params = {'params': ['raw_data', graph_name, 'details'], 'data': {}}
         data = Lambdas('gsbot.gsbot_graph').invoke(params)
@@ -75,10 +71,22 @@ class VivaGraph_Js:
     def invoke_js(self, name, params):
         return self.browser().sync_js_invoke_function(name,params)
 
+    def create_graph_and_send_screenshot_to_slack(self, nodes, edges, options, team_id, channel):
+        if len(nodes) >0:
+            self.create_graph(nodes, edges)
+            if          len(nodes) < 50 :                                            sleep(2)
+            elif  50 <  len(nodes) < 100: self.browser().sync__browser_width(1000) ; sleep(3)
+            elif 100 <  len(nodes) < 200: self.browser().sync__browser_width(2000) ; sleep(5)
+            elif        len(nodes) > 200: self.browser().sync__browser_width(3000) ; sleep(10)
+
+            return self.send_screenshot_to_slack(team_id, channel)
+            #self.create_graph(nodes, edges,options,graph_name)
+            #return self.send_screenshot_to_slack(t§eam_id, channel)
+
 
     # main methods
 
-    def create_graph(self, nodes, edges, graph_data, graph_name):
+    def create_graph(self, nodes, edges):
         self.web_server.start()
         url = self.web_server.url(self.web_page)
 
@@ -91,28 +99,25 @@ class VivaGraph_Js:
                     "dragCoeff"    : 0.02,
                     "gravity"      : -10.2
                  };
+
         self.invoke_js("set_layout",layout)
         js_code = ""
-        for key,issue in nodes.items():
-            if issue:
-                js_code += 'graph.addNode("{0}",{{ "label" : "{1}","img":"{2}"}});'.format(key,key,self.resolve_icon_from_issue_type(issue.get("Issue Type"),key))
+        #for key,issue in nodes.items():
+        for node in nodes:
+            key   = node.get('key')
+            label = node.get('label')
+            img   = node.get('img')
+            params = { "label" : label, "img": img}
+            js_code += 'graph.addNode("{0}",{1});'.format(key,Misc.json_dumps(params))
         for edge in edges:
             js_code += 'graph.addLink("{0}","{1}");\n'.format(edge[0],edge[2])
-            #print(edge)
-        # js_code = """graph.addNode("{0}",'icons/vuln.png')
-        #              graph.addLink("{0}", "RISK-2");
-        #              graph.addLink("RISK-2", "RISK-3");
-        #              graph.addLink("RISK-3", "RISK-2");
-        #              graph.addLink("RISK-4", "RISK-2");
-        #              graph.addLink("RISK-5", "RISK-2");
-        #              graph.addLink("RISK-1", "RISK-5");
-        #              """.format(graph_name)
         js_code += "run_graph()"
         self.exec_js(js_code)
         self.web_server.stop()
         return 42
 
-    def resolve_icon_from_issue_type(self, issue_type,key):
+    def resolve_icon_from_issue_type(self, issue,key):
+        none_icon = 'icons/none.jpg'
         mappings = {
             'Risk'           : 'icons/risk_theme.svg',
             'Risk Theme'     : 'icons/risk_theme.svg',
@@ -136,20 +141,14 @@ class VivaGraph_Js:
             'Incident Task'  : 'icons/incident_task.png',
             'User Access'    : 'icons/user_access.svg',
             'Security Event' : 'icons/security_event.svg',
-
-
         }
+        if issue and issue.get("Issue Type"):
+            issue_type = issue.get("Issue Type")
+            icon = mappings.get(issue_type, none_icon)
 
-        icon = mappings.get(issue_type, 'icons/none.jpg')
-        if icon is 'icons/none.jpg':
-            Dev.pprint(key + ' ' + issue_type)
+            #if icon == none_icon:
+            #    Dev.pprint(key + ' ' + issue_type)
+
+        else:
+            icon = none_icon
         return icon
-
-        if issue_type == 'Risk'         : return 'icons/risk_theme.svg'
-        if issue_type == 'Risk Theme'   : return 'icons/risk_theme.svg'
-        if issue_type == 'Vulnerability': return 'icons/vuln.png'
-        #
-
-        Dev.pprint(issue_type)
-
-        return 'icons/none.jpg'

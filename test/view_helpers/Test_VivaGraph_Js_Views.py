@@ -27,6 +27,21 @@ class Test_VivaGraph_Js_Views(TestCase):
 
         #return
 
+    def test_by_issue_type(self):
+        graph_name = 'graph_XKW'    # (7 nodes)
+        graph_name = 'graph_MKF'    # ( 20 nodes,  27 edges)
+
+        self.png_data = VivaGraph_Js_Views.by_issue_type(params=[graph_name])
+        self.png_data = False
+
+    def test_by_field(self):
+        graph_name = 'graph_XKW'    # (7 nodes)
+        graph_name = 'graph_MKF'    # ( 20 nodes,  27 edges)
+        field      = 'Labels' # ''Rating'
+        self.png_data = VivaGraph_Js_Views.by_field(params=[graph_name,field])
+        self.png_data = False
+
+
 
 
 

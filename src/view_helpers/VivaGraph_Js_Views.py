@@ -1,3 +1,5 @@
+from time import sleep
+
 from utils.Dev import Dev
 from utils.Lambdas_Helpers import slack_message
 from utils.Misc import Misc
@@ -21,29 +23,52 @@ class VivaGraph_Js_Views:
         #
         vivagraph_js.load_page(False)
         if graph_data:
-            nodes = graph_data.get('nodes')
             edges = graph_data.get('edges')
+            nodes = []
+            for key,issue in graph_data.get('nodes').items():
+                node = {
+                            'key'   : key ,
+                            'label' : key,
+                            'img'   : vivagraph_js.resolve_icon_from_issue_type(issue, key)
+                        }
+                nodes.append(node)
             slack_message(":point_right: rendering graph {0} using VivaGraph JS engine, with {1} nodes and {2} edges"
                           .format(graph_name, len(nodes), len(edges)), [], channel,team_id)
-            # graph_name = graph_data.get('graph_name')
-            # for key, issue in graph_data.get('nodes').items():
-            #     nodes.append({'id': key, 'label': key})
-            #     # Dev.pprint(issue)
-            #
-            # for edge in graph_data.get('edges'):
-            #     from_node = edge[0]
-            #     link_type = edge[1]
-            #     to_node = edge[2]
-            #     edges.append({'from': from_node, 'to': to_node, 'label': link_type})
 
-            if no_render is False:
-                vivagraph_js.create_graph(nodes, edges, graph_data, graph_name)
-        if 100 < len(nodes) < 200:
-            vivagraph_js.browser().sync__browser_width(2000)
-        if len(nodes) > 200:
-            vivagraph_js.browser().sync__browser_width(3000)
-        if no_render is True:
-            return (graph_name, nodes, edges, graph_data, vivagraph_js)
-        from time import sleep
-        sleep(5)
-        return vivagraph_js.send_screenshot_to_slack(team_id, channel)
+
+
+            if no_render is True:
+                return graph_name, nodes, edges, graph_data, vivagraph_js
+
+            options = {}
+            vivagraph_js.create_graph_and_send_screenshot_to_slack(nodes, edges, options, team_id, channel)
+
+
+
+    @staticmethod
+    def by_issue_type(team_id=None, channel=None, params=None):
+        params.append('Issue Type')
+        return VivaGraph_Js_Views.by_field(team_id, channel, params)
+
+    @staticmethod
+    def by_rating(team_id=None, channel=None, params=None):
+        params.append('Rating')
+        return VivaGraph_Js_Views.by_field(team_id, channel, params)
+
+    @staticmethod
+    def by_field(team_id=None, channel=None, params=None):
+
+        if len(params) < 2:
+            text = ':red_circle: Hi, for the `by_field` command, you need to provide a field name, for example: `Summary`, `Issue Type`,`Rating`, `Status`  '
+            return text
+
+        (graph_name, nodes, edges, graph_data, vivagraph_js) = VivaGraph_Js_Views.default(team_id, channel, params,no_render=True)
+        field = ' '.join(params)
+        for node in nodes:
+            key   = node.get('key')
+            issue = graph_data.get('nodes').get(key)
+            if issue:
+                value = issue.get(field)
+                node['label'] = value
+
+        vivagraph_js.create_graph_and_send_screenshot_to_slack(nodes, edges, {}, team_id, channel)
