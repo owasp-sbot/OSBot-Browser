@@ -6,6 +6,7 @@ from time import sleep
 from browser.API_Browser import API_Browser
 from browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 from browser.Render_Page import Render_Page
+from browser.Web_Server import Web_Server
 from utils.Dev import Dev
 from utils.Files import Files
 from utils.Json import Json
@@ -19,7 +20,8 @@ class VivaGraph_Js:
         self.web_page    = '/vivagraph/simple.html'
         self.web_root    = Files.path_combine(Files.parent_folder(__file__), '../web_root')
         self.api_browser = API_Browser(headless=headless,auto_close=headless).sync__setup_browser()
-        self.render_page = Render_Page(api_browser=self.api_browser, web_root=self.web_root)
+        self.web_server  = Web_Server(self.web_root)
+        self.render_page = Render_Page(api_browser=self.api_browser, web_server=self.web_server)
 
 
 
@@ -56,7 +58,6 @@ class VivaGraph_Js:
             self.create_graph(nodes, edges,options,graph_name)
             return self.send_screenshot_to_slack(team_id, channel)
 
-    #@use_local_cache_if_available
     def get_graph_data(self, graph_name):
         params = {'params': ['raw_data', graph_name, 'details'], 'data': {}}
         data = Lambdas('gsbot.gsbot_graph').invoke(params)
@@ -67,3 +68,88 @@ class VivaGraph_Js:
             data = Json.load_json_and_delete(tmp_file)
             return data
         return data
+
+    def exec_js(self,js_code):
+        return self.browser().sync__js_execute(js_code)
+
+    def invoke_js(self, name, params):
+        return self.browser().sync_js_invoke_function(name,params)
+
+
+    # main methods
+
+    def create_graph(self, nodes, edges, graph_data, graph_name):
+        self.web_server.start()
+        url = self.web_server.url(self.web_page)
+
+        self.render_page.get_page_html_via_browser(url)
+
+        self.load_page(True)
+        layout = {
+                    "springLength" : 100,
+                    "springCoeff"  : 0.0008,
+                    "dragCoeff"    : 0.02,
+                    "gravity"      : -10.2
+                 };
+        self.invoke_js("set_layout",layout)
+        js_code = ""
+        for key,issue in nodes.items():
+            if issue:
+                js_code += 'graph.addNode("{0}",{{ "label" : "{1}","img":"{2}"}});'.format(key,key,self.resolve_icon_from_issue_type(issue.get("Issue Type"),key))
+        for edge in edges:
+            js_code += 'graph.addLink("{0}","{1}");\n'.format(edge[0],edge[2])
+            #print(edge)
+        # js_code = """graph.addNode("{0}",'icons/vuln.png')
+        #              graph.addLink("{0}", "RISK-2");
+        #              graph.addLink("RISK-2", "RISK-3");
+        #              graph.addLink("RISK-3", "RISK-2");
+        #              graph.addLink("RISK-4", "RISK-2");
+        #              graph.addLink("RISK-5", "RISK-2");
+        #              graph.addLink("RISK-1", "RISK-5");
+        #              """.format(graph_name)
+        js_code += "run_graph()"
+        self.exec_js(js_code)
+        self.web_server.stop()
+        return 42
+
+    def resolve_icon_from_issue_type(self, issue_type,key):
+        mappings = {
+            'Risk'           : 'icons/risk_theme.svg',
+            'Risk Theme'     : 'icons/risk_theme.svg',
+            'Vulnerability'  : 'icons/vuln.png',
+            'GS-Project'     : 'icons/gs_project.svg',
+            'Business entity': 'icons/business_entity.svg',
+            'GS Service '    : 'icons/gs_service.svg',
+            'IT Asset'       : 'icons/it_asset.svg',
+            'IT System'      : 'icons/it_asset.svg',
+            'People'         : 'icons/people.svg',
+            'Programme'      : 'icons/programme.svg',
+            'Threat Model'   : 'icons/threat_model.svg',
+            'Key Result'     : 'icons/key-result.svg',
+            'Objective'      : 'icons/objective.svg',
+            'Task'           : 'icons/task.svg',
+            'Epic'           : 'icons/epic.svg',
+            'Data Journey'   : 'icons/data_journey.svg',
+            'Project'        : 'icons/project.svg',
+            'Fact'           : 'icons/fact.svg',
+            'Incident'       : 'icons/incident.png',
+            'Incident Task'  : 'icons/incident_task.png',
+            'User Access'    : 'icons/user_access.svg',
+            'Security Event' : 'icons/security_event.svg',
+
+
+        }
+
+        icon = mappings.get(issue_type, 'icons/none.jpg')
+        if icon is 'icons/none.jpg':
+            Dev.pprint(key + ' ' + issue_type)
+        return icon
+
+        if issue_type == 'Risk'         : return 'icons/risk_theme.svg'
+        if issue_type == 'Risk Theme'   : return 'icons/risk_theme.svg'
+        if issue_type == 'Vulnerability': return 'icons/vuln.png'
+        #
+
+        Dev.pprint(issue_type)
+
+        return 'icons/none.jpg'

@@ -18,15 +18,12 @@ class Test_VivaGraph_Js_Views(TestCase):
 
     def test_default(self):
         graph_name = 'graph_XKW'    # (7 nodes)
-        #graph_name = 'graph_MKF'    # ( 20 nodes,  27 edges)
-        #graph_name = 'graph_YT4'   # (199 nodes, 236 edges)
+        graph_name = 'graph_MKF'    # ( 20 nodes,  27 edges)
+        graph_name = 'graph_YT4'   # (199 nodes, 236 edges)
         #graph_name = 'graph_VZ5'   # (367 nodes, 653 edges)
-        #graph_name = 'graph_EE3'    # fails in lamnda
+        #graph_name = 'graph_EE3'    # fails in lambda in visjs (but works here :) )
         self.png_data = VivaGraph_Js_Views.default(params=[graph_name])
-
-        browser_helper = Browser_Lamdba_Helper(headless=False).setup()
-        pngData = browser_helper.get_screenshot_png(close_browser=False)
-        browser_helper.save_png_data(pngData)
+        self.png_data = False
 
         #return
 
