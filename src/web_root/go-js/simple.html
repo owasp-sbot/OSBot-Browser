@@ -10,29 +10,22 @@
   <script id="code">
     function init() {
 
-      var $ = go.GraphObject.make;
+        var $ = go.GraphObject.make;
 
-      myDiagram = new go.Diagram("myDiagramDiv");
-      // myDiagram = $(go.Diagram, "myDiagramDiv",
-      //   {
-      //     "undoManager.isEnabled": true
-      //   });
+        myDiagram = new go.Diagram("myDiagramDiv");
 
-      // // define a simple Node template
-      myDiagram.nodeTemplate =
-        $(go.Node, "Auto",
-          $(go.Shape, "RoundedRectangle",
-                     { strokeWidth: 0, fill: "white" },
-                       new go.Binding("fill", "color")),
-          $(go.TextBlock, { margin: 8 }, new go.Binding("text", "key"))
-        );
+        myDiagram.nodeTemplate =
+          $(go.Node, "Auto",
+            $(go.Shape, "RoundedRectangle",
+                       { strokeWidth: 0, fill: "white" },
+                         new go.Binding("fill", "color")),
+            $(go.TextBlock, { margin: 8 }, new go.Binding("text", "key"))
+          );
 
         myDiagram.addDiagramListener("AnimationFinished",function(e)
             {
-                console.log('AnimationFinished')
                 on_done = document.createElement('span');
                 on_done.id='animationFinished';
-                //on_done.innerHTML = "<h1>animationFinished</h1>"
                 document.body.appendChild(on_done)
             })
 

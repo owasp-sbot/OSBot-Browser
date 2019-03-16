@@ -1,7 +1,6 @@
 from unittest import TestCase
 
 from browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
-from utils.Dev import Dev
 from utils.aws.Lambdas import Lambdas
 from view_helpers.VivaGraph_Js_Views import VivaGraph_Js_Views
 
@@ -40,12 +39,6 @@ class Test_VivaGraph_Js_Views(TestCase):
         field      = 'Labels' # ''Rating'
         self.png_data = VivaGraph_Js_Views.by_field(params=[graph_name,field])
         self.png_data = False
-
-
-
-
-
-
 
 
     def test_update_lambda(self):

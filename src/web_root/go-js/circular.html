@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+    <head>
+      <title>Friend Wheel</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <!-- Copyright 1998-2019 by Northwoods Software Corporation. -->
+
+      <script src="https://gojs.net/latest/release/go.js"></script>
+      <script id="code">
+        function WheelLayout() { go.CircularLayout.call(this);}
+
+        go.Diagram.inherit(WheelLayout, go.CircularLayout);
+
+        // override makeNetwork to set the diameter of each node and ignore the TextBlock label
+        WheelLayout.prototype.makeNetwork = function(coll) {
+          var net = go.CircularLayout.prototype.makeNetwork.call(this, coll);
+          net.vertexes.each(function(cv) { cv.diameter = 20; });
+          return net;
+        }
+
+        // override commitNodes to rotate nodes so the text goes away from the center,
+        // and flip text if it would be upside-down
+        WheelLayout.prototype.commitNodes = function() {
+          go.CircularLayout.prototype.commitNodes.call(this);
+          this.network.vertexes.each(function(v) {
+            var node = v.node;
+            if (node === null) return;
+            var a = v.actualAngle;
+            if (a > 90 && a < 270) {  // make sure the text isn't upside down
+              var textBlock = node.findObject("TEXTBLOCK");
+              textBlock.angle = 180;
+            }
+            node.angle = a;
+          });
+        };
+
+        // override commitLinks in order to make sure all of the Bezier links are "inside" the ellipse;
+        // this helps avoid links crossing over any other nodes
+        WheelLayout.prototype.commitLinks = function() {
+          go.CircularLayout.prototype.commitLinks.call(this);
+          if (this.network.vertexes.count > 4) {
+            this.network.vertexes.each(function(v) {
+              v.destinationEdges.each(function(de) {
+                var dv = de.toVertex;
+                var da = dv.actualAngle;
+                var sa = v.actualAngle;
+                if (da - sa > 180) da -= 360;
+                else if (sa - da > 180) sa -= 360;
+                de.link.curviness = (sa > da) ? 15 : -15;
+              })
+            })
+          }
+        }
+        // end WheelLayout class
+
+
+        var highlightColor = "red";  // color parameterization
+
+        function init() {
+
+          var $ = go.GraphObject.make;  // for conciseness in defining templates
+
+          myDiagram =
+            $(go.Diagram, "myDiagramDiv", // must be the ID or reference to div
+              {
+                initialAutoScale: go.Diagram.Uniform,
+                padding: 10,
+                contentAlignment: go.Spot.Center,
+                layout:
+                  $(WheelLayout,  // set up a custom CircularLayout
+                    // set some properties appropriate for this sample
+                    {
+                      arrangement: go.CircularLayout.ConstantDistance,
+                      nodeDiameterFormula: go.CircularLayout.Circular,
+                      spacing: 10,
+                      aspectRatio: 0.7,
+                      sorting: go.CircularLayout.Optimized
+                    }),
+                isReadOnly: true,
+                click: function(e) {  // background click clears any remaining highlighteds
+                  e.diagram.startTransaction("clear");
+                  e.diagram.clearHighlighteds();
+                  e.diagram.commitTransaction("clear");
+                }
+              });
+
+          // define the Node template
+          myDiagram.nodeTemplate =
+            $(go.Node, "Horizontal",
+              {
+                selectionAdorned: false,
+                locationSpot: go.Spot.Center,  // Node.location is the center of the Shape
+                locationObjectName: "SHAPE",
+              },
+              new go.Binding("text", "text"),  // for sorting the nodes
+              $(go.Shape, "Ellipse",
+                {
+                  name: "SHAPE",
+                  fill: "lightgray",  // default value, but also data-bound
+                  stroke: "transparent",  // modified by highlighting
+                  strokeWidth: 2,
+                  desiredSize: new go.Size(20, 20),
+                  portId: ""
+                },  // so links will go to the shape, not the whole node
+                new go.Binding("fill", "color"),
+                new go.Binding("stroke", "isHighlighted",
+                  function(h) { return h ? highlightColor : "transparent"; })
+                  .ofObject()),
+              $(go.TextBlock,
+                { name: "TEXTBLOCK" },  // for search
+                new go.Binding("text", "text"))
+            );
+
+          function highlightLink(link, show) {
+            link.isHighlighted = show;
+            link.fromNode.isHighlighted = show;
+            link.toNode.isHighlighted = show;
+          }
+
+          // define the Link template
+          myDiagram.linkTemplate =
+            $(go.Link,
+              {
+                routing: go.Link.Normal,
+                curve: go.Link.Bezier,
+                selectionAdorned: false,
+                mouseEnter: function(e, link) { highlightLink(link, true); },
+                mouseLeave: function(e, link) { highlightLink(link, false); }
+              },
+              $(go.Shape,
+                new go.Binding("stroke", "isHighlighted",
+                  function(h, shape) { return h ? highlightColor : shape.part.data.color; })
+                  .ofObject(),
+                new go.Binding("strokeWidth", "isHighlighted",
+                  function(h) { return h ? 2 : 1; })
+                  .ofObject())
+              // no arrowhead -- assume directionality of relationship need not be shown
+            );
+
+          generateGraph();
+        }
+
+        function generateGraph() {
+
+            var nodeDataArray = [
+        { key: 1, text: "Concept Maps" },
+        { key: 2, text: "Organized Knowledge" },
+        { key: 3, text: "Context Dependent" },
+        { key: 4, text: "Concepts" },
+        { key: 5, text: "Propositions" },
+        { key: 6, text: "Associated Feelings or Affect" },
+        { key: 7, text: "Perceived Regularities" },
+        { key: 8, text: "Labeled" },
+        { key: 9, text: "Hierarchically Structured" },
+        { key: 10, text: "Effective Teaching" },
+        { key: 11, text: "Crosslinks" },
+        { key: 12, text: "Effective Learning" },
+        { key: 13, text: "Events (Happenings)" },
+        { key: 14, text: "Objects (Things)" },
+        { key: 15, text: "Symbols" },
+        { key: 16, text: "Words" },
+        { key: 17, text: "Creativity" },
+        { key: 18, text: "Interrelationships" },
+        { key: 19, text: "Infants" },
+        { key: 20, text: "Different Map Segments" }
+      ];
+      var linkDataArray = [
+        { from: 1, to: 2, text: "represent" },
+        { from: 2, to: 3, text: "is" },
+        { from: 2, to: 4, text: "is" },
+        { from: 2, to: 5, text: "is" },
+        { from: 2, to: 6, text: "includes" },
+        { from: 2, to: 10, text: "necessary\nfor" },
+        { from: 2, to: 12, text: "necessary\nfor" },
+        { from: 4, to: 5, text: "combine\nto form" },
+        { from: 4, to: 6, text: "include" },
+        { from: 4, to: 7, text: "are" },
+        { from: 4, to: 8, text: "are" },
+        { from: 4, to: 9, text: "are" },
+        { from: 5, to: 9, text: "are" },
+        { from: 5, to: 11, text: "may be" },
+        { from: 7, to: 13, text: "in" },
+        { from: 7, to: 14, text: "in" },
+        { from: 7, to: 19, text: "begin\nwith" },
+        { from: 8, to: 15, text: "with" },
+        { from: 8, to: 16, text: "with" },
+        { from: 9, to: 17, text: "aids" },
+        { from: 11, to: 18, text: "show" },
+        { from: 12, to: 19, text: "begins\nwith" },
+        { from: 17, to: 18, text: "needed\nto see" },
+        { from: 18, to: 20, text: "between" }
+      ];
+      //myDiagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
+
+
+          var names = [
+            "Joshua", "Daniel", "Robert", "Noah", "Anthony",
+            "Elizabeth", "Addison", "Alexis", "Ella", "Samantha",
+            "Joseph", "Scott", "James", "Ryan", "Benjamin",
+            "Walter", "Gabriel", "Christian", "Nathan", "Simon",
+            "Isabella", "Emma", "Olivia", "Sophia", "Ava",
+            "Emily", "Madison", "Tina", "Elena", "Mia",
+            "Jacob", "Ethan", "Michael", "Alexander", "William",
+            "Natalie", "Grace", "Lily", "Alyssa", "Ashley",
+            "Sarah", "Taylor", "Hannah", "Brianna", "Hailey",
+            "Christopher", "Aiden", "Matthew", "David", "Andrew",
+            "Kaylee", "Juliana", "Leah", "Anna", "Allison",
+            "John", "Samuel", "Tyler", "Dylan", "Jonathan",
+          ];
+
+          // var nodeDataArray = [];
+          // for (var i = 0; i < names.length; i++) {
+          //   nodeDataArray.push({ key: i, text: names[i], color: go.Brush.randomColor(128, 240) });
+          // }
+          //
+          //  var linkDataArray = [];
+          //  var num = nodeDataArray.length;
+          //  for (var i = 0; i < num * 2; i++) {
+          //    var a = 1//Math.floor(Math.random() * num);
+          //    var b = Math.floor(Math.random() * num / 4) + 1;
+          //    linkDataArray.push({ from: a, to: (a + b) % num, color: go.Brush.randomColor(0, 127) });
+          //  }
+          // //linkDataArray = [{from: 1, to: 2}]
+          // myDiagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
+
+
+            myDiagram.addDiagramListener("AnimationFinished",function() {
+                  on_done    = document.createElement('span');
+                  on_done.id ='animationFinished';
+                  document.body.appendChild(on_done)
+              })
+          create_graph = function(data) {
+              console.log('in create_graph')
+              myDiagram.model = new go.GraphLinksModel(data.nodes,data.edges)
+          }
+        }
+      </script>
+      <style>
+            #myDiagramDiv {
+              top      : 5px;
+              bottom   : 5px;
+              left     : 5px;
+              right    : 5px;
+              position : fixed;
+              border:  1px solid lightgray;
+            }
+        </style>
+    </head>
+    <body onload="init()">
+
+      <div id="myDiagramDiv"  ></div>
+
+    </body>
+</html>

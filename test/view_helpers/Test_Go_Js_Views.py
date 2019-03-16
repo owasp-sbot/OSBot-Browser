@@ -2,6 +2,8 @@ from unittest import TestCase
 
 from Go_Js_Views import Go_Js_Views
 from browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
+from utils.aws.Lambdas import Lambdas
+from view_helpers.View_Examples import View_Examples
 
 
 class Test_Go_Js_Views(TestCase):
@@ -16,11 +18,22 @@ class Test_Go_Js_Views(TestCase):
 
     def test_default(self):
         graph_name = 'graph_XKW'    # (7 nodes)
-        #graph_name = 'graph_MKF'    # ( 20 nodes,  27 edges)
+        graph_name = 'graph_MKF'    # ( 20 nodes,  27 edges)
         #graph_name = 'graph_YT4'   # (199 nodes, 236 edges)
         #graph_name = 'graph_VZ5'   # (367 nodes, 653 edges)
         #graph_name = 'graph_EE3'    # fails in lambda in visjs (but works here :) )
-        self.png_data = Go_Js_Views.default(params=[graph_name])
-        #self.png_data = False
 
-        #return
+        self.png_data = Go_Js_Views.default(params=[graph_name])
+
+    def test_circular (self): self.png_data = Go_Js_Views.circular (params=['graph_YT4'])
+    def test_sankey   (self): self.png_data = Go_Js_Views.sankey   (params=['graph_MKF'])
+    def test_swimlanes(self): self.png_data = Go_Js_Views.swimlanes(params=['graph_MKF'])
+
+
+
+    def test_open_file_in_browser__go_gs(self):
+        #View_Examples(headless=False).open_file_in_browser('/go-js/sankey.html')
+        View_Examples(headless=False).open_file_in_browser('/go-js/swimlane-vertical.html')
+
+    def test_update_lambda(self):
+        Lambdas('browser.lambda_browser').update_with_src()

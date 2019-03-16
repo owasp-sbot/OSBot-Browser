@@ -58,14 +58,22 @@ class Base_View_Helpers:
     def invoke_js(self, name, params):
         return self.browser().sync_js_invoke_function(name,params)
 
-    def create_graph_and_send_screenshot_to_slack(self, nodes, edges, options=None, team_id=None, channel=None):
+    def render(self, nodes, edges, js_code=None, options=None, team_id=None, channel=None, use_sleep=False, width=True):
         if len(nodes) > 0:
-            self.create_graph(nodes, edges,options)
-            if          len(nodes) < 50 :                                            sleep(2)
-            elif  50 <  len(nodes) < 100: self.browser().sync__browser_width(1000) ; sleep(3)
-            elif 100 <  len(nodes) < 200: self.browser().sync__browser_width(2000) ; sleep(5)
-            elif        len(nodes) > 200: self.browser().sync__browser_width(3000) ; sleep(10)
+            sleep_for = 0
 
-            self.send_screenshot_to_slack(team_id, channel)
+            if width:
+                self.browser().sync__browser_width(width)
+            else:
+                if          len(nodes) < 50 :                                            sleep_for = 2
+                elif  50 <  len(nodes) < 100: self.browser().sync__browser_width(1000) ; sleep_for = 3
+                elif 100 <  len(nodes) < 200: self.browser().sync__browser_width(2000) ; sleep_for = 5
+                elif        len(nodes) > 200: self.browser().sync__browser_width(3000) ; sleep_for = 10
+
+            self.create_graph(nodes, edges, options)
+            self.api_browser.sync__js_execute(js_code)
+
+            if use_sleep and sleep_for: sleep(sleep_for)
+            return self.send_screenshot_to_slack(team_id, channel)
             #self.create_graph(nodes, edges,options,graph_name)
             #return self.send_screenshot_to_slack(t§eam_id, channel)
