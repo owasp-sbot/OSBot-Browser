@@ -14,7 +14,7 @@ class DataTable_Js_Views:
         return vis_js.get_graph_data(graph_name)
 
     @staticmethod
-    def _create_table(headers,rows, team_id, channel,table_width='2000px', columns_defs=None, table_title=None):
+    def _create_table(headers,rows, team_id, channel,table_width='1200px', columns_defs=None, table_title=None):
         from view_helpers.DataTable_Js import DataTable_Js
         datatable_js              = DataTable_Js()
         datatable_js.table_width  = table_width
@@ -23,16 +23,10 @@ class DataTable_Js_Views:
         return datatable_js.create_table(headers, rows).send_screenshot_to_slack(team_id, channel)
 
     @staticmethod
-    def graph(team_id=None, channel=None, params=None):
-        load_dependencies(['syncer', 'requests']);
-        graph_name = params.pop(0)
+    def _create_table_with_headers(team_id, channel, graph_name, headers, columns_defs=[], table_width='1200px'):
         graph_data = DataTable_Js_Views._get_data(graph_name)
-
         if graph_data:
             nodes = graph_data.get('nodes')
-            #headers = sorted(list(set(list(nodes.values()).pop())))
-            #headers = [  'Issue Type', 'Summary', 'Description', 'Issue Links', 'Status' ,'Rating', 'Key']
-            headers = ['Issue Type', 'Summary', 'Description', 'Status', 'Rating', 'Key'] # without issue links
             rows = []
             for index, node in enumerate(nodes.values()):
                 row = [index + 1]
@@ -42,23 +36,40 @@ class DataTable_Js_Views:
                         value = json.dumps(value)
                     else:
                         value = Misc.remove_html_tags(value)
-                    # if header == 'Issue Links':
-                    #     value = "<span style='font-size: 8pt'>{0}</span>".format(value)
                     row.append(value)
                 rows.append(row)
             headers.insert(0, '#')
 
-            columns_defs = [
-                {"targets": [1], "width": "100px"},     # Issue Type
-                {"targets": [2], "width": "300px"},     # Summary
-                #{"targets": [3], "width": "40%"}  ,     # Description
-                #{"targets": [4], "width": "30%"}  ,     # Issue Links
-            ]
-            table_width = '1500px'
             return DataTable_Js_Views._create_table(headers, rows, team_id, channel,
-                                                    table_width=table_width,
+                                                    table_width  = table_width,
                                                     columns_defs = columns_defs,
-                                                    table_title = "<b>{0}</b> <small><small><i>(data from graph)</i></small></small>".format(graph_name))
+                                                    table_title  = "<b>{0}</b> <small><small><i>(data from graph)</i></small></small>".format(graph_name))
+    @staticmethod
+    def graph(team_id=None, channel=None, params=None):
+        load_dependencies(['syncer', 'requests']);
+        graph_name = params.pop(0)
+        headers      = ['Issue Type', 'Summary', 'Description', 'Status', 'Rating', 'Key']  # without issue links
+        table_width  = "1500px"
+        columns_defs = [
+            {"targets": [1], "width": "60px"},  # Key
+            {"targets": [2], "width": "600px"},  # Summary
+        ]
+        return DataTable_Js_Views._create_table_with_headers(team_id, channel, graph_name,headers, columns_defs, table_width)
+
+    @staticmethod
+    def graph_simple(team_id=None, channel=None, params=None):
+        load_dependencies(['syncer', 'requests']);
+        graph_name = params.pop(0)
+        table_width = "1200px"
+        headers     = ['Key', 'Summary', 'Status', 'Rating', 'Issue Type']  # without issue links
+        columns_defs = [
+            {"targets": [1], "width": "60px"},  # Key
+            #{"targets": [1], "width": "600px"},  # Summary
+            {"targets": [3], "width": "150px"},  # Status
+            {"targets": [5], "width": "150px"},  # Status
+        ]
+
+        return DataTable_Js_Views._create_table_with_headers(team_id, channel, graph_name, headers, columns_defs,table_width)
 
     @staticmethod
     def graph_all_fields(team_id=None, channel=None, params=None):

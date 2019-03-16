@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="icon" href="data:;base64,=">
+  <meta charset="UTF-8">
+  <title>GSJS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <script src="https://gojs.net/latest/release/go.js"></script>
+  <script id="code">
+    function init() {
+
+      var $ = go.GraphObject.make;
+
+      myDiagram = new go.Diagram("myDiagramDiv");
+      // myDiagram = $(go.Diagram, "myDiagramDiv",
+      //   {
+      //     "undoManager.isEnabled": true
+      //   });
+
+      // // define a simple Node template
+      myDiagram.nodeTemplate =
+        $(go.Node, "Auto",
+          $(go.Shape, "RoundedRectangle",
+                     { strokeWidth: 0, fill: "white" },
+                       new go.Binding("fill", "color")),
+          $(go.TextBlock, { margin: 8 }, new go.Binding("text", "key"))
+        );
+
+        myDiagram.addDiagramListener("AnimationFinished",function(e)
+            {
+                console.log('AnimationFinished')
+                on_done = document.createElement('span');
+                on_done.id='animationFinished';
+                //on_done.innerHTML = "<h1>animationFinished</h1>"
+                document.body.appendChild(on_done)
+            })
+
+        create_graph = function(data) {
+            console.log('in create_graph')
+            console.log(data)
+            myDiagram.model = new go.GraphLinksModel(data.nodes,data.edges)
+        }
+
+    }
+  </script>
+  <style>
+    #myDiagramDiv {
+      top      : 5px;
+      bottom   : 5px;
+      left     : 5px;
+      right    : 5px;
+      position : fixed;
+      border:  1px solid lightgray;
+    }
+  </style>
+</head>
+<body onload="init()">
+<div id="sample">
+  <div id="myDiagramDiv"></div>
+</div>
+</body>
+</html>

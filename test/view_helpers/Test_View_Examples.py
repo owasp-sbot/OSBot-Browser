@@ -13,7 +13,8 @@ from utils.aws.Lambdas import Lambdas
 
 class Test_View_Examples(TestCase):
     def setUp(self):
-        self.view_examples = View_Examples('/tmp/test_screenshot_html.png')
+        self.headless      = False
+        self.view_examples = View_Examples('/tmp/test_screenshot_html.png',self.headless)
         self.clip          = {'x': 1, 'y': 1, 'width': 520, 'height': 50}
 
     def test_hello_world_content(self):
@@ -43,6 +44,10 @@ class Test_View_Examples(TestCase):
 
     def test_open_file_in_browser__vivagraph(self):
         result = self.view_examples.open_file_in_browser('/vivagraph/first-test.html')
+        Dev.pprint(result)
+
+    def test_open_file_in_browser__go_gs(self):
+        result = self.view_examples.open_file_in_browser('/go-js/simple.html')
         Dev.pprint(result)
 
     def test_update_lambda(self):

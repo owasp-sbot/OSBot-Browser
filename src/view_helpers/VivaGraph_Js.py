@@ -71,9 +71,9 @@ class VivaGraph_Js:
     def invoke_js(self, name, params):
         return self.browser().sync_js_invoke_function(name,params)
 
-    def create_graph_and_send_screenshot_to_slack(self, nodes, edges, options, team_id, channel):
+    def create_graph_and_send_screenshot_to_slack(self, nodes, edges, options=None, team_id=None, channel=None):
         if len(nodes) >0:
-            self.create_graph(nodes, edges)
+            self.create_graph(nodes, edges,options)
             if          len(nodes) < 50 :                                            sleep(2)
             elif  50 <  len(nodes) < 100: self.browser().sync__browser_width(1000) ; sleep(3)
             elif 100 <  len(nodes) < 200: self.browser().sync__browser_width(2000) ; sleep(5)
@@ -86,7 +86,7 @@ class VivaGraph_Js:
 
     # main methods
 
-    def create_graph(self, nodes, edges):
+    def create_graph(self, nodes, edges,options=None):
         self.web_server.start()
         url = self.web_server.url(self.web_page)
 
