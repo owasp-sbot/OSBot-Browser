@@ -26,8 +26,8 @@ class Test_Am_Charts_Views(TestCase):
         #graph_name = 'graph_OJF'   # org chart
         self.png_data = Am_Charts_Views.default(params=[graph_name],headless=False)
 
-    def test_triangle(self):
-        self.png_data = Am_Charts_Views.triangle(params=[], headless=False)
+    def test_chord   (self): self.png_data = Am_Charts_Views.chord   (params=['graph_MKF'], headless=False)
+    def test_triangle(self): self.png_data = Am_Charts_Views.triangle(params=[           ], headless=False)
 
     def test_open_file_in_browser__am_charts(self):
         #View_Examples(headless=False).open_file_in_browser('/go-js/sankey.html')

@@ -32,7 +32,9 @@ class Test_Go_Js_Views(TestCase):
     def test_swimlanes(self): self.png_data = Go_Js_Views.swimlanes(params=['graph_MKF'])
     def test_mindmap  (self): self.png_data = Go_Js_Views.mindmap  (params=['graph_OJF'])
     def test_piechart (self): self.png_data = Go_Js_Views.piechart (params=['_'        ])
-    def test_chart_js (self): self.png_data = Go_Js_Views.chart_js (params=['_'])
+    def test_kanban   (self): self.png_data = Go_Js_Views.kanban   (params=['graph_MKF'],headless=False)
+
+    def test_chart_js(self): self.png_data = Go_Js_Views.chart_js(params=['_'])
 
     def test_mindmap_with_size(self):
         self.png_data = Go_Js_Views.mindmap(params=['graph_EPU',1000,300])

@@ -163,3 +163,14 @@ class Go_Js_Views:
         go_js.api_browser.sync__await_for_element('#animationFinished')
         return go_js.send_screenshot_to_slack(team_id=team_id, channel=channel)
 
+
+    def kanban(team_id=None, channel=None, params=None, headless=True):
+        (go_js, graph_data) = Go_Js_Views._get_graph_data(params, "kanban",headless)
+        go_js.load_page(True)
+
+        go_js.browser().sync__browser_width(1000, 600)
+        #(nodes, edges) = Go_Js_Views._get_nodes_and_edges(graph_data)
+        #return go_js.render(nodes, edges, team_id=team_id, channel=channel)
+
+        go_js.api_browser.sync__await_for_element('#animationFinished')
+        return go_js.send_screenshot_to_slack(team_id=team_id, channel=channel)
