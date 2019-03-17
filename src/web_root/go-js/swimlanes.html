@@ -7,6 +7,7 @@
     <meta charset="UTF-8">
 
     <script src="https://gojs.net/latest/release/go.js"></script>
+    <!-- Copyright 1998-2019 by Northwoods Software Corporation. -->
       <script id="code">
         // These parameters need to be set before defining the templates.
         var MINLENGTH = 200;  // this controls the minimum length of any swimlane
@@ -421,16 +422,6 @@
               myDiagram.model = new go.GraphLinksModel(data.nodes,data.edges)
             }
         }  // end init
-
-        // Show the diagram's model in JSON format
-        function save() {
-          document.getElementById("mySavedModel").value = myDiagram.model.toJson();
-          myDiagram.isModified = false;
-        }
-        function load() {
-          myDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
-          myDiagram.delayInitialization(relayoutDiagram);
-        }
       </script>
     <style>
             #myDiagramDiv {

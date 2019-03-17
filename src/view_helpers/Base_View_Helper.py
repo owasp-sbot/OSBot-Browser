@@ -37,7 +37,7 @@ class Base_View_Helpers:
         clip = None
         return self.browser().sync__screenshot(clip=clip)
 
-    def send_screenshot_to_slack(self, team_id, channel):
+    def send_screenshot_to_slack(self, team_id=None, channel=None):
         png_file = self.create_dashboard_screenshot()
         return Browser_Lamdba_Helper().send_png_file_to_slack(team_id, channel, self.title, png_file)
 

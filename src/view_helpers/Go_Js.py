@@ -16,6 +16,7 @@ class Go_Js(Base_View_Helpers):
     def create_graph(self,nodes, edges,options):
 
         self.load_page(True)
+
         data = {
             "nodes":  nodes
                     ,
