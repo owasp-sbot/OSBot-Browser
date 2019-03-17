@@ -23,13 +23,13 @@ class Test_Go_Js_Views(TestCase):
         #graph_name = 'graph_YT4'   # (199 nodes, 236 edges)
         #graph_name = 'graph_VZ5'   # (367 nodes, 653 edges)
         #graph_name = 'graph_EE3'    # fails in lambda in visjs (but works here :) )
-
+        #graph_name = 'graph_OJF'   # org chart
         self.png_data = Go_Js_Views.default(params=[graph_name])
 
-    def test_circular (self): self.png_data = Go_Js_Views.circular (params=['graph_MKF'])
+    def test_circular (self): self.png_data = Go_Js_Views.circular (params=['graph_OJF'])
     def test_sankey   (self): self.png_data = Go_Js_Views.sankey   (params=['graph_MKF'])
     def test_swimlanes(self): self.png_data = Go_Js_Views.swimlanes(params=['graph_MKF'])
-    def test_mindmap  (self): self.png_data = Go_Js_Views.mindmap  (params=['graph_IGF'])
+    def test_mindmap  (self): self.png_data = Go_Js_Views.mindmap  (params=['graph_OJF'])
 
 
 
@@ -41,7 +41,9 @@ class Test_Go_Js_Views(TestCase):
         Lambdas('browser.lambda_browser').update_with_src()
 
 
-    def test_invoke_via_lambda(self):
+    # BUGs
+
+    def test_bug_cache_issue_in_lambdas(self):
         Lambdas('browser.lambda_browser').update_with_src()
 
         payload = { "params" : ["go_js","graph_MKF", "default"]}

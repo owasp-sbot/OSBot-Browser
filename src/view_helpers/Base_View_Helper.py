@@ -6,6 +6,7 @@ from browser.Render_Page import Render_Page
 from browser.Web_Server import Web_Server
 from utils.Files import Files
 from utils.Json import Json
+from utils.Misc import Misc
 from utils.aws.Lambdas import Lambdas
 from utils.aws.s3 import S3
 
@@ -58,22 +59,29 @@ class Base_View_Helpers:
     def invoke_js(self, name, params):
         return self.browser().sync_js_invoke_function(name,params)
 
-    def render(self, nodes, edges, js_code=None, options=None, team_id=None, channel=None, use_sleep=False, width=True):
+    def set_browser_width_based_on_nodes(self,nodes):
+        if   len(nodes) < 30 : self.browser().sync__browser_width(800)
+        elif len(nodes) < 100: self.browser().sync__browser_width(1500)
+        elif len(nodes) < 200: self.browser().sync__browser_width(2000)
+        else                 : self.browser().sync__browser_width(3000)
+
+    def render(self, nodes, edges, js_code=None, options=None, team_id=None, channel=None, sleep_for=None, width=None):
         if len(nodes) > 0:
-            sleep_for = 0
 
             if width:
                 self.browser().sync__browser_width(width)
             else:
-                if          len(nodes) < 50 :                                            sleep_for = 2
-                elif  50 <  len(nodes) < 100: self.browser().sync__browser_width(1000) ; sleep_for = 3
-                elif 100 <  len(nodes) < 200: self.browser().sync__browser_width(2000) ; sleep_for = 5
-                elif        len(nodes) > 200: self.browser().sync__browser_width(3000) ; sleep_for = 10
+                self.set_browser_width_based_on_nodes(nodes)
+                # if          len(nodes) < 50 :                                            sleep_for = 2
+                # elif  50 <  len(nodes) < 100: self.browser().sync__browser_width(1000) ; sleep_for = 3
+                # elif 100 <  len(nodes) < 200: self.browser().sync__browser_width(2000) ; sleep_for = 5
+                # elif        len(nodes) > 200: self.browser().sync__browser_width(3000) ; sleep_for = 10
 
             self.create_graph(nodes, edges, options)
             self.api_browser.sync__js_execute(js_code)
 
-            if use_sleep and sleep_for: sleep(sleep_for)
+            if sleep_for: sleep(sleep_for)
+
             return self.send_screenshot_to_slack(team_id, channel)
             #self.create_graph(nodes, edges,options,graph_name)
             #return self.send_screenshot_to_slack(t§eam_id, channel)
