@@ -57,13 +57,13 @@
 
 
               function makeGeo(data) {
-                // this is much more efficient than calling go.GraphObject.make:
+                    size = 120
                 return new go.Geometry()
-                  .add(new go.PathFigure(150, 150)  // start point
+                  .add(new go.PathFigure(size, size)  // start point
                     .add(new go.PathSegment(go.PathSegment.Arc,
                                 data.start, data.sweep,
-                                150, 150,  // center
-                                150, 150)  // radius
+                                size, size,  // center
+                                size, size)  // radius
                       .close()));
               }
 
@@ -73,12 +73,6 @@
                           on_done.id ='animationFinished';
                           document.body.appendChild(on_done)
                       })
-                    create_graph = function(data) {
-                      console.log('in create_graph')
-                      myDiagram.model = new go.GraphLinksModel(data.nodes,data.edges)
-                    }
-
-                //load()
             }
 
             function get_node_data() {

@@ -117,16 +117,49 @@ class Go_Js_Views:
 
         nodes =  [{ "key": 1,
                     "text": "Pie Chart from GSBot",
-                    "slices": [#{"start": -30 , "sweep": 60 , "color": "white"},
-                               {"start": 30  , "sweep": 300, "color": "red"}]}]
-        edges = [ {'from': 1, 'to': 2}] #, {'from': 2, 'to': 3} ]
+                    "slices": [{"start": -30 , "sweep": 60 , "color": "white"},
+                               {"start": 30  , "sweep": 300, "color": "red"}]},
+                  {  "key": 2,
+                     "text": "partial circle",
+                     "slices": [
+                          { "start": 0  , "sweep": 120, "color": "lightgreen"},
+                          { "start": 120, "sweep": 70 , "color": "blue"      },
+                          { "start": 250, "sweep": 20 , "color": "yellow"    }]},
+                  {  "key": 3, "text": "another circle"}]
+
+        edges = [ {'from': 1, 'to': 2}, {'from': 2, 'to': 3} ]
         data = { 'edges': edges,'nodes': nodes}
 
         go_js.invoke_js('set_data', data)
-        go_js.exec_js('init()')
+        go_js.exec_js  ('init()')
 
-        #go_js.api_browser.sync__await_for_element('#animationFinished')
+        go_js.api_browser.sync__await_for_element('#animationFinished')
 
         return go_js.send_screenshot_to_slack(team_id=team_id, channel=channel)
-        #(nodes, edges) = Go_Js_Views._get_nodes_and_edges(graph_data)
-        #return go_js.render(nodes, edges, width=2000, team_id=team_id, channel=channel)
+
+    @staticmethod
+    def chart_js(team_id=None, channel=None, params=None, headless=True):
+
+        def make_random_points(size=None, max=None):
+            if size is None : size = 20
+            if max is None  : max = 100
+            return [Misc.random_number(0,max) for _ in range(0,size)]
+
+
+        (go_js, graph_data) = Go_Js_Views._get_graph_data(params, "chart-js", headless=headless)
+        go_js.load_page(True)
+
+        #go_js.browser().sync__browser_width(1200)
+
+        nodes = [{ "key": 1, "text": "Dynamically",                   "datasets": [{"label": "Random data"                                             ,"borderColor": "black", "data": make_random_points(8,10)}]},
+                 { "key": 2, "text": "Created"    ,                   "datasets": [{"label": "First dataset"  ,"fill": False,"backgroundColor": "red"  ,"borderColor": "red"  , "data": make_random_points(8    )},
+                                                                             {"label": "Second dataset" ,"fill": False,"backgroundColor": "blue" ,"borderColor": "blue" , "data": make_random_points(8    )}]},
+                 { "key": 3, "text": "By GSBot"   , "color": "green", "datasets": [{"label": "some data"      ,"fill": False,"backgroundColor": "green","borderColor": "green", "data": make_random_points(     )}]}]
+        edges = [{'from': 1, 'to': 2}, {'from': 1, 'to': 3}]
+        data = {'edges': edges, 'nodes': nodes}
+
+        go_js.invoke_js('create_graph',data)
+
+        go_js.api_browser.sync__await_for_element('#animationFinished')
+        return go_js.send_screenshot_to_slack(team_id=team_id, channel=channel)
+
