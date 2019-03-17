@@ -32,7 +32,7 @@ class VivaGraph_Js_Views:
                             'img'   : vivagraph_js.resolve_icon_from_issue_type(issue, key)
                         }
                 nodes.append(node)
-            slack_message(":point_right: rendering graph {0} using VivaGraph JS engine, with {1} nodes and {2} edges"
+            slack_message(":point_right: Rendering `{0}` using VivaGraph JS engine (`{1}` nodes and `{2}` edges)"
                           .format(graph_name, len(nodes), len(edges)), [], channel,team_id)
 
 

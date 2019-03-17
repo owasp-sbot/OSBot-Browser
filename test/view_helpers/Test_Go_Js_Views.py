@@ -26,7 +26,7 @@ class Test_Go_Js_Views(TestCase):
         #graph_name = 'graph_OJF'   # org chart
         self.png_data = Go_Js_Views.default(params=[graph_name])
 
-    def test_circular (self): self.png_data = Go_Js_Views.circular (params=['graph_OJF'])
+    def test_circular (self): self.png_data = Go_Js_Views.circular (params=['graph_GYY'])
     def test_sankey   (self): self.png_data = Go_Js_Views.sankey   (params=['graph_MKF'])
     def test_swimlanes(self): self.png_data = Go_Js_Views.swimlanes(params=['graph_MKF'])
     def test_mindmap  (self): self.png_data = Go_Js_Views.mindmap  (params=['graph_OJF'])
