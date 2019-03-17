@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="icon" href="data:;base64,=">
+        <title>Pie Charts</title>
+        <meta name="description" content="GoJS nodes containing simple pie charts, each slice showing a tooltip." />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- Copyright 1998-2019 by Northwoods Software Corporation. -->
+
+        <script src="https://gojs.net/latest/release/go.js"></script>
+        <script id="code">
+            function init() {
+
+                var $ = go.GraphObject.make;
+
+                myDiagram =
+                    $(go.Diagram, "myDiagramDiv",
+                        {
+                            initialAutoScale: go.Diagram.Uniform,
+                            contentAlignment: go.Spot.Center,
+                            nodeTemplate:
+                                $(go.Node, "Vertical",
+                                    $(go.Panel,
+                                        new go.Binding("itemArray", "slices"),
+                                        {
+                                            itemTemplate:
+                                                $(go.Panel,
+                                                    $(go.Shape,
+                                                        {fill: "lightgreen", isGeometryPositioned: true},
+                                                        new go.Binding("fill", "color"),
+                                                        new go.Binding("geometry", "", makeGeo)),
+                                                    {
+                                                        toolTip:
+                                                            $("ToolTip",
+                                                                $(go.TextBlock, {margin: 4},
+                                                                    new go.Binding("text", "", function (data) {
+                                                                        return data.color + ": " + data.start +
+                                                                            " to " + (data.start + data.sweep);
+                                                                    }))
+                                                            )
+                                                    }
+                                                )
+                                        }),
+                                    $(go.TextBlock,
+                                        { font: "bold 16pt sans-serif",margin: new go.Margin(10, 0, 0, 0) },
+                                        new go.Binding("text"))
+                                ),
+                            model: $(go.GraphLinksModel, {
+                                                            copiesArrays: true,
+                                                            copiesArrayObjects: true,
+                                                            nodeDataArray: get_node_data(),
+                                                            linkDataArray: get_link_data()
+                                                          })
+                            })
+                //load()
+
+
+              function makeGeo(data) {
+                // this is much more efficient than calling go.GraphObject.make:
+                return new go.Geometry()
+                  .add(new go.PathFigure(150, 150)  // start point
+                    .add(new go.PathSegment(go.PathSegment.Arc,
+                                data.start, data.sweep,
+                                150, 150,  // center
+                                150, 150)  // radius
+                      .close()));
+              }
+
+              myDiagram.addDiagramListener("AnimationFinished",function() {
+                          console.log('in AnimationFinished')
+                          on_done    = document.createElement('span');
+                          on_done.id ='animationFinished';
+                          document.body.appendChild(on_done)
+                      })
+                    create_graph = function(data) {
+                      console.log('in create_graph')
+                      myDiagram.model = new go.GraphLinksModel(data.nodes,data.edges)
+                    }
+
+                //load()
+            }
+
+            function get_node_data() {
+                if (window.nodes) return window.nodes
+
+                return [
+                            {
+                                key: 1,
+                                text: "full circle",
+                                slices: [
+                                    {start: -30, sweep: 60, color: "white"},
+                                    {start: 30, sweep: 300, color: "red"}
+                                ]
+                            },
+                            {
+                                key: 2,
+                                text: "partial circle",
+                                slices: [
+                                    {start: 0, sweep: 120, color: "lightgreen"},
+                                    {start: 120, sweep: 70, color: "blue"},
+                                    {start: 250, sweep: 20, color: "yellow"}
+                                ]
+                            },{
+                                key: 3,
+                                text: "another circle" }
+                            ]
+            }
+
+            function get_link_data() {
+                if (window.edges) return window.edges
+                return [ {from: 1, to: 2}, {from: 2, to: 3} ]
+            }
+
+            function set_data(data) {
+                window.nodes = data.nodes
+                window.edges = data.edges
+                console.log(data.edges)
+            }
+
+                //$(go.GraphLinksModel,
+                //$(go.Diagram, "myDiagramDiv",{
+
+
+        </script>
+        <style>
+            #myDiagramDiv {
+              top      : 5px;
+              bottom   : 5px;
+              left     : 5px;
+              right    : 5px;
+              position : fixed;
+              border:  1px solid lightgray;
+            }
+        </style>
+    </head>
+    <body _onload="init()">
+        <div id="myDiagramDiv"  ></div>
+    </body>
+</html>

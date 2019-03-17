@@ -1,3 +1,5 @@
+from time import sleep
+
 from utils.Dev import Dev
 from utils.Misc import Misc
 from utils.aws.Lambdas import load_dependencies
@@ -77,39 +79,21 @@ class Go_Js_Views:
     def mindmap(team_id=None, channel=None, params=None):
         (go_js, graph_data) = Go_Js_Views._get_graph_data(params, "mindmap",headless=True)
 
-        go_js.load_page(True)
-
-        # data = {
-        #     "class": "go.TreeModel",
-        #     "nodeDataArray": [
-        #         {"key": 0, "text": "Mind Map"},
-        #         {"key": 1, "parent": 0, "text": "Getting more time", "brush": "skyblue"},
-        #         {"key": 2, "parent": 0, "text": "1cGetting 1234....AAAA", "brush": "skyblue"},
-        #         {"key": 3, "parent": 0, "text": "2cGetting 4567....", "brush": "skyblue"}]
-        # }
-        #
-
-        #
-        # for index, node in enumerate(nodes):
-        #     key = node.get('key')
-        #     item = {"key": index, "parent": 0, "text":key, "brush": "skyblue"}
-        #     data['nodeDataArray'].append(item)
-
+        go_js.load_page(False)
         (nodes, edges) = Go_Js_Views._get_nodes_and_edges(graph_data,text_field='Summary')
         data = { "class": "go.TreeModel", "nodeDataArray": []}
-
-        go_js.set_browser_width_based_on_nodes(nodes)
+        width  = Misc.to_int(Misc.array_pop(params, 0))
+        height = Misc.to_int(Misc.array_pop(params, 0))
+        if width and height:
+            go_js.browser().sync__browser_width(width,height)
+        else:
+            go_js.set_browser_width_based_on_nodes(nodes)
 
         nodes_indexed = {}
         for index, node in enumerate(nodes):
             key  = node.get('key')
             text = node.get('text')
             nodes_indexed[key] = {'index':index, 'text': text }
-
-        #Dev.pprint(nodes_indexed)
-
-        #root_node_key  = nodes[0].get('key')
-        root_node_text = nodes[0].get('text')
 
         data['nodeDataArray'].append({"key": 0, "text": nodes[0].get('text')})                     # add root node first
         for edge in edges:
@@ -125,5 +109,24 @@ class Go_Js_Views:
 
         Dev.pprint(go_js.exec_js(js_code))
         return go_js.send_screenshot_to_slack(team_id=team_id, channel=channel)
-        #return go_js.render(nodes, edges, width=400, team_id=team_id, channel=channel)
 
+    @staticmethod
+    def piechart(team_id=None, channel=None, params=None, headless=True):
+        (go_js, graph_data) = Go_Js_Views._get_graph_data(params, "pie-chart", headless=headless)
+        go_js.load_page(True)
+
+        nodes =  [{ "key": 1,
+                    "text": "Pie Chart from GSBot",
+                    "slices": [#{"start": -30 , "sweep": 60 , "color": "white"},
+                               {"start": 30  , "sweep": 300, "color": "red"}]}]
+        edges = [ {'from': 1, 'to': 2}] #, {'from': 2, 'to': 3} ]
+        data = { 'edges': edges,'nodes': nodes}
+
+        go_js.invoke_js('set_data', data)
+        go_js.exec_js('init()')
+
+        #go_js.api_browser.sync__await_for_element('#animationFinished')
+
+        return go_js.send_screenshot_to_slack(team_id=team_id, channel=channel)
+        #(nodes, edges) = Go_Js_Views._get_nodes_and_edges(graph_data)
+        #return go_js.render(nodes, edges, width=2000, team_id=team_id, channel=channel)

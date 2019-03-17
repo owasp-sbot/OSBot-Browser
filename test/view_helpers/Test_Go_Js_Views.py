@@ -30,8 +30,10 @@ class Test_Go_Js_Views(TestCase):
     def test_sankey   (self): self.png_data = Go_Js_Views.sankey   (params=['graph_MKF'])
     def test_swimlanes(self): self.png_data = Go_Js_Views.swimlanes(params=['graph_MKF'])
     def test_mindmap  (self): self.png_data = Go_Js_Views.mindmap  (params=['graph_OJF'])
+    def test_piechart (self): self.png_data = Go_Js_Views.piechart (params=['graph_OJF'])
 
-
+    def test_mindmap_with_size(self):
+        self.png_data = Go_Js_Views.mindmap(params=['graph_EPU',1000,300])
 
     def test_open_file_in_browser__go_gs(self):
         #View_Examples(headless=False).open_file_in_browser('/go-js/sankey.html')
