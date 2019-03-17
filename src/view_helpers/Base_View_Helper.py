@@ -59,6 +59,9 @@ class Base_View_Helpers:
     def invoke_js(self, name, params):
         return self.browser().sync_js_invoke_function(name,params)
 
+    def assign_variable_js(self, variable, data):
+        return self.browser().sync_js_assign_variable(variable,data)
+
     def set_browser_width_based_on_nodes(self,nodes):
         if   len(nodes) < 30 : self.browser().sync__browser_width(800)
         elif len(nodes) < 100: self.browser().sync__browser_width(1500)

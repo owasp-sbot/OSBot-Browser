@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from Go_Js_Views import Go_Js_Views
+from view_helpers.Go_Js_Views import Go_Js_Views
 from browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 from utils.Dev import Dev
 from utils.aws.Lambdas import Lambdas
@@ -41,7 +41,9 @@ class Test_Go_Js_Views(TestCase):
         #View_Examples(headless=False).open_file_in_browser('/go-js/sankey.html')
         View_Examples(headless=False).open_file_in_browser('/go-js/mindmap.html')
 
-
+    def test_open_file_in_browser__am_charts(self):
+        #View_Examples(headless=False).open_file_in_browser('/go-js/sankey.html')
+        View_Examples(headless=False).open_file_in_browser('/am_charts/triangle.html')
 
 
     def test_update_lambda(self):
