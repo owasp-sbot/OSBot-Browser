@@ -17,12 +17,14 @@
           myDiagram =
             $(go.Diagram, "myDiagramDiv",
               {
-                // when the user drags a node, also move/copy/delete the whole subtree starting with that node
-                "commandHandler.copiesTree": true,
-                "commandHandler.copiesParentKey": true,
-                "commandHandler.deletesTree": true,
-                "draggingTool.dragsTree": true,
-                "undoManager.isEnabled": true
+                    initialAutoScale: go.Diagram.Uniform,  //DC
+                    contentAlignment: go.Spot.Center,      //DC
+                    // when the user drags a node, also move/copy/delete the whole subtree starting with that node
+                    "commandHandler.copiesTree": true,
+                    "commandHandler.copiesParentKey": true,
+                    "commandHandler.deletesTree": true,
+                    "draggingTool.dragsTree": true,
+                    "undoManager.isEnabled": true
               });
 
           // when the document is modified, add a "*" to the title and enable the "Save" button

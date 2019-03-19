@@ -30,14 +30,18 @@ class Test_Go_Js_Views(TestCase):
     def test_circular (self): self.png_data = Go_Js_Views.circular (params=['graph_GYY'])
     def test_sankey   (self): self.png_data = Go_Js_Views.sankey   (params=['graph_MKF'])
     def test_swimlanes(self): self.png_data = Go_Js_Views.swimlanes(params=['graph_MKF'])
-    def test_mindmap  (self): self.png_data = Go_Js_Views.mindmap  (params=['graph_OJF'])
+    def test_mindmap  (self): self.png_data = Go_Js_Views.mindmap  (params=['graph_FCM'])
     def test_piechart (self): self.png_data = Go_Js_Views.piechart (params=['_'        ])
     def test_kanban   (self): self.png_data = Go_Js_Views.kanban   (params=['graph_MKF'],headless=False)
+    def test_timeline (self): self.png_data = Go_Js_Views.timeline (params=['graph_MKF'],headless=False)
 
     def test_chart_js(self): self.png_data = Go_Js_Views.chart_js(params=['_'])
 
-    def test_mindmap_with_size(self):
+    def test_mindmap___with_size(self):
         self.png_data = Go_Js_Views.mindmap(params=['graph_EPU',1000,300])
+
+    def test_mindmap___with_non_issue_nodes(self):
+        self.png_data = Go_Js_Views.mindmap(params=['graph_THV',1000,500])
 
     def test_open_file_in_browser__go_gs(self):
         #View_Examples(headless=False).open_file_in_browser('/go-js/sankey.html')

@@ -72,6 +72,23 @@ class DataTable_Js_Views:
         return DataTable_Js_Views._create_table_with_headers(team_id, channel, graph_name, headers, columns_defs,table_width)
 
     @staticmethod
+    def graph_tasks(team_id=None, channel=None, params=None):
+        load_dependencies(['syncer', 'requests']);
+        graph_name = params.pop(0)
+        table_width = "1200px"
+        headers = ['Key', 'Summary', 'Latest_Information','Status', 'Issue Type']  # without issue links
+        columns_defs = [
+            {"targets": [1], "width": "70px"},  # Key
+            {"targets": [1], "width": "300px"},  # Summary
+            {"targets": [2], "width": "300px"},  # Latest_Information
+            #{"targets": [3], "width": "100px"},  # Status
+            #{"targets": [5], "width": "100px"},  # Rating
+        ]
+
+        return DataTable_Js_Views._create_table_with_headers(team_id, channel, graph_name, headers, columns_defs,
+                                                             table_width)
+
+    @staticmethod
     def graph_all_fields(team_id=None, channel=None, params=None):
         load_dependencies(['syncer', 'requests']);
         graph_data = DataTable_Js_Views._get_data(params.pop(0))

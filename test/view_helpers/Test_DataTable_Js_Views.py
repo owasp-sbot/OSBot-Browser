@@ -27,6 +27,10 @@ class Test_DataTable_Js_Views(TestCase):
     def test_graph_simple(self):
         graph_name = 'graph_9CP'
         self.png_data = DataTable_Js_Views.graph_simple(params=[graph_name])
+
+    def test_graph_tasks(self):
+        graph_name = 'graph_CMB'
+        self.png_data = DataTable_Js_Views.graph_tasks(params=[graph_name])
         Dev.pprint(self.png_data)
 
     def test_graph_all_fields(self):

@@ -49,13 +49,10 @@ chart.legend.padding(20,20,20,20);
 
 chart.___data = "" 
         """
-        data = [{ "name": "Dynamic", "value": 54},
-                 {"name": "Pyramid","value": 245},
-                 {"name": "via","value": 187},
-                 {"name": "GS Bot","value": 123},
-                 {"name": "The fifth","value": 87},
-                 {"name": "The sixth","value": 45},
-                 {"name": "The seventh","value": 297}]
+        data = [{ "name": "High"    , "value": 100},
+                 {"name": "Moderate", "value": 100},
+                 {"name": "Low"     , "value": 100},
+                 ]
         am_charts.exec_js(js_code)
         am_charts.assign_variable_js('window.chart.data',data)
 

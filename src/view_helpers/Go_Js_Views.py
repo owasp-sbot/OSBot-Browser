@@ -78,7 +78,6 @@ class Go_Js_Views:
     @staticmethod
     def mindmap(team_id=None, channel=None, params=None):
         (go_js, graph_data) = Go_Js_Views._get_graph_data(params, "mindmap",headless=True)
-
         go_js.load_page(False)
         (nodes, edges) = Go_Js_Views._get_nodes_and_edges(graph_data,text_field='Summary')
         data = { "class": "go.TreeModel", "nodeDataArray": []}
@@ -92,14 +91,27 @@ class Go_Js_Views:
         nodes_indexed = {}
         for index, node in enumerate(nodes):
             key  = node.get('key')
-            text = node.get('text')
+            text = "{1} | {0}".format(key,node.get('text'))
             nodes_indexed[key] = {'index':index, 'text': text }
 
-        data['nodeDataArray'].append({"key": 0, "text": nodes[0].get('text')})                     # add root node first
+        root_node_text = "{1} | {0}".format(nodes[0].get('key'), nodes[0].get('text'))
+        data['nodeDataArray'].append({"key": 0, "text": root_node_text })                     # add root node first
         for edge in edges:
-            parent    = nodes_indexed.get(edge['from']).get('index')
-            key       = nodes_indexed.get(edge['to'  ]).get('index')
-            text      = nodes_indexed.get(edge['to'  ]).get('text')
+            from_key   = edge['from']
+            to_key     = edge['to']
+            from_issue = nodes_indexed.get(from_key)
+            to_issue   = nodes_indexed.get(to_key)
+
+            if from_issue:
+                parent = nodes_indexed.get(edge['from']).get('index')
+            else:
+                parent = from_key
+            if to_issue:
+                key    = nodes_indexed.get(edge['to'  ]).get('index')
+                text   = nodes_indexed.get(edge['to'  ]).get('text')
+            else:
+                key    = to_key
+                text   = to_key
             item = {"key": key, "parent": parent, "text": text, "brush": Misc.get_random_color()}
             data['nodeDataArray'].append(item)
 
@@ -172,5 +184,69 @@ class Go_Js_Views:
         #(nodes, edges) = Go_Js_Views._get_nodes_and_edges(graph_data)
         #return go_js.render(nodes, edges, team_id=team_id, channel=channel)
 
-        go_js.api_browser.sync__await_for_element('#animationFinished')
+        data = { "class": "go.GraphLinksModel",
+                          "nodeDataArray": [{"key":"Problems"   , "text":"_Problems"    , "isGroup":True, "loc":"0 23.52284749830794" },
+                                            {"key":"Reproduced" , "text":"_Reproduced"  , "isGroup":True, "color":"0", "loc":"109 23.52284749830794" },
+                                            {"key":"Identified" , "text":"Identified"   , "isGroup":True, "color":"0", "loc":"235 23.52284749830794" },
+                                            {"key":"Fixing"     , "text":"Fixing"       , "isGroup":True, "color":"0", "loc":"343 23.52284749830794" },
+                                            {"key":"Reviewing"  , "text":"Reviewing"    , "isGroup":True, "color":"0", "loc":"451 23.52284749830794"},
+                                            {"key":"Testing"    , "text":"Testing"      , "isGroup":True, "color":"0", "loc":"562 23.52284749830794" },
+                                            {"key":"Customer"   , "text":"Customer"     , "isGroup":True, "color":"0", "loc":"671 23.52284749830794" },
+                                            {"key":-1, "group":"Problems", "category":"newbutton",  "loc":"12 35.52284749830794" },
+                                            {"key":1, "text":"text for oneA", "group":"Problems", "color":"0", "loc":"12 35.52284749830794"},
+                                            {"key":2, "text":"text for oneB", "group":"Problems", "color":"1", "loc":"12 65.52284749830794"},
+                                            {"key":3, "text":"text for oneC", "group":"Problems", "color":"0", "loc":"12 95.52284749830794"},
+                                            {"key":4, "text":"text for oneD", "group":"Problems", "color":"1", "loc":"12 125.52284749830794"},
+                                            {"key":5, "text":"text for twoA", "group":"Reproduced", "color":"1", "loc":"121 35.52284749830794"},
+                                            {"key":6, "text":"text for twoB", "group":"Reproduced", "color":"1", "loc":"121 65.52284749830794"},
+                                            {"key":7, "text":"text for twoC", "group":"Identified", "color":"0", "loc":"247 35.52284749830794"},
+                                            {"key":8, "text":"text for twoD", "group":"Fixing", "color":"0", "loc":"355 35.52284749830794"},
+                                            {"key":9, "text":"text for twoE", "group":"Reviewing", "color":"0", "loc":"463 35.52284749830794"},
+                                            {"key":10, "text":"text for twoF", "group":"Reviewing", "color":"1", "loc":"463 65.52284749830794"},
+                                            {"key":11, "text":"text for twoG", "group":"Testing", "color":"0", "loc":"574 35.52284749830794"},
+                                            {"key":12, "text":"text for fourA", "group":"Customer", "color":"1", "loc":"683 35.52284749830794"},
+                                            {"key":13, "text":"text for fourB", "group":"Customer", "color":"1", "loc":"683 65.52284749830794"},
+                                            {"key":14, "text":"text for fourC", "group":"Customer", "color":"1", "loc":"683 95.52284749830794"},
+                                            {"key":15, "text":"text for fourD", "group":"Customer", "color":"0", "loc":"683 125.52284749830794"},
+                                            {"key":16, "text":"text for fiveA", "group":"Customer", "color":"0", "loc":"683 155.52284749830795"}
+                                            ],
+                          "linkDataArray": []}
+                   # create_graph_from_json(data)
+        go_js.invoke_js('create_graph_from_json',data)
+        #go_js.api_browser.sync__await_for_element('#animationFinished')
+        return go_js.send_screenshot_to_slack(team_id=team_id, channel=channel)
+
+    def timeline(team_id=None, channel=None, params=None, headless=True):
+        (go_js, graph_data) = Go_Js_Views._get_graph_data(params, "timeline",headless)
+        go_js.load_page(True)
+
+        #go_js.browser().sync__browser_width(1000, 600)
+
+        # var data = [
+        #         { # this defines the actual time "Line" bar
+        #           "key"         : "timeline", "category": "Line",
+        #           "lineSpacing": 30,            # distance between timeline and event nodes
+        #           "length"     : 700,           # the width of the timeline
+        #           "start"      : datetime.now #new Date("1 Jan 2016"),
+        #           "end: new Date("31 Dec 2016")
+        #         },
+        #
+        #         # // the rest are just "events" --
+        #         # // you can add as much information as you want on each and extend the
+        #         # // default nodeTemplate to show as much information as you want
+        #         # { event: "New Year's Day", date: new Date("1 Jan 2016") },
+        #         # { event: "MLK Jr. Day", date: new Date("18 Jan 2016") },
+        #         # { event: "Presidents Day", date: new Date("15 Feb 2016") },
+        #         # { event: "Memorial Day", date: new Date("30 May 2016") },
+        #         # { event: "Independence Day", date: new Date("4 Jul 2016") },
+        #         # { event: "Labor Day", date: new Date("5 Sep 2016") },
+        #         # { event: "Columbus Day", date: new Date("10 Oct 2016") },
+        #         # { event: "Veterans Day", date: new Date("11 Nov 2016") },
+        #         # { event: "Thanksgiving", date: new Date("24 Nov 2016") },
+        #         # { event: "Christmas", date: new Date("25 Dec 2016") }
+        #       ];
+        #go_js.invoke_js('create_graph_from_json',data)
+
+
+        #go_js.api_browser.sync__await_for_element('#animationFinished')
         return go_js.send_screenshot_to_slack(team_id=team_id, channel=channel)
