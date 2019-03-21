@@ -9,6 +9,12 @@ gsuite_secret_id = 'gsuite_gsbot_user'
 class Full_Calendar_Views:
 
     @staticmethod
+    def _get_gcalendar():
+        load_dependencies(['syncer', 'requests', 'gmail']);
+        from gsuite.GCalendar import GCalendar
+        return GCalendar(gsuite_secret_id=gsuite_secret_id)
+
+    @staticmethod
     def _show_google_calendar(calendar_data,team_id=None, channel=None,headless=True):
         #load_dependencies(['syncer', 'requests', 'gmail']);
         from view_helpers.Full_Calendar import Full_Calendar
@@ -35,9 +41,15 @@ class Full_Calendar_Views:
 
     @staticmethod
     def gs_team(team_id=None, channel=None, params=None,headless=True):
-        load_dependencies(['syncer', 'requests', 'gmail']);
-        slack_message(":point_right: Loading data from GS Team shared calendar")
-        from gsuite.GCalendar import GCalendar
-        gcalendar = GCalendar(gsuite_secret_id=gsuite_secret_id)
-        calendar_data = gcalendar.gs_team()
+        slack_message(":point_right: Loading data from GS Team shared calendar", [], channel,team_id)
+
+        calendar_data = Full_Calendar_Views._get_gcalendar().gs_team()
         return Full_Calendar_Views._show_google_calendar(calendar_data,team_id,channel)
+
+    @staticmethod
+    def gs_cs_team(team_id=None, channel=None, params=None, headless=True):
+        slack_message(":point_right: Loading data from GS CS Team shared calendar", [], channel, team_id)
+
+        calendar_data = Full_Calendar_Views._get_gcalendar().gs_cs_team()
+
+        return Full_Calendar_Views._show_google_calendar(calendar_data, team_id, channel)

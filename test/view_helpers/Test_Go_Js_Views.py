@@ -51,19 +51,10 @@ class Test_Go_Js_Views(TestCase):
         #View_Examples(headless=False).open_file_in_browser('/go-js/sankey.html')
         View_Examples(headless=False).open_file_in_browser('/am_charts/triangle.html')
 
+    # bugs
 
-    def test_update_lambda(self):
-        Lambdas('browser.lambda_browser').update_with_src()
-
-
-
-
-
-
-
-
-
-    # BUGs
+    def test_default_doesnt_render(self):
+        self.png_data = Go_Js_Views.default(params=['graph_414']) # graph_name has a node whose text is None
 
     def test_bug_cache_issue_in_lambdas(self):
         Lambdas('browser.lambda_browser').update_with_src()
@@ -77,3 +68,8 @@ class Test_Go_Js_Views(TestCase):
 
     def test_bug_graph_breaks_mindmap(self):
         self.png_data = Go_Js_Views.mindmap(params=['graph_W2E'])
+
+
+    # update lambda
+    def test_update_lambda(self):
+        Lambdas('browser.lambda_browser').update_with_src()

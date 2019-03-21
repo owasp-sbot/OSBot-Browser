@@ -25,6 +25,10 @@ class Test_VivaGraph_Js_Views(TestCase):
         #self.png_data = False
 
         #return
+    def test_default__with_non_issue_nodes(self):
+        graph_name = 'graph_THV'                    # create by an group_by filter
+        self.png_data = VivaGraph_Js_Views.default(params=[graph_name])
+
 
     def test_by_issue_type(self):
         graph_name = 'graph_XKW'    # (7 nodes)
@@ -38,6 +42,16 @@ class Test_VivaGraph_Js_Views(TestCase):
         field      = 'Labels' # ''Rating'
         self.png_data = VivaGraph_Js_Views.by_field(params=[graph_name,field])
         #self.png_data = False
+
+
+    # bugs
+
+    def test_graph_doesnt_render(self):
+        graph_name = 'graph_AEY'
+        self.png_data = VivaGraph_Js_Views.default(params=[graph_name])
+
+
+    # update lambda
 
 
     def test_update_lambda(self):

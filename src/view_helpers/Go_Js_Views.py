@@ -22,23 +22,23 @@ class Go_Js_Views:
     def _get_nodes_and_edges(graph_data,nodes=None,edges=None, text_field='Key', append_key_to_text=False):
         if nodes is None: nodes = []
         if edges is None: edges = []
+        if graph_data:
+            for key,issue in graph_data.get('nodes').items():
+                if issue and issue.get('Summary'):
+                    text = issue.get(text_field)
+                    if append_key_to_text:
+                        text += " | {0}".format(key)
+                    nodes.append({'key': key, 'text': text , 'color': Misc.get_random_color()})
 
-        for key,issue in graph_data.get('nodes').items():
-            if issue and issue.get('Summary'):
-                text = issue.get(text_field)
-                if append_key_to_text:
-                    text += " | {0}".format(key)
-                nodes.append({'key': key, 'text': text , 'color': Misc.get_random_color()})
-
-        for edge in graph_data.get('edges'):
-            edges.append({ 'from': edge[0], 'text' : edge[1] ,'to': edge[2] ,'color':  Misc.get_random_color()})
+            for edge in graph_data.get('edges'):
+                if edge[1] and edge[2]:
+                    edges.append({ 'from': edge[0], 'text' : edge[1] ,'to': edge[2] ,'color':  Misc.get_random_color()})
         return nodes,edges
 
     @staticmethod
     def default(team_id=None, channel=None, params=None):
         (go_js, graph_data) = Go_Js_Views._get_graph_data(params)
         (nodes,edges)       = Go_Js_Views._get_nodes_and_edges(graph_data)
-
         return go_js.render(nodes, edges, width=2000,team_id = team_id, channel= channel )
 
     @staticmethod

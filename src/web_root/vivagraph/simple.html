@@ -9,25 +9,6 @@
                 graph = Viva.Graph.graph();
 
                 nodeSize = 20
-                // root = 0
-                // for (i = 1; i < 50; i++) {
-                //     for (j = 1; j < 10; j++) {
-                //         graph.addLink(root++, j);
-                //     }
-                // }
-                // graph.addLink(1, 3);
-                // graph.addLink(1, 4);
-                // graph.addLink(1, 5);
-                // graph.addNode('world', 'custom data');
-                // graph.addLink('world', 5);
-                // graph.addLink('world','anvaka')
-                // graph.addLink('world','indexzero')
-                // graph.addLink('world','anvaka')
-                //
-                //
-                // graph.addNode('anvaka', 'vuln');
-                // graph.addNode('indexzero', 'vuln');
-                // graph.addLink('anvaka', 'vuln');
 
                 graphics = Viva.Graph.View.svgGraphics();
 
@@ -41,17 +22,16 @@
                         label   = node.id
                     }
 
-                    var ui = Viva.Graph.svg('g'),
-                          svgText = Viva.Graph.svg('text')
-                                                .attr('y', '+30px')
-                                                .attr('x', '-10px')
-                                                .attr('font-size', '8px')
-                                                .text(label),
-                          img = Viva.Graph.svg('image')
-                                 .attr('width', nodeSize)
-                                 .attr('height', nodeSize)
-                                 .link(img_url);
-                                 //.link('icons/'+ node.data + '.png');
+                    ui      = Viva.Graph.svg('g')
+                    console.log(label)
+                    svgText = Viva.Graph.svg('text') .attr('y', '+30px')
+                                                     .attr('x', '-10px')
+                                                     .attr('font-size', '8px')
+                                                     .text(label),
+                    //console.log(img)
+                    img     = Viva.Graph.svg('image').attr('width', nodeSize)
+                                                     .attr('height', nodeSize)
+                                                     .link(img_url);
                     ui.append(svgText);
                     ui.append(img);
                     return ui;
