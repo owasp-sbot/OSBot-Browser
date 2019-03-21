@@ -24,8 +24,8 @@ class Base_View_Helpers:
     def browser(self):
         return self.api_browser
 
-    def browser_width(self,value):
-        self.browser().sync__browser_width(value)
+    def browser_width(self,value,height=None):
+        self.browser().sync__browser_width(value,height)
         return self
 
     def load_page(self,reload=False):
