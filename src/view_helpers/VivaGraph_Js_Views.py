@@ -11,13 +11,13 @@ from view_helpers.Node_Format import Node_Format
 class VivaGraph_Js_Views:
 
     @staticmethod
-    def default(team_id=None, channel=None, params=None, no_render=False):
+    def default(team_id=None, channel=None, params=None, no_render=False,headless=True):
 
         load_dependencies(['syncer', 'requests']);
         from view_helpers.VivaGraph_Js import VivaGraph_Js
 
         graph_name = params.pop(0)
-        vivagraph_js = VivaGraph_Js(headless=False)  # will start browser
+        vivagraph_js = VivaGraph_Js(headless=headless)  # will start browser
 
         graph_data = vivagraph_js.get_graph_data(graph_name)
         #
@@ -41,7 +41,7 @@ class VivaGraph_Js_Views:
                 return graph_name, nodes, edges, graph_data, vivagraph_js
 
             options = {}
-            vivagraph_js.create_graph_and_send_screenshot_to_slack(nodes, edges, options, team_id, channel)
+            return vivagraph_js.create_graph_and_send_screenshot_to_slack(nodes, edges, options, team_id, channel)
 
 
 
@@ -71,4 +71,4 @@ class VivaGraph_Js_Views:
                 value = issue.get(field)
                 node['label'] = value
 
-        vivagraph_js.create_graph_and_send_screenshot_to_slack(nodes, edges, {}, team_id, channel)
+        return vivagraph_js.create_graph_and_send_screenshot_to_slack(nodes, edges, {}, team_id, channel)

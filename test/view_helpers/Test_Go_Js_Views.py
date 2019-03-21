@@ -74,3 +74,6 @@ class Test_Go_Js_Views(TestCase):
 
         self.png_data = Lambdas('browser.lambda_browser').invoke(payload)
         Dev.pprint(self.png_data)
+
+    def test_bug_graph_breaks_mindmap(self):
+        self.png_data = Go_Js_Views.mindmap(params=['graph_W2E'])

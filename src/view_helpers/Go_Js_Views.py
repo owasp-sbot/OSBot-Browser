@@ -89,38 +89,39 @@ class Go_Js_Views:
             go_js.set_browser_width_based_on_nodes(nodes)
 
         nodes_indexed = {}
-        for index, node in enumerate(nodes):
-            key  = node.get('key')
-            text = "{1} | {0}".format(key,node.get('text'))
-            nodes_indexed[key] = {'index':index, 'text': text }
+        if len(nodes) > 0:
+            for index, node in enumerate(nodes):
+                key  = node.get('key')
+                text = "{0} | {1}".format(key,node.get('text'))
+                nodes_indexed[key] = {'index':index, 'text': text }
 
-        root_node_text = "{1} | {0}".format(nodes[0].get('key'), nodes[0].get('text'))
-        data['nodeDataArray'].append({"key": 0, "text": root_node_text })                     # add root node first
-        for edge in edges:
-            from_key   = edge['from']
-            to_key     = edge['to']
-            from_issue = nodes_indexed.get(from_key)
-            to_issue   = nodes_indexed.get(to_key)
+            root_node_text = "{0} | {1}".format(nodes[0].get('key'), nodes[0].get('text'))
+            data['nodeDataArray'].append({"key": 0, "text": root_node_text })                     # add root node first
+            for edge in edges:
+                from_key   = edge['from']
+                to_key     = edge['to']
+                from_issue = nodes_indexed.get(from_key)
+                to_issue   = nodes_indexed.get(to_key)
 
-            if from_issue:
-                parent = nodes_indexed.get(edge['from']).get('index')
-            else:
-                parent = from_key
-            if to_issue:
-                key    = nodes_indexed.get(edge['to'  ]).get('index')
-                text   = nodes_indexed.get(edge['to'  ]).get('text')
-            else:
-                key    = to_key
-                text   = to_key
-            item = {"key": key, "parent": parent, "text": text, "brush": Misc.get_random_color()}
-            data['nodeDataArray'].append(item)
+                if from_issue:
+                    parent = nodes_indexed.get(edge['from']).get('index')
+                else:
+                    parent = from_key
+                if to_issue:
+                    key    = nodes_indexed.get(edge['to'  ]).get('index')
+                    text   = nodes_indexed.get(edge['to'  ]).get('text')
+                else:
+                    key    = to_key
+                    text   = to_key
+                item = {"key": key, "parent": parent, "text": text, "brush": Misc.get_random_color()}
+                data['nodeDataArray'].append(item)
 
-        go_js.invoke_js("create_graph_from_json", data)
-        js_code = 'layoutAll()'
-        go_js.api_browser.sync__await_for_element('#animationFinished')
+            go_js.invoke_js("create_graph_from_json", data)
+            js_code = 'layoutAll()'
+            go_js.api_browser.sync__await_for_element('#animationFinished')
 
-        Dev.pprint(go_js.exec_js(js_code))
-        return go_js.send_screenshot_to_slack(team_id=team_id, channel=channel)
+            Dev.pprint(go_js.exec_js(js_code))
+            return go_js.send_screenshot_to_slack(team_id=team_id, channel=channel)
 
     @staticmethod
     def piechart(team_id=None, channel=None, params=None, headless=True):

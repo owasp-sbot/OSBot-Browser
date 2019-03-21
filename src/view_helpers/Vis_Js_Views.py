@@ -8,12 +8,12 @@ from view_helpers.Node_Format import Node_Format
 class Vis_Js_Views:
 
     @staticmethod
-    def default(team_id=None, channel=None, params=None, no_render=False):
+    def default(team_id=None, channel=None, params=None, no_render=False, headless=True):
 
         load_dependencies(['syncer', 'requests']) ; from view_helpers.Vis_Js import Vis_Js
 
         graph_name = params.pop(0)
-        vis_js = Vis_Js(headless=True)                               # will start browser
+        vis_js = Vis_Js(headless=headless)                               # will start browser
         graph_data = vis_js.get_graph_data(graph_name)
 
         nodes = []
@@ -162,8 +162,8 @@ class Vis_Js_Views:
                 .send_screenshot_to_slack(team_id, channel))
 
     @staticmethod
-    def r1_pinned(team_id=None, channel=None, params=None):
-        (graph_name,nodes, edges, graph_data,vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+    def r1_pinned(team_id=None, channel=None, params=None,headless=False):
+        (graph_name,nodes, edges, graph_data,vis_js) = Vis_Js_Views.default(params=params, no_render=True,headless=headless)
         graph_name += ' | r1_pinned'
 
         issues = graph_data.get('nodes')

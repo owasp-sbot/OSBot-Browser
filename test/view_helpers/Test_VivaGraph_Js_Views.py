@@ -22,7 +22,7 @@ class Test_VivaGraph_Js_Views(TestCase):
         #graph_name = 'graph_VZ5'   # (367 nodes, 653 edges)
         #graph_name = 'graph_EE3'    # fails in lambda in visjs (but works here :) )
         self.png_data = VivaGraph_Js_Views.default(params=[graph_name])
-        self.png_data = False
+        #self.png_data = False
 
         #return
 
@@ -31,14 +31,13 @@ class Test_VivaGraph_Js_Views(TestCase):
         graph_name = 'graph_MKF'    # ( 20 nodes,  27 edges)
 
         self.png_data = VivaGraph_Js_Views.by_issue_type(params=[graph_name])
-        self.png_data = False
 
     def test_by_field(self):
         graph_name = 'graph_XKW'    # (7 nodes)
         graph_name = 'graph_MKF'    # ( 20 nodes,  27 edges)
         field      = 'Labels' # ''Rating'
         self.png_data = VivaGraph_Js_Views.by_field(params=[graph_name,field])
-        self.png_data = False
+        #self.png_data = False
 
 
     def test_update_lambda(self):
