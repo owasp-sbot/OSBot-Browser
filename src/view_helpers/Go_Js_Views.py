@@ -1,8 +1,10 @@
+import json
 from time import sleep
 
 from utils.Dev import Dev
+from utils.Lambdas_Helpers import slack_message
 from utils.Misc import Misc
-from utils.aws.Lambdas import load_dependencies
+from utils.aws.Lambdas import load_dependencies, Lambdas
 
 
 class Go_Js_Views:
@@ -80,7 +82,27 @@ class Go_Js_Views:
         return go_js.render(nodes, edges, js_code=js_code, width=1400, team_id=team_id, channel=channel)
 
     @staticmethod
-    def mindmap(team_id=None, channel=None, params=None):
+    def mindmap_issue(team_id=None, channel=None, params=None):
+        def log_message(message):
+            slack_message(':point_right: {0}'.format(message),[],channel,team_id)
+
+        (start, direction, depth, view) = (params.pop(0), 'all', 1, '')
+
+        log_message('Step 1: Generating graph for issue {0} using direction `all` and depth `{1}`'.format(direction, depth))
+
+        payload     = {"params": ['links', start, direction, depth, view]}
+        result      = Lambdas('gs.elastic_jira').invoke(payload)
+        graph       = json.loads(result.get('text'))
+        graph_name  = graph.get('graph_name')
+        log_message('Step 2: Filtering graph {0} with filter `group_by_field` on field `Issue links`'.format(graph_name))
+        payload = {"params": ["filter", "group_by_field", graph_name, "Issue Links"]}
+        graph_filtered_name = Lambdas('gsbot.gsbot_graph').invoke(payload)
+        log_message('Step 3: Creating  mindmap for filtered graph `{0}`'.format(graph_filtered_name))
+        return Go_Js_Views.mindmap(team_id, channel, params=[graph_filtered_name], root_node_text=start)
+
+
+    @staticmethod
+    def mindmap(team_id=None, channel=None, params=None, root_node_text=None):
         (go_js, graph_data) = Go_Js_Views._get_graph_data(params, "mindmap",headless=True)
         go_js.load_page(False)
         (nodes, edges) = Go_Js_Views._get_nodes_and_edges(graph_data,text_field='Summary')
@@ -96,10 +118,13 @@ class Go_Js_Views:
         if len(nodes) > 0:
             for index, node in enumerate(nodes):
                 key  = node.get('key')
-                text = "{0} | {1}".format(key,node.get('text'))
+                #text = "{1} | {0}".format(key,node.get('text'))                            # need a better way to trigger this
+                text = node.get('text')
                 nodes_indexed[key] = {'index':index, 'text': text }
 
-            root_node_text = "{0} | {1}".format(nodes[0].get('key'), nodes[0].get('text'))
+            #root_node_text = "{1} | {0}".format(nodes[0].get('key'), nodes[0].get('text')) # and this
+            if root_node_text is None:
+                root_node_text = nodes[0].get('text')
             data['nodeDataArray'].append({"key": 0, "text": root_node_text })                     # add root node first
             for edge in edges:
                 from_key   = edge['from']

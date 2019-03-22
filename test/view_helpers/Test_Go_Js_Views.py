@@ -43,6 +43,14 @@ class Test_Go_Js_Views(TestCase):
     def test_mindmap___with_non_issue_nodes(self):
         self.png_data = Go_Js_Views.mindmap(params=['graph_THV',1000,500])
 
+    def test_mindmap_issue(self):
+        import json
+        jira_id = 'GSCS-14'
+        #jira_id = 'IA-402'
+        self.png_data = Go_Js_Views.mindmap_issue(params=[jira_id])
+        #params = [graph_name]
+
+
     def test_open_file_in_browser__go_gs(self):
         #View_Examples(headless=False).open_file_in_browser('/go-js/sankey.html')
         View_Examples(headless=False).open_file_in_browser('/go-js/mindmap.html')
@@ -71,8 +79,9 @@ class Test_Go_Js_Views(TestCase):
         graph_name = 'graph_0QZ'   # example 2
         self.png_data = Go_Js_Views.mindmap(params=[graph_name])
 
-    def test_bug___graph_doesnt_create_good_mindmap(self):
-        graph_name = 'graph_56Q'
+    def test_fixed_bug___graph_doesnt_create_good_mindmap(self):
+        graph_name = 'graph_56Q'    # prob was this graph (that was missing a root node)
+        graph_name = 'graph_O80'
         self.png_data = Go_Js_Views.mindmap(params=[graph_name])
 
 

@@ -26,7 +26,7 @@ class VivaGraph_Js_Views:
             edges = graph_data.get('edges')
             nodes = []
             for key,issue in graph_data.get('nodes').items():
-                if issue.get("Image Url") :
+                if issue and issue.get("Image Url") :
                     (label, img_size, img_url) = (key,20,issue.get("Image Url"))
                 else:
                     (label,img_size,img_url) = vivagraph_js.resolve_icon_from_issue_type(issue, key)

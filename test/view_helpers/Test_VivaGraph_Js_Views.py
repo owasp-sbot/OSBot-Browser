@@ -52,7 +52,8 @@ class Test_VivaGraph_Js_Views(TestCase):
 
     def test_fixed__bug_graph_doesnt_render(self):
         graph_name = 'graph_AEY'
-        self.png_data = VivaGraph_Js_Views.default(params=[graph_name],headless=False)
+        graph_name = 'graph_NP5'
+        self.png_data = VivaGraph_Js_Views.default(params=[graph_name],headless=True)
 
     def test_fixed_bug__broken_images(self):
         graph_name = 'graph_34F'
