@@ -154,7 +154,7 @@ class VivaGraph_Js:
             #    Dev.pprint(key + ' ' + issue_type)
 
         else:
-            icon = 'icons/none.jpg' \
+            icon = 'icons/none.jpg'
             #icon = 'https://dummyimage.com/100x40/2c2f87/FFFFFF&text={0}'.format(key)
             #img_size = 10
 
