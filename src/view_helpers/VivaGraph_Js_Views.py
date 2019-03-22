@@ -26,10 +26,12 @@ class VivaGraph_Js_Views:
             edges = graph_data.get('edges')
             nodes = []
             for key,issue in graph_data.get('nodes').items():
+                (label,img_size,img_url) = vivagraph_js.resolve_icon_from_issue_type(issue, key)
                 node = {
-                            'key'   : key ,
-                            'label' : key,
-                            'img'   : vivagraph_js.resolve_icon_from_issue_type(issue, key)
+                            'key'     : key     ,
+                            'label'   : label   ,
+                            'img_url' : img_url ,
+                            'img_size': img_size
                         }
                 nodes.append(node)
             slack_message(":point_right: Rendering `{0}` using VivaGraph JS engine (`{1}` nodes and `{2}` edges)"
@@ -70,5 +72,23 @@ class VivaGraph_Js_Views:
             if issue:
                 value = issue.get(field)
                 node['label'] = value
+
+        return vivagraph_js.create_graph_and_send_screenshot_to_slack(nodes, edges, {}, team_id, channel)
+
+
+    def people(team_id=None, channel=None, params=None, no_render=False,headless=True):
+
+        (graph_name, nodes, edges, graph_data, vivagraph_js) = VivaGraph_Js_Views.default(team_id, channel, params,no_render=True,headless=headless)
+        from utils.slack.API_Slack import API_Slack
+        slack = API_Slack(team_id='T0SDK1RA8')
+        Dev.pprint(slack.user('U4AF226H0'))
+        # users = self.api.users()
+        for node in nodes:
+            if node.get('key') == 'GSP-95':
+                node['img_url'] = 'https://ca.slack-edge.com/T0SDK1RA8-U4AF226H0-4606985f1305-72'
+
+                return
+
+        #Dev.pprint(len(set(users)))
 
         return vivagraph_js.create_graph_and_send_screenshot_to_slack(nodes, edges, {}, team_id, channel)

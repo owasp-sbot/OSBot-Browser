@@ -104,10 +104,11 @@ class VivaGraph_Js:
         js_code = ""
         #for key,issue in nodes.items():
         for node in nodes:
-            key   = node.get('key')
-            label = node.get('label')
-            img   = node.get('img')
-            params = { "label" : label, "img": img}
+            key       = node.get('key'     )
+            label     = node.get('label'   )
+            img_url   = node.get('img_url' )
+            img_size  = node.get('img_size')
+            params = { "label" : label, "img_url": img_url, 'img_size':img_size}
             js_code += 'graph.addNode("{0}",{1});'.format(key,Misc.json_dumps(params))
         for edge in edges:
             js_code += 'graph.addLink("{0}","{1}");\n'.format(edge[0],edge[2])
@@ -117,6 +118,8 @@ class VivaGraph_Js:
         return 42
 
     def resolve_icon_from_issue_type(self, issue,key):
+        label    = key
+        img_size = 20
         none_icon = 'icons/none.jpg'
         mappings = {
             'Risk'           : 'icons/risk_theme.svg',
@@ -142,6 +145,7 @@ class VivaGraph_Js:
             'User Access'    : 'icons/user_access.svg',
             'Security Event' : 'icons/security_event.svg',
         }
+
         if issue and issue.get("Issue Type"):
             issue_type = issue.get("Issue Type")
             icon = mappings.get(issue_type, none_icon)
@@ -150,5 +154,8 @@ class VivaGraph_Js:
             #    Dev.pprint(key + ' ' + issue_type)
 
         else:
-            icon = none_icon
-        return icon
+            icon = 'icons/none.jpg' \
+            #icon = 'https://dummyimage.com/100x40/2c2f87/FFFFFF&text={0}'.format(key)
+            #img_size = 10
+
+        return label,img_size,icon

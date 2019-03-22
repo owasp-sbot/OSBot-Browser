@@ -1,39 +1,47 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>01. Create Graph. Vivagraph SVG tutorial.</title>
+        <title>GSBot Viva_Graph</title>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/vivagraphjs/0.10.1/vivagraph.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="  crossorigin="anonymous"></script>
         <script type="text/javascript">
             function onLoad () {
                 graph = Viva.Graph.graph();
 
-                nodeSize = 20
-
+                font_size = '8px'
                 graphics = Viva.Graph.View.svgGraphics();
 
                 graphics.node(function(node) {
+                    console.log(node)
                     if (node.data) {
-                        img_url = node.data.img
-                        label   = node.data.label
+                        img_url  = node.data.img_url
+                        label    = node.data.label
+                        nodeSize = node.data.img_size
                     }
                     else {
-                        img_url = 'icons/none.png'
-                        label   = node.id
+                        img_url   = undefined //'icons/none.jpg'
+                        label     = node.id
+                        nodeSize  = 20
                     }
 
                     ui      = Viva.Graph.svg('g')
-                    console.log(label)
-                    svgText = Viva.Graph.svg('text') .attr('y', '+30px')
-                                                     .attr('x', '-10px')
-                                                     .attr('font-size', '8px')
-                                                     .text(label),
-                    //console.log(img)
-                    img     = Viva.Graph.svg('image').attr('width', nodeSize)
+
+                    if (img_url) {
+                        img = Viva.Graph.svg('image').attr('width', nodeSize)
                                                      .attr('height', nodeSize)
                                                      .link(img_url);
+
+                        ui.append(img);
+                    }
+                    else {
+                        font_size = '18px'
+                    }
+                    svgText = Viva.Graph.svg('text') .attr('y', '+30px')
+                                                     .attr('x', '-10px')
+                                                     .attr('font-size', font_size)
+                                                     .text(label),
                     ui.append(svgText);
-                    ui.append(img);
+
                     return ui;
                 }).placeNode(function(nodeUI, pos) {
                     nodeUI.attr('transform',

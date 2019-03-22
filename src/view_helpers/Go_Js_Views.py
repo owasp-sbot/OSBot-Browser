@@ -28,11 +28,15 @@ class Go_Js_Views:
                     text = issue.get(text_field)
                     if append_key_to_text:
                         text += " | {0}".format(key)
-                    nodes.append({'key': key, 'text': text , 'color': Misc.get_random_color()})
+                else:
+                    text = key
+                nodes.append({'key': key, 'text': text, 'color': Misc.get_random_color()})
 
             for edge in graph_data.get('edges'):
-                if edge[1] and edge[2]:
+                if edge[0] and edge[2]:
                     edges.append({ 'from': edge[0], 'text' : edge[1] ,'to': edge[2] ,'color':  Misc.get_random_color()})
+                else:
+                    print(edge)
         return nodes,edges
 
     @staticmethod

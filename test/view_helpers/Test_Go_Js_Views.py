@@ -53,10 +53,10 @@ class Test_Go_Js_Views(TestCase):
 
     # bugs
 
-    def test_default_doesnt_render(self):
+    def test_fixed__bug_default_doesnt_render(self):
         self.png_data = Go_Js_Views.default(params=['graph_414']) # graph_name has a node whose text is None
 
-    def test_bug_cache_issue_in_lambdas(self):
+    def test_fixed__bug_cache_issue_in_lambdas(self):
         Lambdas('browser.lambda_browser').update_with_src()
 
         payload = { "params" : ["go_js","graph_MKF", "default"]}
@@ -66,8 +66,14 @@ class Test_Go_Js_Views(TestCase):
         self.png_data = Lambdas('browser.lambda_browser').invoke(payload)
         Dev.pprint(self.png_data)
 
-    def test_bug_graph_breaks_mindmap(self):
-        self.png_data = Go_Js_Views.mindmap(params=['graph_W2E'])
+    def test_fixed__bug___graph_breaks_mindmap(self):
+        #graph_name = 'graph_W2E'  # example 1
+        graph_name = 'graph_0QZ'   # example 2
+        self.png_data = Go_Js_Views.mindmap(params=[graph_name])
+
+    def test_bug___graph_doesnt_create_good_mindmap(self):
+        graph_name = 'graph_56Q'
+        self.png_data = Go_Js_Views.mindmap(params=[graph_name])
 
 
     # update lambda

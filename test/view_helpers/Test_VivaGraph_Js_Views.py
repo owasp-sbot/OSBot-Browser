@@ -43,12 +43,20 @@ class Test_VivaGraph_Js_Views(TestCase):
         self.png_data = VivaGraph_Js_Views.by_field(params=[graph_name,field])
         #self.png_data = False
 
+    def test_people(self):
+        graph_name = 'graph_CR9'
+        self.png_data = VivaGraph_Js_Views.people(params=[graph_name],headless=False)
 
     # bugs
 
-    def test_graph_doesnt_render(self):
+    def test_fixed__bug_graph_doesnt_render(self):
         graph_name = 'graph_AEY'
-        self.png_data = VivaGraph_Js_Views.default(params=[graph_name])
+        self.png_data = VivaGraph_Js_Views.default(params=[graph_name],headless=False)
+
+    def test_fixed_bug__broken_images(self):
+        graph_name = 'graph_34F'
+        self.png_data = VivaGraph_Js_Views.default(params=[graph_name],headless=False)
+
 
 
     # update lambda
