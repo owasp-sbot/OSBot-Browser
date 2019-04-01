@@ -1,7 +1,7 @@
 import json
 from unittest import TestCase
 
-from browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
+from browser import Browser_Lamdba_Helper
 from view_helpers.Vis_Js import Vis_Js
 from utils.Assert import Assert
 from utils.Dev import Dev

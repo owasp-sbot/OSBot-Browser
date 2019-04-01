@@ -1,5 +1,4 @@
-from browser.Render_Page import Render_Page
-from utils.Dev import Dev
+from browser import Render_Page
 from utils.Files import Files
 from utils.Unzip_File import Unzip_File
 from utils.Zip_Folder import Zip_Folder

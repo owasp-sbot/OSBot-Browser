@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from view_helpers.Go_Js_Views import Go_Js_Views
-from browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
+from browser import Browser_Lamdba_Helper
 from utils.Dev import Dev
 from utils.aws.Lambdas import Lambdas
 from view_helpers.View_Examples import View_Examples
@@ -44,7 +44,6 @@ class Test_Go_Js_Views(TestCase):
         self.png_data = Go_Js_Views.mindmap(params=['graph_THV',1000,500])
 
     def test_mindmap_issue(self):
-        import json
         jira_id = 'GSCS-14'
         #jira_id = 'IA-402'
         self.png_data = Go_Js_Views.mindmap_issue(params=[jira_id])

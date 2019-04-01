@@ -133,8 +133,8 @@ class Vis_Js_Views:
                           .send_screenshot_to_slack(team_id, channel) )
 
     @staticmethod
-    def by_issue_type(team_id=None, channel=None, params=None):
-        (graph_name,nodes, edges, graph_data,vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+    def by_issue_type(team_id=None, channel=None, params=None, headless=True):
+        (graph_name,nodes, edges, graph_data,vis_js) = Vis_Js_Views.default(params=params, no_render=True,headless=headless)
         graph_name += ' | by_issue_type'
 
         issues = graph_data.get('nodes')
@@ -264,3 +264,7 @@ class Vis_Js_Views:
         return vis_js.send_screenshot_to_slack(team_id, channel)
         #return vis_js.create_graph_and_send_screenshot_to_slack(fixed_nodes, edges, options, team_id, channel)
 
+    @staticmethod
+    def hello_gs_cs(team_id=None, channel=None, params=None):
+
+        return "hello, this is live test (this is now running from lambda)"

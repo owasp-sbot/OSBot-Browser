@@ -1,7 +1,6 @@
 from unittest import TestCase
 
-from browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
-from utils.Dev import Dev
+from browser import Browser_Lamdba_Helper
 from utils.aws.Lambdas import Lambdas
 from view_helpers.Full_Calendar_Views import Full_Calendar_Views
 
@@ -16,7 +15,7 @@ class Test_Full_Calendar_Views(TestCase):
         Browser_Lamdba_Helper().save_png_data(self.png_data)
 
     def test_default(self):
-        self.png_data = self.calendar_views.default(headless=True)
+        self.png_data = self.calendar_views.gs_team(headless=False)
         self.png_data = self.png_data
 
 

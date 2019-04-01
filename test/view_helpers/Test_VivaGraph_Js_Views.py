@@ -1,7 +1,6 @@
 from unittest import TestCase
 
-from browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
-from utils.Dev import Dev
+from browser import Browser_Lamdba_Helper
 from utils.aws.Lambdas import Lambdas
 from view_helpers.VivaGraph_Js_Views import VivaGraph_Js_Views
 

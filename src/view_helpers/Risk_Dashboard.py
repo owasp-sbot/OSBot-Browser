@@ -1,20 +1,19 @@
 import json
 from time import sleep
 
-from browser.API_Browser import API_Browser
-from browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
-from browser.Render_Page import Render_Page
-from utils.Dev import Dev
-from utils.Files import Files
-from utils.Json import Json
-from utils.Misc import Misc
+from browser.API_Browser             import API_Browser
+from browser.Browser_Lamdba_Helper   import Browser_Lamdba_Helper
+from browser.Render_Page             import Render_Page
+from pbx_gs_python_utils.utils.Files import Files
+from pbx_gs_python_utils.utils.Json  import Json
+from pbx_gs_python_utils.utils.Misc  import Misc
 
 
 class Risk_Dashboard:
     def __init__(self):
         self.web_page    = '/gs/risk/risks-dashboard.html'
         self.web_root    = Files.path_combine(Files.parent_folder(__file__),'../web_root')
-        self.headless = False
+        self.headless    = True
         self.api_browser = API_Browser(self.headless,self.headless).sync__setup_browser()
         self.render_page = Render_Page(api_browser=self.api_browser, web_root=self.web_root)
         self.graph_name  = None
@@ -71,6 +70,7 @@ class Risk_Dashboard:
             if diff  > 0 : value = '+' + str(diff)
             if diff == 0 : value = '='
             if diff  < 0 : value = diff
+            #value = ""
             badge_code = '<br><span class="badge badge-secondary">{0}</span>'.format(value)
             js_code += "if ($('#{0}').text() != '') {{ $('#{0}').append('{1}') }}".format(r2_id,badge_code)
             if show_diff_delta:
@@ -217,9 +217,9 @@ class Risk_Dashboard:
 
     def create_dashboard_for_jira_key(self,jira_key):
 
-        from utils.aws.Lambdas import Lambdas
+        from pbx_gs_python_utils.utils.aws.Lambdas import Lambdas
 
-        lambda_graph = Lambdas('gsbot.gsbot_graph')
+        lambda_graph = Lambdas('pbx_gs_python_utils.lambdas.gsbot.gsbot_graph')
 
         payload = { 'data': {}, "params": ['expand', jira_key, 9, 'delivered by,risks_up']}
         result           = lambda_graph.invoke(payload)

@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
+from browser import Browser_Lamdba_Helper
 from utils.Dev import Dev
 from utils.aws.Lambdas import Lambdas
 from view_helpers.Vis_Js_Views import Vis_Js_Views
@@ -66,7 +66,7 @@ class Test_Vis_Js_Views(TestCase):
     def test_by_issue_type(self):
         # graph_RKR # large graph (r0 with 4 levels)
         graph_name = 'graph_9CP' #'graph_1Q5'  #
-        self.png_data = Vis_Js_Views.by_issue_type(params=[graph_name])
+        self.png_data = Vis_Js_Views.by_issue_type(params=[graph_name],headless=False)
         #self.png_data = None
 
     def test_r1_pinned(self):
@@ -75,6 +75,11 @@ class Test_Vis_Js_Views(TestCase):
         #graph_name ='graph_DAS'
         self.png_data = Vis_Js_Views.r1_pinned(params=[graph_name],headless=False)
         #self.png_data = None
+
+    def test_hello_gs_cs(self):
+        result = Vis_Js_Views.hello_gs_cs()
+        result = Lambdas('browser.lambda_browser').update_with_src().invoke({"params" : ["graph", "___","hello_gs_cs"]})
+        Dev.pprint(result)
 
     def test_update_lambda(self):
         Lambdas('browser.lambda_browser').update_with_src()

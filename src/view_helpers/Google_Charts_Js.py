@@ -1,7 +1,6 @@
-from browser.API_Browser import API_Browser
-from browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
-from browser.Render_Page import Render_Page
-from utils.Dev import Dev
+from browser import API_Browser
+from browser import Browser_Lamdba_Helper
+from browser import Render_Page
 from utils.Files import Files
 
 

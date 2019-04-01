@@ -1,12 +1,11 @@
 from time import sleep
 
-from browser.API_Browser import API_Browser
-from browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
-from browser.Render_Page import Render_Page
+from browser import API_Browser
+from browser import Browser_Lamdba_Helper
+from browser import Render_Page
 from browser.Web_Server import Web_Server
 from utils.Files import Files
 from utils.Json import Json
-from utils.Misc import Misc
 from utils.aws.Lambdas import Lambdas
 from utils.aws.s3 import S3
 

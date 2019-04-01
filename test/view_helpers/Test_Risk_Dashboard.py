@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
+from browser import Browser_Lamdba_Helper
 from view_helpers.Risk_Dashboard import Risk_Dashboard
 from utils.Dev import Dev
 
