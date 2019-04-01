@@ -1,8 +1,8 @@
 from time import sleep
-from utils.Dev import Dev
-from utils.Lambdas_Helpers import slack_message
-from utils.Misc import Misc
-from utils.aws.Lambdas import load_dependencies
+from pbx_gs_python_utils.utils.Dev import Dev
+from pbx_gs_python_utils.utils.Lambdas_Helpers import slack_message
+from pbx_gs_python_utils.utils.Misc import Misc
+from pbx_gs_python_utils.utils.aws.Lambdas import load_dependencies
 
 gsuite_secret_id = 'gsuite_gsbot_user'
 

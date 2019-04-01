@@ -4,3 +4,5 @@ venv
 gs-dashboard.json
 r1-and-r2.coffee
 Test_GS_FY_Risk_Dashboards.py
+src/browser/__pycache__
+test_QA/browser/__pycache__

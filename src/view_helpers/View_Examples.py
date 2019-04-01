@@ -1,7 +1,7 @@
 from browser import Render_Page
-from utils.Files import Files
-from utils.Unzip_File import Unzip_File
-from utils.Zip_Folder import Zip_Folder
+from pbx_gs_python_utils.utils.Files import Files
+from pbx_gs_python_utils.utils.Unzip_File import Unzip_File
+from pbx_gs_python_utils.utils.Zip_Folder import Zip_Folder
 
 
 class View_Examples:

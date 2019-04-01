@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from browser import Browser_Lamdba_Helper
 from view_helpers.Risk_Dashboard import Risk_Dashboard
-from utils.Dev import Dev
+from pbx_gs_python_utils.utils.Dev import Dev
 
 class Test_risk_dashboard(TestCase):
 

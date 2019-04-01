@@ -1,6 +1,6 @@
-from utils.Dev import Dev
-from utils.Misc import Misc
-from utils.aws.Lambdas import load_dependencies
+from pbx_gs_python_utils.utils.Dev import Dev
+from pbx_gs_python_utils.utils.Misc import Misc
+from pbx_gs_python_utils.utils.aws.Lambdas import load_dependencies
 from view_helpers.Edge_Format import Edge_Format
 from view_helpers.Node_Format import Node_Format
 

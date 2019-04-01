@@ -1,9 +1,9 @@
 from unittest import TestCase
 
 from gsuite.GSheets import GSheets
-from utils.Dev import Dev
-from utils.Local_Cache import use_local_cache_if_available
-from utils.aws.Lambdas import Lambdas
+from pbx_gs_python_utils.utils.Dev import Dev
+from pbx_gs_python_utils.utils.Local_Cache import use_local_cache_if_available
+from pbx_gs_python_utils.utils.aws.Lambdas import Lambdas
 
 
 class Create_Dashboard_From_Slides:

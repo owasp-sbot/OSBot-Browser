@@ -3,8 +3,8 @@ from unittest import TestCase
 
 from browser import Browser_Lamdba_Helper
 from view_helpers.Vis_Js import Vis_Js
-from utils.Assert import Assert
-from utils.Dev import Dev
+from pbx_gs_python_utils.utils.Assert import Assert
+from pbx_gs_python_utils.utils.Dev import Dev
 
 
 class Test_Vis_Js(TestCase):

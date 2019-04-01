@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from browser import Browser_Lamdba_Helper
-from utils.aws.Lambdas import Lambdas
+from pbx_gs_python_utils.utils.aws.Lambdas import Lambdas
 from view_helpers.VivaGraph_Js_Views import VivaGraph_Js_Views
 
 

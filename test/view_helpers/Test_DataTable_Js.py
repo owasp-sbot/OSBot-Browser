@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from browser import Browser_Lamdba_Helper
-from utils.Dev import Dev
+from pbx_gs_python_utils.utils.Dev import Dev
 from view_helpers.DataTable_Js import DataTable_Js
 
 

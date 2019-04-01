@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from utils.Dev import Dev
+from pbx_gs_python_utils.utils.Dev import Dev
 from view_helpers.Go_Js import Go_Js
 from view_helpers.VivaGraph_Js import VivaGraph_Js
 

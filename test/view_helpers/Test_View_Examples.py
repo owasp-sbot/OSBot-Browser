@@ -1,8 +1,8 @@
 from unittest import TestCase
 
 from src.view_helpers.View_Examples import View_Examples
-from utils.Dev import Dev
-from utils.aws.Lambdas import Lambdas
+from pbx_gs_python_utils.utils.Dev import Dev
+from pbx_gs_python_utils.utils.aws.Lambdas import Lambdas
 
 #
 #<script src="https://cdnjs.cloudflare.com/ajax/libs/vivagraphjs/0.10.1/vivagraph.min.js"></script>

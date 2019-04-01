@@ -101,7 +101,7 @@ class Risk_Dashboard:
 
 
     def send_graph_name_to_slack(self, team_id, channel):
-        from utils.Lambdas_Helpers import slack_message
+        from pbx_gs_python_utils.utils.Lambdas_Helpers import slack_message
         slack_message(":point_right: Created graph `{0}` from jira key `{1}`".format(self.graph_name, self.jira_key),[], channel,team_id)
         return self
 
@@ -172,7 +172,7 @@ class Risk_Dashboard:
 
 
     def create_dashboard_for_graph(self,graph_name, root_node):
-        from utils.aws.Lambdas import Lambdas
+        from pbx_gs_python_utils.utils.aws.Lambdas import Lambdas
         from view_helpers.Vis_Js import Vis_Js
         self.graph_name = graph_name
         self.jira_key   = root_node
@@ -219,7 +219,7 @@ class Risk_Dashboard:
 
         from pbx_gs_python_utils.utils.aws.Lambdas import Lambdas
 
-        lambda_graph = Lambdas('pbx_gs_python_utils.lambdas.gsbot.gsbot_graph')
+        lambda_graph = Lambdas('lambdas.gsbot.gsbot_graph')
 
         payload = { 'data': {}, "params": ['expand', jira_key, 9, 'delivered by,risks_up']}
         result           = lambda_graph.invoke(payload)

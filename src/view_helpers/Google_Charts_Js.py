@@ -1,7 +1,7 @@
-from browser import API_Browser
-from browser import Browser_Lamdba_Helper
-from browser import Render_Page
-from utils.Files import Files
+from browser.API_Browser import API_Browser
+from browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
+from browser.Render_Page import Render_Page
+from pbx_gs_python_utils.utils.Files import Files
 
 
 class Google_Charts_Js:

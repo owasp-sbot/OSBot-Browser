@@ -1,4 +1,4 @@
-from utils.Dev import Dev
+from pbx_gs_python_utils.utils.Dev import Dev
 
 
 class Edge_Format:
@@ -37,7 +37,7 @@ class Edge_Format:
     # @staticmethod
     # def calculate_links_scores(edges, nodes):
     #
-    #     from utils.aws.Lambdas import Lambdas
+    #     from pbx_gs_python_utils.utils.aws.Lambdas import Lambdas
     #
     #     graph_paths = Lambdas('gs.graph_paths')
     #

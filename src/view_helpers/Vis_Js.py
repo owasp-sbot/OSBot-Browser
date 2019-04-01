@@ -3,14 +3,13 @@ import datetime
 import json
 from time import sleep
 
-from browser import API_Browser
-from browser import Browser_Lamdba_Helper
-from browser import Render_Page
-from utils.Files import Files
-from utils.Json import Json
-#from utils.Local_Cache import use_local_cache_if_available
-from utils.aws.Lambdas import Lambdas
-from utils.aws.s3 import S3
+from browser.API_Browser                    import API_Browser
+from browser.Browser_Lamdba_Helper          import Browser_Lamdba_Helper
+from browser.Render_Page                    import Render_Page
+from pbx_gs_python_utils.utils.Files        import Files
+from pbx_gs_python_utils.utils.Json         import Json
+from pbx_gs_python_utils.utils.aws.Lambdas  import Lambdas
+from pbx_gs_python_utils.utils.aws.s3       import S3
 
 
 class Vis_Js:
@@ -58,7 +57,7 @@ class Vis_Js:
     # @use_local_cache_if_available
     def get_graph_data(self, graph_name):
         params = {'params': ['raw_data', graph_name, 'details'], 'data': {}}
-        data = Lambdas('gsbot.gsbot_graph').invoke(params)
+        data = Lambdas('lambdas.gsbot.gsbot_graph').invoke(params)
         if type(data) is str:
             s3_key = data
             s3_bucket = 'gs-lambda-tests'

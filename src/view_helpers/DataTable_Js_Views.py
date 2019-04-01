@@ -1,8 +1,8 @@
 import json
 
-from utils.Dev import Dev
-from utils.Misc import Misc
-from utils.aws.Lambdas import load_dependencies
+from pbx_gs_python_utils.utils.Dev import Dev
+from pbx_gs_python_utils.utils.Misc import Misc
+from pbx_gs_python_utils.utils.aws.Lambdas import load_dependencies
 
 
 class DataTable_Js_Views:

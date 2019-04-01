@@ -1,8 +1,8 @@
 from unittest import TestCase
 
 from browser import Browser_Lamdba_Helper
-from utils.Dev import Dev
-from utils.aws.Lambdas import Lambdas
+from pbx_gs_python_utils.utils.Dev import Dev
+from pbx_gs_python_utils.utils.aws.Lambdas import Lambdas
 from view_helpers.DataTable_Js_Views import DataTable_Js_Views
 
 
