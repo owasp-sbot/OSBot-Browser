@@ -1,6 +1,4 @@
-import sys
-sys.path.append('../libs/pbx-gs-python-utils')
-sys.path.append('../src')
+import sys ; sys.path.append('../osbot_browser')
 
 import base64
 import unittest

@@ -1,6 +1,4 @@
-import sys
-sys.path.append('../libs/pbx-gs-python-utils')
-sys.path.append('../src')
+import sys ; sys.path.append('../osbot_browser')
 
 from unittest           import TestCase
 from osbot_browser.browser.Web_Server import Web_Server
