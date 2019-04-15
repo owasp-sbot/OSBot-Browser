@@ -6,7 +6,6 @@ from   unittest import TestCase
 from browser.Browser_Commands import Browser_Commands
 from pbx_gs_python_utils.utils.Dev import Dev
 from pbx_gs_python_utils.utils.Files import Files
-from pbx_gs_python_utils.utils.aws.Lambdas import Lambdas
 
 
 class Test_Browser_Commands(TestCase):
@@ -144,8 +143,3 @@ class Test_Browser_Commands(TestCase):
         params =['issue','GSOS-181']
         result = self.browser_commands.table(params=params)
         Dev.pprint(result)
-
-        #self._save_png_data(result)
-
-    def test_update_lambda(self):
-        Lambdas('browser.lambda_browser').update_with_src()

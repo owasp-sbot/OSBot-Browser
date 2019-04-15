@@ -2,7 +2,6 @@ from unittest import TestCase
 
 from browser import Browser_Lamdba_Helper
 from pbx_gs_python_utils.utils.Dev import Dev
-from pbx_gs_python_utils.utils.aws.Lambdas import Lambdas
 from view_helpers.DataTable_Js_Views import DataTable_Js_Views
 
 
@@ -51,8 +50,4 @@ class Test_DataTable_Js_Views(TestCase):
 
     def test_test_data(self):
         self.png_data = DataTable_Js_Views.test_data()
-
-    def test_update_lambda(self):
-        Lambdas('browser.lambda_browser').update_with_src()
-
 

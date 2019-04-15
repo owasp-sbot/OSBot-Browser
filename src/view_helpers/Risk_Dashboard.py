@@ -1,6 +1,8 @@
 import json
 from time import sleep
 
+from osbot_aws.apis.Lambda import Lambda
+
 from browser.API_Browser             import API_Browser
 from browser.Browser_Lamdba_Helper   import Browser_Lamdba_Helper
 from browser.Render_Page             import Render_Page
@@ -10,10 +12,10 @@ from pbx_gs_python_utils.utils.Misc  import Misc
 
 
 class Risk_Dashboard:
-    def __init__(self):
+    def __init__(self, headless=True):
         self.web_page    = '/gs/risk/risks-dashboard.html'
         self.web_root    = Files.path_combine(Files.parent_folder(__file__),'../web_root')
-        self.headless    = True
+        self.headless    = headless
         self.api_browser = API_Browser(self.headless,self.headless).sync__setup_browser()
         self.render_page = Render_Page(api_browser=self.api_browser, web_root=self.web_root)
         self.graph_name  = None
@@ -172,13 +174,12 @@ class Risk_Dashboard:
 
 
     def create_dashboard_for_graph(self,graph_name, root_node):
-        from pbx_gs_python_utils.utils.aws.Lambdas import Lambdas
         from view_helpers.Vis_Js import Vis_Js
         self.graph_name = graph_name
         self.jira_key   = root_node
 
         payload     = {"graph_name": graph_name, 'destination_node': root_node}
-        graph_paths = Lambdas('gs.graph_paths').invoke(payload)
+        graph_paths = Lambda('gs.graph_paths').invoke(payload)
 
         self.create_dashboard_with_R1_R2()
 
@@ -216,10 +217,7 @@ class Risk_Dashboard:
 
 
     def create_dashboard_for_jira_key(self,jira_key):
-
-        from pbx_gs_python_utils.utils.aws.Lambdas import Lambdas
-
-        lambda_graph = Lambdas('lambdas.gsbot.gsbot_graph')
+        lambda_graph = Lambda('lambdas.gsbot.gsbot_graph')
 
         payload = { 'data': {}, "params": ['expand', jira_key, 9, 'delivered by,risks_up']}
         result           = lambda_graph.invoke(payload)

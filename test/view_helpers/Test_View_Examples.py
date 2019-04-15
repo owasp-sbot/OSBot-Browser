@@ -2,7 +2,6 @@ from unittest import TestCase
 
 from src.view_helpers.View_Examples import View_Examples
 from pbx_gs_python_utils.utils.Dev import Dev
-from pbx_gs_python_utils.utils.aws.Lambdas import Lambdas
 
 #
 #<script src="https://cdnjs.cloudflare.com/ajax/libs/vivagraphjs/0.10.1/vivagraph.min.js"></script>
@@ -49,6 +48,3 @@ class Test_View_Examples(TestCase):
     def test_open_file_in_browser__full_calendar(self):
         result = self.view_examples.open_file_in_browser('/full-calendar/test.html')
         Dev.pprint(result)
-
-    def test_update_lambda(self):
-        Lambdas('browser.lambda_browser').update_with_src()

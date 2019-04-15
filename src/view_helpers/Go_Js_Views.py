@@ -1,10 +1,11 @@
 import json
 from time import sleep
 
+from osbot_aws.apis.Lambda import Lambda, load_dependencies
+
 from pbx_gs_python_utils.utils.Dev import Dev
 from pbx_gs_python_utils.utils.Lambdas_Helpers import slack_message
 from pbx_gs_python_utils.utils.Misc import Misc
-from pbx_gs_python_utils.utils.aws.Lambdas import load_dependencies, Lambdas
 
 
 class Go_Js_Views:
@@ -94,13 +95,13 @@ class Go_Js_Views:
         log_message('Step 1: Generating graph for issue {0} using direction `all` and depth `{1}`'.format(direction, depth))
 
         payload     = {"params": ['links', start, direction, depth, view]}
-        result      = Lambdas('gs.elastic_jira').invoke(payload)
+        result      = Lambda('gs.elastic_jira').invoke(payload)
         graph       = json.loads(result.get('text'))
         graph_name  = graph.get('graph_name')
         sleep(0.5)
         log_message('Step 2: Filtering graph {0} with filter `group_by_field` on field `Issue links`'.format(graph_name))
         payload = {"params": ["filter", "group_by_field", graph_name, "Issue Links"]}
-        graph_filtered_name = Lambdas('lambdas.gsbot.gsbot_graph').invoke(payload)
+        graph_filtered_name = Lambda('lambdas.gsbot.gsbot_graph').invoke(payload)
         if graph_name:
             log_message('Step 3: Creating  mindmap for filtered graph `{0}`'.format(graph_filtered_name))
             return Go_Js_Views.mindmap(team_id, channel, params=[graph_filtered_name], root_node_text=start)

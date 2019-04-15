@@ -1,8 +1,9 @@
 from unittest import TestCase
 
+from osbot_aws.apis.Lambda import Lambda
+
 from browser import Browser_Lamdba_Helper
 from pbx_gs_python_utils.utils.Dev import Dev
-from pbx_gs_python_utils.utils.aws.Lambdas import Lambdas
 from view_helpers.Vis_Js_Views import Vis_Js_Views
 
 
@@ -78,10 +79,8 @@ class Test_Vis_Js_Views(TestCase):
 
     def test_hello_gs_cs(self):
         result = Vis_Js_Views.hello_gs_cs()
-        result = Lambdas('browser.lambda_browser').update_with_src().invoke({"params" : ["graph", "___","hello_gs_cs"]})
+        result = Lambda('browser.lambda_browser').invoke({"params" : ["graph", "___","hello_gs_cs"]})
         Dev.pprint(result)
 
-    def test_update_lambda(self):
-        Lambdas('browser.lambda_browser').update_with_src()
 
 

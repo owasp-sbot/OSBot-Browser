@@ -2,7 +2,6 @@ from unittest import TestCase
 
 from view_helpers.Am_Charts_Views import Am_Charts_Views
 from browser import Browser_Lamdba_Helper
-from pbx_gs_python_utils.utils.aws.Lambdas import Lambdas
 from view_helpers.View_Examples import View_Examples
 
 
@@ -31,7 +30,3 @@ class Test_Am_Charts_Views(TestCase):
     def test_open_file_in_browser__am_charts(self):
         #View_Examples(headless=False).open_file_in_browser('/go-js/sankey.html')
         View_Examples(headless=False).open_file_in_browser('/am_charts/triangle.html')
-
-
-    def test_update_lambda(self):
-        Lambdas('browser.lambda_browser').update_with_src()

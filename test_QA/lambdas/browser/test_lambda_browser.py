@@ -2,14 +2,14 @@ import base64
 import json
 import unittest
 
+from osbot_aws.apis.Lambda import Lambda
+
 from pbx_gs_python_utils.utils.Dev          import Dev
-from pbx_gs_python_utils.utils.Process      import Process
-from pbx_gs_python_utils.utils.aws.Lambdas  import Lambdas
 
 
 class Test_Lambda_lambda_browser(unittest.TestCase):
     def setUp(self):
-        self.lambda_browser = Lambdas('lambdas.browser.lambda_browser',memory=3008)
+        self.lambda_browser = Lambda('lambdas.browser.lambda_browser',memory=3008)
 
     def _save_png_file(self, png_data):
         try:

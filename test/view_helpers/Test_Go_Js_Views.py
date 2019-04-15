@@ -1,9 +1,10 @@
 from unittest import TestCase
 
+from osbot_aws.apis.Lambda import Lambda
+
 from view_helpers.Go_Js_Views import Go_Js_Views
 from browser import Browser_Lamdba_Helper
 from pbx_gs_python_utils.utils.Dev import Dev
-from pbx_gs_python_utils.utils.aws.Lambdas import Lambdas
 from view_helpers.View_Examples import View_Examples
 
 
@@ -64,13 +65,11 @@ class Test_Go_Js_Views(TestCase):
         self.png_data = Go_Js_Views.default(params=['graph_414']) # graph_name has a node whose text is None
 
     def test_fixed__bug_cache_issue_in_lambdas(self):
-        Lambdas('browser.lambda_browser').update_with_src()
-
         payload = { "params" : ["go_js","graph_MKF", "default"]}
-        self.png_data = Lambdas('browser.lambda_browser').invoke(payload)
+        self.png_data = Lambda('browser.lambda_browser').invoke(payload)
         Dev.pprint(self.png_data)
 
-        self.png_data = Lambdas('browser.lambda_browser').invoke(payload)
+        self.png_data = Lambda('browser.lambda_browser').invoke(payload)
         Dev.pprint(self.png_data)
 
     def test_fixed__bug___graph_breaks_mindmap(self):
@@ -82,8 +81,3 @@ class Test_Go_Js_Views(TestCase):
         graph_name = 'graph_56Q'    # prob was this graph (that was missing a root node)
         graph_name = 'graph_O80'
         self.png_data = Go_Js_Views.mindmap(params=[graph_name])
-
-
-    # update lambda
-    def test_update_lambda(self):
-        Lambdas('browser.lambda_browser').update_with_src()

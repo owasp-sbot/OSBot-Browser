@@ -1,8 +1,10 @@
 import base64
 import os
+
+from osbot_aws.apis.Lambda import load_dependency, Lambda
+from osbot_aws.apis.S3 import S3
+
 from pbx_gs_python_utils.utils.Files import Files
-from pbx_gs_python_utils.utils.aws.Lambdas import load_dependency, Lambdas
-from pbx_gs_python_utils.utils.aws.s3 import S3
 
 
 class Browser_Lamdba_Helper:
@@ -38,7 +40,7 @@ class Browser_Lamdba_Helper:
         if team_id and channel:
             s3_bucket    = 'gs-lambda-tests'
             s3_key       = S3().file_upload_as_temp_file(png_file, s3_bucket)
-            png_to_slack = Lambdas('utils.png_to_slack')
+            png_to_slack = Lambda('utils.png_to_slack')
             payload = {'s3_bucket': s3_bucket, 's3_key': s3_key, 'team_id': team_id, 'channel': channel, 'title': target }
             png_to_slack.invoke_async(payload)
             return None, None
