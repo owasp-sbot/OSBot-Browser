@@ -24,7 +24,9 @@ class Test_Browser_Commands(TestCase):
 
     def test_list(self):
         result = self.browser_commands.list(None, None, None)
-        assert result == ('Here are the current examples files:', [{'text': ''}])
+        assert result[0] == 'Here are the current examples files:'
+        assert len(result[1][0].get('text').split('\n')) > 10
+        #assert result == (, [{'text': ''}])
 
 
     def test_screenshot(self):

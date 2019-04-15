@@ -1,3 +1,0 @@
-[submodule "libs/pbx-gs-python-utils"]
-	path = libs/pbx-gs-python-utils
-	url = git@github.com:pbx-gs/pbx-gs-python-utils.git

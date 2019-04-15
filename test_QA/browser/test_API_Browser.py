@@ -81,16 +81,15 @@ some text  and 'single quotes'
 
 class test_workflows_API_Browser(TestCase):
 
+
     @sync
     async def test_open_jira_page(self):
-        from pbx_gs_python_utils.utils.aws.secrets import Secrets
+        from osbot_aws.apis.Secrets import Secrets
         self.api = API_Browser(headless=False, auto_close=False)
-        #self.api.sync__open('https://jira.photobox.com')
-
-        #Dev.pprint(await self.api.url())
 
         login_needed = False
         self.secrets_id = 'GS_BOT_GS_JIRA'
+
         (server, username, password) = Secrets(self.secrets_id).value_from_json_string().values()
 
         if login_needed:

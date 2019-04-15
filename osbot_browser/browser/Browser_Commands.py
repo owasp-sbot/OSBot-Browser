@@ -33,8 +33,9 @@ class Browser_Commands:
         text = "Here are the current examples files:"
         attachments = []
         files       = ''
-        for file in Files.find('./web_root/**/*.html'):
-            files += '{0} \n'.format(file.replace('./web_root/',''))
+        web_root    = Browser_Lamdba_Helper().web_root() +'/'
+        for file in Files.files(web_root):
+            files += '{0} \n'.format(file.replace(web_root,''))
         attachments.append({'text': files })
         return text, attachments
 
