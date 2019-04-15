@@ -16,7 +16,7 @@ from pbx_gs_python_utils.utils.Http     import WS_is_open
 class test_API_Browser(TestCase):
 
     def setUp(self):
-         self.api = API_Browser(headless = True, auto_close = True)
+         self.api = API_Browser(headless = False, auto_close = False)
 
     @sync
     async def test_browser_connect(self):
@@ -77,6 +77,41 @@ some text  and 'single quotes'
         await self.api.open('https://news.bbc.co.uk')
         file = await self.api.screenshot()
         assert Files.exists(file)
+
+
+class test_workflows_API_Browser(TestCase):
+
+    @sync
+    async def test_open_jira_page(self):
+        from pbx_gs_python_utils.utils.aws.secrets import Secrets
+        self.api = API_Browser(headless=False, auto_close=False)
+        #self.api.sync__open('https://jira.photobox.com')
+
+        #Dev.pprint(await self.api.url())
+
+        login_needed = False
+        self.secrets_id = 'GS_BOT_GS_JIRA'
+        (server, username, password) = Secrets(self.secrets_id).value_from_json_string().values()
+
+        if login_needed:
+
+
+            Dev.pprint(server, username, password)
+            await self.api.open(server + '/login.jsp')
+            page = await self.api.page()
+            await page.type('#login-form-username', username)
+            await page.type('#login-form-password', password)
+            await page.click('#login-form-submit')
+
+        await self.api.open(server + '/browse/GSP-95')
+        page = await self.api.page()
+        await self.api.js_execute("$('#show-more-links-link').click()")
+        from time import sleep
+        sleep(1)
+        #await self.api.page_size(1200,2000)
+
+        await self.api.screenshot(file_screenshot='/tmp/tmp-jira-screenshot.png', full_page=True)
+
 
 
 class Test_API_Browser___with_browser_not_closing(TestCase):

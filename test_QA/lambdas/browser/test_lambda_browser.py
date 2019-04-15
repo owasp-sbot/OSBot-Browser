@@ -6,7 +6,7 @@ from osbot_aws.apis.Lambda import Lambda
 from pbx_gs_python_utils.utils.Misc import Misc
 
 from browser.Browser_Commands import Browser_Commands
-from lambdas.browser.lambda_browser import run
+from lambdas.lambda_browser import run
 from pbx_gs_python_utils.utils.Dev          import Dev
 
 
