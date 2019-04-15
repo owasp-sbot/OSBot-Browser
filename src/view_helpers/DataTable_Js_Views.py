@@ -1,8 +1,9 @@
 import json
 
+from osbot_aws.apis.Lambda import load_dependencies
+
 from pbx_gs_python_utils.utils.Dev import Dev
 from pbx_gs_python_utils.utils.Misc import Misc
-from pbx_gs_python_utils.utils.aws.Lambdas import load_dependencies
 
 
 class DataTable_Js_Views:

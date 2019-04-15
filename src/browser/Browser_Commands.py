@@ -1,13 +1,16 @@
+from osbot_aws.apis.Lambda import load_dependency
+
 from browser.Browser_Lamdba_Helper                          import Browser_Lamdba_Helper
 from pbx_gs_python_utils.utils.Files                        import Files
 from pbx_gs_python_utils.utils.Lambdas_Helpers              import slack_message
 from pbx_gs_python_utils.utils.Misc                         import Misc
 from pbx_gs_python_utils.utils.Process                      import Process
-from pbx_gs_python_utils.utils.aws.Lambdas                  import load_dependency
 from pbx_gs_python_utils.utils.slack.Slack_Commands_Helper  import Slack_Commands_Helper
 
 
 class Browser_Commands:
+
+    current_version = 'v0.30'
 
     @staticmethod
     def screenshot(team_id=None, channel=None, params=[]):
@@ -278,3 +281,7 @@ class Browser_Commands:
 
         if team_id is None:
             return text
+
+    @staticmethod
+    def version(team_id=None, channel=None, params=None):
+        return Browser_Commands.current_version

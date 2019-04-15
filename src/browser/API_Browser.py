@@ -3,6 +3,7 @@ import json
 import os
 from time import sleep
 
+from osbot_aws.apis.Lambda import load_dependency
 from syncer import sync
 
 from pbx_gs_python_utils.utils.Dev          import Dev
@@ -10,7 +11,6 @@ from pbx_gs_python_utils.utils.Files        import Files
 from pbx_gs_python_utils.utils.Http         import WS_is_open
 from pbx_gs_python_utils.utils.Json         import Json
 from pbx_gs_python_utils.utils.Process      import Process
-from pbx_gs_python_utils.utils.aws.Lambdas  import load_dependency
 
 
 class API_Browser:

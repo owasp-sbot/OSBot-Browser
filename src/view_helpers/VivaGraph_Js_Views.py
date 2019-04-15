@@ -1,9 +1,10 @@
 from time import sleep
 
+from osbot_aws.apis.Lambda import load_dependencies
+
 from pbx_gs_python_utils.utils.Dev import Dev
 from pbx_gs_python_utils.utils.Lambdas_Helpers import slack_message
 from pbx_gs_python_utils.utils.Misc import Misc
-from pbx_gs_python_utils.utils.aws.Lambdas import load_dependencies, Lambdas
 from view_helpers.Edge_Format import Edge_Format
 from view_helpers.Node_Format import Node_Format
 
