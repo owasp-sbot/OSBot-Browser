@@ -3,9 +3,9 @@ from time import sleep
 
 from osbot_aws.apis.Lambda import Lambda
 
-from browser.API_Browser             import API_Browser
-from browser.Browser_Lamdba_Helper   import Browser_Lamdba_Helper
-from browser.Render_Page             import Render_Page
+from osbot_browser.browser.API_Browser             import API_Browser
+from osbot_browser.browser.Browser_Lamdba_Helper   import Browser_Lamdba_Helper
+from osbot_browser.browser.Render_Page             import Render_Page
 from pbx_gs_python_utils.utils.Files import Files
 from pbx_gs_python_utils.utils.Json  import Json
 from pbx_gs_python_utils.utils.Misc  import Misc
@@ -174,7 +174,7 @@ class Risk_Dashboard:
 
 
     def create_dashboard_for_graph(self,graph_name, root_node):
-        from view_helpers.Vis_Js import Vis_Js
+        from osbot_browser.view_helpers.Vis_Js import Vis_Js
         self.graph_name = graph_name
         self.jira_key   = root_node
 

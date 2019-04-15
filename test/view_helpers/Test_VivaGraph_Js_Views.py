@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from browser import Browser_Lamdba_Helper
-from view_helpers.VivaGraph_Js_Views import VivaGraph_Js_Views
+from osbot_browser.view_helpers.VivaGraph_Js_Views import VivaGraph_Js_Views
 
 
 class Test_VivaGraph_Js_Views(TestCase):

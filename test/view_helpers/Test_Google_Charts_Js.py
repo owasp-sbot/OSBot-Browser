@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from view_helpers.Google_Charts_Js import Google_Charts_Js
+from osbot_browser.view_helpers.Google_Charts_Js import Google_Charts_Js
 
 
 class Test_Google_Charts_Js(TestCase):

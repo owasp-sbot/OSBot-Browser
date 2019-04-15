@@ -10,13 +10,13 @@ class DataTable_Js_Views:
 
     @staticmethod
     def _get_data(graph_name):
-        from view_helpers.Vis_Js import Vis_Js
+        from osbot_browser.view_helpers.Vis_Js import Vis_Js
         vis_js = Vis_Js()
         return vis_js.get_graph_data(graph_name)
 
     @staticmethod
     def _create_table(headers,rows, team_id, channel,table_width='1200px', columns_defs=None, table_title=None):
-        from view_helpers.DataTable_Js import DataTable_Js
+        from osbot_browser.view_helpers.DataTable_Js import DataTable_Js
         datatable_js              = DataTable_Js()
         datatable_js.table_width  = table_width
         datatable_js.columns_defs = columns_defs
@@ -138,7 +138,7 @@ class DataTable_Js_Views:
 
         load_dependencies(['syncer', 'requests']);
 
-        from view_helpers.DataTable_Js import DataTable_Js
+        from osbot_browser.view_helpers.DataTable_Js import DataTable_Js
         headers = ['Header AAA','Header BBB']
         rows    = [['value 1'  , 'value 2'  ],
                    ['value 3'  , 'value 4'  ],

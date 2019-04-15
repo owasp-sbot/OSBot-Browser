@@ -29,8 +29,8 @@ class Browser_Lamdba_Helper:
 
     def open_local_page_and_get_screenshot(self, path, png_file=None,js_code=None,clip=None, delay=None):
         with self.render_page.web_server as web_server:
-           url      = web_server.url(path)
-           return self.render_page.get_screenshot_via_browser(url, js_code=js_code, clip=clip,png_file=png_file,delay=delay)
+            url      = web_server.url(path)
+            return self.render_page.get_screenshot_via_browser(url, js_code=js_code, clip=clip,png_file=png_file,delay=delay)
 
     def render_file(self,team_id, channel, path,js_code=None,clip=None, delay=None):
         png_file = self.open_local_page_and_get_screenshot(path=path, js_code=js_code,clip=clip, delay=delay)
@@ -62,8 +62,8 @@ class Browser_Lamdba_Helper:
         # else:
         #     self.setup_local()
 
-        from browser.API_Browser import API_Browser
-        from browser.Render_Page import Render_Page
+        from osbot_browser.browser.API_Browser import API_Browser
+        from osbot_browser.browser.Render_Page import Render_Page
         self.api_browser = API_Browser(headless=self.headless, auto_close=self.auto_close).sync__setup_browser()
         self.render_page = Render_Page(api_browser=self.api_browser, web_root=self.web_root())
 
@@ -90,10 +90,10 @@ class Browser_Lamdba_Helper:
 
     def web_root(self):
         if os.getenv('AWS_REGION') is not None:         # if we are in AWS
-            return Files.path_combine('.','./web_root')
+            return Files.path_combine('.','./osbot_browser/web_root')
         if 'test/browser' in Files.current_folder():    # if we are in an unit test
-            return  Files.path_combine('.','../../src/web_root')
+            return  Files.path_combine('.','../../osbot_browser/web_root')
         parent_folder = Files.folder_name(__file__)
-        if 'serverless-render/src/browser' in parent_folder:
+        if 'serverless-render/osbot_browser/browser' in parent_folder:
             return Files.path_combine(parent_folder,'../web_root')
         return None

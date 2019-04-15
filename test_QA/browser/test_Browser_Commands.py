@@ -3,7 +3,7 @@ import json
 import unittest
 from   unittest import TestCase
 
-from browser.Browser_Commands import Browser_Commands
+from osbot_browser.browser.Browser_Commands import Browser_Commands
 from pbx_gs_python_utils.utils.Dev import Dev
 from pbx_gs_python_utils.utils.Files import Files
 

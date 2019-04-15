@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-cd ./src/web_root
+cd ./osbot_browser/web_root
 python -m SimpleHTTPServer 12345

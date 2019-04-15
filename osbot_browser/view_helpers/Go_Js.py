@@ -1,4 +1,4 @@
-from view_helpers.Base_View_Helper import Base_View_Helpers
+from osbot_browser.view_helpers.Base_View_Helper import Base_View_Helpers
 
 
 class Go_Js(Base_View_Helpers):

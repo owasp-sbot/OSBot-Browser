@@ -1,6 +1,6 @@
 from osbot_aws.apis.Lambda import load_dependency
 
-from browser.Browser_Lamdba_Helper                          import Browser_Lamdba_Helper
+from osbot_browser.browser.Browser_Lamdba_Helper                          import Browser_Lamdba_Helper
 from pbx_gs_python_utils.utils.Files                        import Files
 from pbx_gs_python_utils.utils.Lambdas_Helpers              import slack_message
 from pbx_gs_python_utils.utils.Misc                         import Misc
@@ -70,8 +70,8 @@ class Browser_Commands:
         # return None
         # load_dependency('syncer')
         # load_dependency('requests')
-        # from browser.API_Browser import API_Browser
-        # from browser.Render_Page import Render_Page
+        # from osbot_browser.browser.API_Browser import API_Browser
+        # from osbot_browser.browser.Render_Page import Render_Page
         #
         # web_root = './web_root/'
         # target   = url_path
@@ -111,7 +111,7 @@ class Browser_Commands:
         load_dependency('syncer') ;
         load_dependency('requests')
 
-        from view_helpers.Risk_Dashboard import Risk_Dashboard
+        from osbot_browser.view_helpers.Risk_Dashboard import Risk_Dashboard
 
         jira_key = params.pop(0)
 
@@ -130,7 +130,7 @@ class Browser_Commands:
         load_dependency('syncer') ;
         load_dependency('requests')
 
-        from view_helpers.Risk_Dashboard import Risk_Dashboard
+        from osbot_browser.view_helpers.Risk_Dashboard import Risk_Dashboard
 
         return Risk_Dashboard().create_dashboard_with_test_data().send_screenshot_to_slack(team_id, channel)
 
@@ -153,7 +153,7 @@ class Browser_Commands:
     #     nodes   = data.get('nodes'  )
     #     edges   = data.get('edges'  )
     #     options = data.get('options')
-    #     from view_helpers.Vis_Js import Vis_Js
+    #     from osbot_browser.view_helpers.Vis_Js import Vis_Js
     #     vis_js = Vis_Js()
     #     vis_js.create_graph(nodes, edges, options)
     #     #vis_js.show_jira_graph(graph_name)
@@ -174,7 +174,7 @@ class Browser_Commands:
                               '*view name* - the view to render'
             return text, [{'text': attachment_text}]
 
-        from view_helpers.Am_Charts_Views import Am_Charts_Views
+        from osbot_browser.view_helpers.Am_Charts_Views import Am_Charts_Views
         params[0], params[1] = params[1], params[0]
 
         (text, attachments) = Slack_Commands_Helper(Am_Charts_Views).show_duration(True).invoke(team_id, channel, params)
@@ -184,7 +184,7 @@ class Browser_Commands:
 
     @staticmethod
     def calendar(team_id=None, channel=None, params=None):
-        from view_helpers.Full_Calendar_Views import Full_Calendar_Views
+        from osbot_browser.view_helpers.Full_Calendar_Views import Full_Calendar_Views
         #params[0], params[1] = params[1], params[0]
         Slack_Commands_Helper(Full_Calendar_Views).show_duration(True).invoke(team_id, channel,params)
 
@@ -197,7 +197,7 @@ class Browser_Commands:
                               '*view name* - the view to render'
             return text, [{'text': attachment_text}]
 
-        from view_helpers.Go_Js_Views import Go_Js_Views
+        from osbot_browser.view_helpers.Go_Js_Views import Go_Js_Views
         params[0], params[1] = params[1], params[0]
 
         (text, attachments) = Slack_Commands_Helper(Go_Js_Views).show_duration(True).invoke(team_id, channel, params)
@@ -213,7 +213,7 @@ class Browser_Commands:
                               '*view name* - the view to render'
             return text,[{'text': attachment_text}]
 
-        from view_helpers.Vis_Js_Views import Vis_Js_Views
+        from osbot_browser.view_helpers.Vis_Js_Views import Vis_Js_Views
 
         params[0],params[1] = params[1],params[0]       # swap items (since it is more user friendly to add the graph name first)
 
@@ -230,7 +230,7 @@ class Browser_Commands:
                               '*view name* - the view to render'
             return text, [{'text': attachment_text}]
 
-        from view_helpers.VivaGraph_Js_Views import VivaGraph_Js_Views
+        from osbot_browser.view_helpers.VivaGraph_Js_Views import VivaGraph_Js_Views
 
         params[0], params[1] = params[1], params[0]
 
@@ -242,8 +242,8 @@ class Browser_Commands:
     @staticmethod
     def elk(team_id=None, channel=None, params=None):
         load_dependency('syncer')
-        from browser.sites.Site_ELK import ELK_Commands
-        from browser.sites.Site_ELK import Site_ELK
+        from osbot_browser.browser.sites.Site_ELK import ELK_Commands
+        from osbot_browser.browser.sites.Site_ELK import Site_ELK
 
         if len(params) == 0:
             Slack_Commands_Helper(ELK_Commands).invoke(team_id, channel, params)
@@ -273,7 +273,7 @@ class Browser_Commands:
                               '*view name* - the view to render'
             return text,[{'text': attachment_text}]
 
-        from view_helpers.DataTable_Js_Views import DataTable_Js_Views
+        from osbot_browser.view_helpers.DataTable_Js_Views import DataTable_Js_Views
 
         params[0],params[1] = params[1],params[0]       # swap items (since it is more user friendly to add the graph name first)
 

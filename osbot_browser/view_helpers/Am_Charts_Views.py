@@ -11,7 +11,7 @@ class Am_Charts_Views:
     @staticmethod
     def _get_graph_data(params,layout=None, headless=True):
         load_dependencies(['syncer', 'requests']);
-        from view_helpers.Am_Charts import Am_Charts
+        from osbot_browser.view_helpers.Am_Charts import Am_Charts
 
         am_charts  = Am_Charts(headless=headless,layout=layout)
         graph_name = Misc.array_pop(params,0)
@@ -62,7 +62,7 @@ chart.___data = ""
     @staticmethod
     def chord(team_id=None, channel=None, params=None, headless=True):
         load_dependencies(['syncer', 'requests']);
-        from view_helpers.Am_Charts import Am_Charts
+        from osbot_browser.view_helpers.Am_Charts import Am_Charts
         (am_charts, graph_data) = Am_Charts_Views._get_graph_data(params, headless=headless)
 
         am_charts.load_page(True)

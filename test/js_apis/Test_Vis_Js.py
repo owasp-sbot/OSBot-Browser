@@ -2,7 +2,7 @@ import json
 from unittest import TestCase
 
 from browser import Browser_Lamdba_Helper
-from view_helpers.Vis_Js import Vis_Js
+from osbot_browser.view_helpers.Vis_Js import Vis_Js
 from pbx_gs_python_utils.utils.Assert import Assert
 from pbx_gs_python_utils.utils.Dev import Dev
 
@@ -41,7 +41,7 @@ class Test_Vis_Js(TestCase):
 
     def test_setup(self):
         Assert(self.browser                        ).is_class   ('API_Browser'                          )
-        Assert(self.vis_js.web_root                ).contains   ('serverless-render/src/web_root'       )
+        Assert(self.vis_js.web_root                ).contains   ('serverless-render/osbot_browser/web_root'       )
         Assert(self.browser.sync__url()            ).is_equal   ('about:blank')
         Dev.print(self.browser.sync__url())
         #Assert(self.browser.sync__url()            ).match_regex('http://localhost:.*/vis-js/empty.html')

@@ -4,7 +4,7 @@ from osbot_aws.apis.Lambda import Lambda
 
 from browser import Browser_Lamdba_Helper
 from pbx_gs_python_utils.utils.Dev import Dev
-from view_helpers.Vis_Js_Views import Vis_Js_Views
+from osbot_browser.view_helpers.Vis_Js_Views import Vis_Js_Views
 
 
 class Test_Vis_Js_Views(TestCase):

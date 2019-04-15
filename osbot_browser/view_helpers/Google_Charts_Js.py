@@ -1,6 +1,6 @@
-from browser.API_Browser import API_Browser
-from browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
-from browser.Render_Page import Render_Page
+from osbot_browser.browser.API_Browser import API_Browser
+from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
+from osbot_browser.browser.Render_Page import Render_Page
 from pbx_gs_python_utils.utils.Files import Files
 
 

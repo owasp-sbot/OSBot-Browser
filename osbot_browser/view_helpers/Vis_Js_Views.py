@@ -2,8 +2,8 @@ from osbot_aws.apis.Lambda import load_dependencies
 
 from pbx_gs_python_utils.utils.Dev import Dev
 from pbx_gs_python_utils.utils.Misc import Misc
-from view_helpers.Edge_Format import Edge_Format
-from view_helpers.Node_Format import Node_Format
+from osbot_browser.view_helpers.Edge_Format import Edge_Format
+from osbot_browser.view_helpers.Node_Format import Node_Format
 
 
 class Vis_Js_Views:
@@ -11,7 +11,7 @@ class Vis_Js_Views:
     @staticmethod
     def default(team_id=None, channel=None, params=None, no_render=False, headless=True):
 
-        load_dependencies(['syncer', 'requests']) ; from view_helpers.Vis_Js import Vis_Js
+        load_dependencies(['syncer', 'requests']) ; from osbot_browser.view_helpers.Vis_Js import Vis_Js
 
         graph_name = params.pop(0)
         vis_js = Vis_Js(headless=headless)                               # will start browser

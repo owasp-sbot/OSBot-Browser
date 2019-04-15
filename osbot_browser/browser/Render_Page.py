@@ -1,7 +1,7 @@
 from syncer import sync
 
-from browser.API_Browser import API_Browser
-from browser.Web_Server import Web_Server, Web_Server_Temp_File
+from osbot_browser.browser.API_Browser import API_Browser
+from osbot_browser.browser.Web_Server import Web_Server, Web_Server_Temp_File
 from pbx_gs_python_utils.utils.Dev import Dev
 from pbx_gs_python_utils.utils.Files import Files
 from pbx_gs_python_utils.utils.Misc import Misc
@@ -9,7 +9,7 @@ from pbx_gs_python_utils.utils.Misc import Misc
 
 class Render_Page:
 
-    def __init__(self, api_browser=None, headless = True, auto_close = True, web_root=None, web_server=None):
+    def __init__(self, api_browser=None, headless = True, web_root=None, web_server=None):
         if web_server:
             self.web_server = web_server
         else:
@@ -17,7 +17,7 @@ class Render_Page:
         if api_browser:
             self.api_browser = api_browser
         else:
-            self.api_browser = API_Browser(headless,auto_close)
+            self.api_browser = API_Browser(headless,headless)
 
     def render_file(self, html_file):
         return self.render_html(Files.contents(html_file))

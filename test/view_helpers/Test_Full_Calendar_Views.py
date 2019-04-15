@@ -3,7 +3,7 @@ from unittest import TestCase
 from osbot_aws.apis.Lambda import Lambda
 
 from browser import Browser_Lamdba_Helper
-from view_helpers.Full_Calendar_Views import Full_Calendar_Views
+from osbot_browser.view_helpers.Full_Calendar_Views import Full_Calendar_Views
 
 
 class Test_Full_Calendar_Views(TestCase):

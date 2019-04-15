@@ -1,5 +1,5 @@
 from pbx_gs_python_utils.utils.Misc import Misc
-from view_helpers.Base_View_Helper import Base_View_Helpers
+from osbot_browser.view_helpers.Base_View_Helper import Base_View_Helpers
 
 
 class Am_Charts(Base_View_Helpers):

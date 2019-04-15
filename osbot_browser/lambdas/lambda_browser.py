@@ -9,7 +9,7 @@ def cleanup_chrome_processes_and_tmp_files():               # remote temp files
 
 
 def run(event, context):
-    from browser.Browser_Commands import Browser_Commands
+    from osbot_browser.browser.Browser_Commands import Browser_Commands
     from pbx_gs_python_utils.utils.slack.Slack_Commands_Helper import Slack_Commands_Helper
     params  = event.get('params')
     data    = event.get('data')

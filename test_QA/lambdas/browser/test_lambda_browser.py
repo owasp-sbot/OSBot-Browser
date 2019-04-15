@@ -3,16 +3,21 @@ import json
 import unittest
 
 from osbot_aws.apis.Lambda import Lambda
+
+from osbot_browser.Deploy import Deploy
 from pbx_gs_python_utils.utils.Misc import Misc
 
-from browser.Browser_Commands import Browser_Commands
-from lambdas.lambda_browser import run
+from osbot_browser.browser.Browser_Commands import Browser_Commands
+from osbot_browser.lambdas.lambda_browser   import run
 from pbx_gs_python_utils.utils.Dev          import Dev
 
 
 class Test_Lambda_lambda_browser(unittest.TestCase):
     def setUp(self):
-        self.lambda_browser = Lambda('lambdas.browser.lambda_browser')
+        self.lambda_name = 'osbot_browser.lambdas.lambda_browser'
+        self.lambda_browser = Lambda(self.lambda_name) #lambdas.browser.lambda_browser')
+
+        #Deploy(lambda_name).deploy()
 
     def _save_png_file(self, png_data):
         try:
@@ -39,11 +44,9 @@ class Test_Lambda_lambda_browser(unittest.TestCase):
         assert result == '*Here are the `Browser_Commands` commands available:*'
 
     def test_markdown(self):
-        #payload = {"params": ['markdown'] }
         markdown = Misc.random_string_and_numbers(prefix='# Created from Lambda ')
         payload  = {"params": ['markdown', markdown, " \n normal text"]}
         png_data = self.lambda_browser.invoke(payload)
-        Dev.pprint(png_data)
         self._save_png_file(png_data)
 
     def test_screenshot(self):

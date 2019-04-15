@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from browser import Browser_Lamdba_Helper
 from pbx_gs_python_utils.utils.Dev import Dev
-from view_helpers.DataTable_Js_Views import DataTable_Js_Views
+from osbot_browser.view_helpers.DataTable_Js_Views import DataTable_Js_Views
 
 
 class Test_DataTable_Js_Views(TestCase):

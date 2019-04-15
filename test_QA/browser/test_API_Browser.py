@@ -7,7 +7,7 @@ import unittest
 from syncer import sync
 from unittest import TestCase
 
-from browser.API_Browser                import API_Browser
+from osbot_browser.browser.API_Browser                import API_Browser
 from pbx_gs_python_utils.utils.Dev      import Dev
 from pbx_gs_python_utils.utils.Files    import Files
 from pbx_gs_python_utils.utils.Http     import WS_is_open

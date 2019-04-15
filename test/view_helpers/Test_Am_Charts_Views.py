@@ -1,8 +1,8 @@
 from unittest import TestCase
 
-from view_helpers.Am_Charts_Views import Am_Charts_Views
+from osbot_browser.view_helpers.Am_Charts_Views import Am_Charts_Views
 from browser import Browser_Lamdba_Helper
-from view_helpers.View_Examples import View_Examples
+from osbot_browser.view_helpers.View_Examples import View_Examples
 
 
 class Test_Am_Charts_Views(TestCase):

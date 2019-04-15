@@ -2,10 +2,10 @@ from unittest import TestCase
 
 from osbot_aws.apis.Lambda import Lambda
 
-from view_helpers.Go_Js_Views import Go_Js_Views
+from osbot_browser.view_helpers.Go_Js_Views import Go_Js_Views
 from browser import Browser_Lamdba_Helper
 from pbx_gs_python_utils.utils.Dev import Dev
-from view_helpers.View_Examples import View_Examples
+from osbot_browser.view_helpers.View_Examples import View_Examples
 
 
 class Test_Go_Js_Views(TestCase):

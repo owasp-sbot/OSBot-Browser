@@ -3,7 +3,7 @@ sys.path.append('../libs/pbx-gs-python-utils')
 sys.path.append('../src')
 
 from unittest           import TestCase
-from browser.Web_Server import Web_Server
+from osbot_browser.browser.Web_Server import Web_Server
 
 
 class Test_Web_Server(TestCase):

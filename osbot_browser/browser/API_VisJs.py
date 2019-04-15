@@ -2,7 +2,7 @@ import json
 
 from syncer import sync
 
-from browser.API_Browser import API_Browser
+from osbot_browser.browser.API_Browser import API_Browser
 
 
 class API_VisJs():

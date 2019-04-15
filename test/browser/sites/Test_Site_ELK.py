@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from syncer import sync
 
-from browser.sites.Site_ELK import Site_ELK
+from osbot_browser.browser.sites.Site_ELK import Site_ELK
 from utils.Dev import Dev
 
 

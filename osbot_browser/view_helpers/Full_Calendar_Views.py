@@ -16,7 +16,7 @@ class Full_Calendar_Views:
     @staticmethod
     def _show_google_calendar(calendar_data,team_id=None, channel=None,headless=True):
         #load_dependencies(['syncer', 'requests', 'gmail']);
-        from view_helpers.Full_Calendar import Full_Calendar
+        from osbot_browser.view_helpers.Full_Calendar import Full_Calendar
 
         full_calendar = Full_Calendar(headless=headless)
         full_calendar.load_page()
