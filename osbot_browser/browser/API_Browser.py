@@ -15,13 +15,13 @@ from pbx_gs_python_utils.utils.Process      import Process
 
 class API_Browser:
 
-    def __init__(self, headless = True, auto_close = True, url_chrome = None):
+    def __init__(self, headless = True, url_chrome = None):
         self.file_tmp_last_chrome_session = '/tmp/browser-last_chrome_session.json'
         #self.file_tmp_screenshot          = '/tmp/browser-page-screenshot.png'
         self.file_tmp_screenshot          = Files.temp_file('.png')
         self._browser                     = None
         self.headless                     = headless
-        self.auto_close                   = auto_close      # happens after taking a screenshot
+        self.auto_close                   = headless                       # don't auto close when not running headless
         self.url_chrome                   = url_chrome
         self.log_js_errors_to_console     = True
 
@@ -263,8 +263,8 @@ class API_Browser:
         return await self.url()
 
     @sync
-    async def sync__screenshot(self, url=None,file_screenshot = None,clip=None):
-        return await self.screenshot(url,file_screenshot = file_screenshot,clip=clip)
+    async def sync__screenshot(self, url=None,file_screenshot = None,clip=None,full_page=True):
+        return await self.screenshot(url,file_screenshot = file_screenshot,clip=clip,full_page=full_page)
 
     @sync
     async def sync__screenshot_base64(self, url=None,full_page=True,close_browser=False, clip=None,delay=None):
