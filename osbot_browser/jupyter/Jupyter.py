@@ -5,7 +5,7 @@ from pbx_gs_python_utils.utils.Dev import Dev
 from osbot_browser.browser.API_Browser import API_Browser
 
 
-class API_Jupyter:
+class Jupyter:
 
     def __init__(self, pwd_token):
         self.browser        = API_Browser(headless=False)
@@ -17,8 +17,14 @@ class API_Jupyter:
         self.browser.sync__browser_width(width=width)
         return self
 
+    def current_page(self):
+        return self.browser.sync__url()
+
     def login(self):
         return self.open('?token={0}'.format(self.pwd_token))
+
+    def logout(self):
+        return self.open('logout')
 
     def open(self, path):
         url = self.resolve_url(path)
