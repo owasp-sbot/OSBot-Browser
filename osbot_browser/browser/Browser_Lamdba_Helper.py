@@ -12,8 +12,6 @@ class Browser_Lamdba_Helper:
         self.api_browser = None
         self.render_page = None
         self.headless    = headless
-        self.auto_close  = headless
-
 
     def get_screenshot_png(self,url=None, clip=None,full_page=None,close_browser=True, delay=None):
         load_dependency('syncer')
@@ -64,7 +62,7 @@ class Browser_Lamdba_Helper:
 
         from osbot_browser.browser.API_Browser import API_Browser
         from osbot_browser.browser.Render_Page import Render_Page
-        self.api_browser = API_Browser(headless=self.headless, auto_close=self.auto_close).sync__setup_browser()
+        self.api_browser = API_Browser(headless=self.headless).sync__setup_browser()
         self.render_page = Render_Page(api_browser=self.api_browser, web_root=self.web_root())
 
         return self

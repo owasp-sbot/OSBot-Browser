@@ -14,7 +14,7 @@ from pbx_gs_python_utils.utils.Http     import WS_is_open
 class test_API_Browser(TestCase):
 
     def setUp(self):
-         self.api = API_Browser(headless = False, auto_close = False)
+         self.api = API_Browser(headless = False)
 
     @sync
     async def test_browser_connect(self):
@@ -83,7 +83,7 @@ class test_workflows_API_Browser(TestCase):
     @sync
     async def test_open_jira_page(self):
         from osbot_aws.apis.Secrets import Secrets
-        self.api = API_Browser(headless=False, auto_close=False)
+        self.api = API_Browser(headless=False)
 
         login_needed = False
         self.secrets_id = 'GS_BOT_GS_JIRA'
@@ -114,7 +114,7 @@ class test_workflows_API_Browser(TestCase):
 class Test_API_Browser___with_browser_not_closing(TestCase):
 
     def setUp(self):
-        self.api = API_Browser(headless=True, auto_close=True)
+        self.api = API_Browser(headless=True)
 
     @sync
     async def test_html(self):

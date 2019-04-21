@@ -33,7 +33,7 @@ class Site_ELK:
         self.password   = login_details.get('password')
         self.server_url = login_details.get('server_url')
         if self._browser is None:
-            self._browser = API_Browser(headless=self.headless, auto_close=self.auto_close).sync__setup_browser()
+            self._browser = API_Browser(headless=self.headless).sync__setup_browser()
         return self._browser
 
     def browser(self):
