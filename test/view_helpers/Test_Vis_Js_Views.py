@@ -77,10 +77,5 @@ class Test_Vis_Js_Views(TestCase):
         self.png_data = Vis_Js_Views.r1_pinned(params=[graph_name],headless=False)
         #self.png_data = None
 
-    def test_hello_gs_cs(self):
-        result = Vis_Js_Views.hello_gs_cs()
-        result = Lambda('browser.lambda_browser').invoke({"params" : ["graph", "___","hello_gs_cs"]})
-        Dev.pprint(result)
-
 
 

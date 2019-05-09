@@ -264,8 +264,3 @@ class Vis_Js_Views:
         vis_js.browser().sync__browser_width(2000)
         return vis_js.send_screenshot_to_slack(team_id, channel)
         #return vis_js.create_graph_and_send_screenshot_to_slack(fixed_nodes, edges, options, team_id, channel)
-
-    @staticmethod
-    def hello_gs_cs(team_id=None, channel=None, params=None):
-
-        return "hello, this is live test (this is now running from lambda)"
