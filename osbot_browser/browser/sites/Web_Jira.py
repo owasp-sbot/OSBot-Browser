@@ -25,6 +25,7 @@ class Web_Jira:
         self.server_url     = self.server_details.get('server')
 
         self.page.on_dialog__always_accept()
+        self.page.on_request__block_these(['jira.photobox.com','jeditor','tinymce'])
         return self
 
     # def browser(self):
@@ -44,10 +45,13 @@ class Web_Jira:
 
     def issue(self,issue_id):
         #(server, username, password) = self.server_details().values()
-        path =  '/browse/{0}'.format(issue_id)
+        path =  '/browse/{0}?filter=-1'.format(issue_id)
         self.open(path)
         #self.browser().sync__await_for_element('.jira-help-tip')
         #self.browser().sync__js_execute("$('.jira-help-tip').hide()")
+
+        #self.page.click('#show-more-links-link')
+        self.page.javascript_eval("$('#show-more-links-link').click()")
 
         return self
 
@@ -55,26 +59,13 @@ class Web_Jira:
         path = '/login.jsp?os_destination=/rest/helptips/1.0/tips'
         self.open(path)
         page_text = self.page.text()
-        # (server, username, password) = self.server_details().values()
-        # url = server + '/login.jsp?os_destination=/rest/helptips/1.0/tips'
-        # page = self.browser().sync__page__with_auto_dialog_accept()
-        # self.browser().sync__open(url)
-        # page_text = self.browser().sync__page_text()
-        #
+
         if "Username" in page_text:
             self.page.type('#login-form-username', self.server_details.get('username'))
             self.page.type('#login-form-password', self.server_details.get('password'))
             self.page.javascript_eval('document.forms[1].submit()')
             self.page.wait_for_navigation()
-        #     self.browser().sync__type (page, '#login-form-password', password)
-        #     #self.browser().sync__click(page, '#login-form-submit')
-        #     self.browser().sync__js_execute('document.forms[1].submit()')
-        #     self.browser().sync__wait_for_navigation()
-        # #self.browser().sync__open(url)
-        # #page_text = self.browser().sync__page_text()
-        # html_start = '<html><head></head><body><pre style="word-wrap: break-word; '
-        # return html_start in self.browser().sync__html_raw()
-        #return page_text == '["newsletter-signup-tip"]'
+
 
     def logout(self):
         self.open('/logout')
@@ -86,5 +77,13 @@ class Web_Jira:
         url = "{0}{1}".format(self.server_url, path)
         return self.page.open(url)
 
-    def screenshot(self):
+    def screenshot(self,width=None):
+        if width:
+            self.page.width(width)
         return self.page.screenshot()
+
+
+    def fix_set_list_view(self):
+        self.open('/issues/?filter=-1')
+        self.page.javascript_eval("$('.aui-list-item-link').eq(1).click()")
+        return self

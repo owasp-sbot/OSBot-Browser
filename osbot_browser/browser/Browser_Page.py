@@ -35,9 +35,12 @@ class Browser_Page:
     def javascript_eval(self, code):
         return self.browser.sync__js_execute(code, self.page)
 
-
     def open(self,url):
         self.browser.sync__open(url,self.page)
+        return self
+
+    def width(self, width):
+        self.browser.sync__browser_width(width)
         return self
 
     def select(self, selector):
@@ -51,6 +54,16 @@ class Browser_Page:
 
     def on_dialog__always_accept(self):
         self.browser.sync_on_dialog__always_accept(self.page)
+        return self
+
+    def on_request__block_these(self,items_to_block):
+        def on_request(request):
+            for item in items_to_block:
+                if item in request.url:
+                    #print('BLOCKED: {0}'.format(request.url))
+                    return False
+            return True
+        self.browser.sync_on_request(self.page, on_request)
         return self
 
     def type(self,element, value):

@@ -18,8 +18,6 @@ class test_jira_web(unittest.TestCase):
         self.png_data = None
         self.result = None
         self._lambda = Lambda_Package('osbot_browser.lambdas.jira_web')
-        self._lambda.update_code()
-
 
 
     def tearDown(self):
@@ -37,8 +35,11 @@ class test_jira_web(unittest.TestCase):
 
 
     def test_invoke(self):
-        payload ={ "params" : []}
-        #self.result = self._lambda.invoke(payload)
-        self.png_data = self._lambda.invoke(payload)
+        #self._lambda.update_code()
+        payload ={ 'issue_id':  'GSP-95', 'channel': 'GDL2EC3EE', 'team_id': 'T7F3AUXGV'}
+        self.result = self._lambda.invoke(payload)
+        #self.png_data = self._lambda.invoke(payload)
 
+    def test_update_lambda(self):
+        self._lambda.update_code()
 

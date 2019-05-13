@@ -137,22 +137,6 @@ class API_Browser:
         browser = await self.browser()
         pages = await browser.pages()
         page = pages.pop()
-
-        async def on_request(request):
-            #print("\n-{0}".format(request.url))
-            #if (someCondition) request.abort();
-            #else request.continue();
-            if 'jira.photobox.com' in request.url or 'jeditor' in request.url :
-                print("BLOCKED: {0}".format(request.url))
-                return await request.abort()
-            else:
-
-                return await request.continue_()
-            #
-
-        await page.setRequestInterception(True)
-        page.on('request', lambda dialog: on_request(dialog))
-
         return page
 
     async def sleep(self, mseconds):
@@ -297,18 +281,20 @@ class API_Browser:
         return page
 
     @sync
+    async def sync_on_request(self, page, on_request):
+        async def on_request_local_handler(request):
+            if on_request and on_request(request):
+                return await request.continue_()
+            else:
+                return await request.abort()
+
+        await page.setRequestInterception(True)
+        page.on('request', lambda dialog: on_request_local_handler(dialog))
+        return page
+
+    @sync
     async def sync__page(self):
         return await self.page()
-
-        # async def on_request(request):
-        #     print("on on_request: {0}".format(request))
-        #     #if (someCondition) request.abort();
-        #     #else request.continue();
-        #     request.continue_()
-        #
-        # page =
-        # page.on('request', lambda dialog: on_request(dialog))
-        # return page
 
     @sync
     async def sync__page_close(self,page):
@@ -320,17 +306,17 @@ class API_Browser:
         return await page.evaluate('() => document.body.innerText')
         #return await self.page().plainText()
 
-    @sync
-    async def sync__page__with_auto_dialog_accept(self):
-        page = await self.page()
-
-        async def close_dialog(dialog):
-            print("on close_dialog: {0}".format(dialog))
-            await dialog.accept()
-
-        #page.on('dialog', lambda dialog: asyncio.ensure_future(close_dialog(dialog)))
-        page.on('dialog', lambda dialog: close_dialog(dialog))
-        return page
+    # @sync
+    # async def sync__page__with_auto_dialog_accept(self):
+    #     page = await self.page()
+    #
+    #     async def close_dialog(dialog):
+    #         print("on close_dialog: {0}".format(dialog))
+    #         await dialog.accept()
+    #
+    #     #page.on('dialog', lambda dialog: asyncio.ensure_future(close_dialog(dialog)))
+    #     page.on('dialog', lambda dialog: close_dialog(dialog))
+    #     return page
 
     @sync
     async def sync__open(self, url, page=None):

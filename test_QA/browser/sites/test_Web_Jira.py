@@ -32,8 +32,9 @@ class test_Web_Jira(TestCase):
 
     def test_issue(self):
         #self.web_jira.logout()
-        self.result = self.web_jira.login()
-        self.png_data = self.web_jira.issue('RISK-42').screenshot()
+        #self.result = self.web_jira.login()
+        #self.web_jira.fix_set_list_view()
+        self.png_data = self.web_jira.issue('GSP-95').screenshot()
 
 
     def test_login(self):
