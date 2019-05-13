@@ -30,7 +30,7 @@ class Test_Vis_Js_Views(TestCase):
         return
 
         browser_helper = Browser_Lamdba_Helper(headless=False).setup()
-        pngData = browser_helper.get_screenshot_png(close_browser=False)
+        pngData = browser_helper.get_screenshot_png()
         browser_helper.save_png_data(pngData)
 
         #return

@@ -13,9 +13,9 @@ class Browser_Lamdba_Helper:
         self.render_page = None
         self.headless    = headless
 
-    def get_screenshot_png(self,url=None, clip=None,full_page=None,close_browser=True, delay=None):
+    def get_screenshot_png(self,url=None, clip=None,full_page=None, delay=None):
         load_dependency('syncer')
-        return self.api_browser.sync__screenshot_base64(url, close_browser=close_browser, clip=clip,full_page=full_page,delay=delay)
+        return self.api_browser.sync__screenshot_base64(url, clip=clip,full_page=full_page,delay=delay)
 
     def open_local_file(self, path, js_code=None):
         return self.open_local_page_and_get_html(path,js_code)

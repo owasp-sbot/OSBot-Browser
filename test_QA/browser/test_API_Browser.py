@@ -91,8 +91,6 @@ class test_workflows_API_Browser(TestCase):
         (server, username, password) = Secrets(self.secrets_id).value_from_json_string().values()
 
         if login_needed:
-
-
             Dev.pprint(server, username, password)
             await self.api.open(server + '/login.jsp')
             page = await self.api.page()
@@ -100,12 +98,12 @@ class test_workflows_API_Browser(TestCase):
             await page.type('#login-form-password', password)
             await page.click('#login-form-submit')
 
-        await self.api.open(server + '/browse/GSP-95')
-        page = await self.api.page()
-        await self.api.js_execute("$('#show-more-links-link').click()")
-        from time import sleep
-        sleep(1)
-        #await self.api.page_size(1200,2000)
+        #await self.api.open(server + '/browse/GSP-95')
+        #page = await self.api.page()
+        #await self.api.js_execute("$('#show-more-links-link').click()")
+        #from time import sleep
+        #sleep(1)
+        await self.api.page_size(2000,3000)
 
         await self.api.screenshot(file_screenshot='/tmp/tmp-jira-screenshot.png', full_page=True)
 
