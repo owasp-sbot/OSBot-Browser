@@ -4,12 +4,12 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    version                       = "0.2.22"               , # change this on every release
+    version                       = "0.3.01"               , # change this on every release
     name                          = "osbot_browser"  ,
 
     author                        = "Dinis Cruz",
     author_email                  = "dinis.cruz@owasp.org",
-    description                   = "OWASP Security Bot - GSuite",
+    description                   = "OWASP Security Bot - Browser APIs (serverless)",
     long_description              = long_description,
     long_description_content_type = " text/markdown",
     url                           = "https://github.com/pbx-gs/OSBot-GSuite",

@@ -87,3 +87,19 @@ class Web_Jira:
         self.open('/issues/?filter=-1')
         self.page.javascript_eval("$('.aui-list-item-link').eq(1).click()")
         return self
+
+    def fix_issue_remove_ui_elements(self):
+        js_code =   """
+                        $('.command-bar'            ).hide();
+                        $('#header'                 ).hide();
+                        $('#viewissuesidebar'       ).hide();
+                        $('#attachmentmodule'       ).hide();
+                        $('#addcomment'             ).hide();
+                        $('#footer'                 ).hide();
+                        $('.aui-page-header-actions').hide();
+                                             
+                        $('#resolution-val'  )      .parent().hide();
+                        $('#priority-val'    )      .parent().hide();
+                        $('.remote-link'     ).eq(0).parent().hide();
+                    """
+        self.page.javascript_eval(js_code)

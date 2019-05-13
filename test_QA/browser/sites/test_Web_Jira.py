@@ -39,6 +39,7 @@ class test_Web_Jira(TestCase):
 
     def test_login(self):
         self.result = self.web_jira.logout().login()
+        self.web_jira.fix_issue_remove_ui_elements()
         self.png_data = self.web_jira.screenshot()
 
     def test_open(self):
