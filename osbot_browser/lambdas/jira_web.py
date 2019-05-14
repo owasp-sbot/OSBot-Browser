@@ -15,6 +15,7 @@ def run(event, context):
 
     web_jira.login()  #web_jira.fix_set_list_view()
     web_jira.issue(issue_id)
+    web_jira.fix_issue_remove_ui_elements()
     png_data =  web_jira.screenshot(width=1200)
 
     if channel:

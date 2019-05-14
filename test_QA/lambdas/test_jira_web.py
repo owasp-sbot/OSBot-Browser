@@ -35,7 +35,7 @@ class test_jira_web(unittest.TestCase):
 
 
     def test_invoke(self):
-        #self._lambda.update_code()
+        self._lambda.update_code()
         payload ={ 'issue_id':  'GSP-95', 'channel': 'GDL2EC3EE', 'team_id': 'T7F3AUXGV'}
         self.result = self._lambda.invoke(payload)
         #self.png_data = self._lambda.invoke(payload)

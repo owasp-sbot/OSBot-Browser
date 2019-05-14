@@ -92,14 +92,16 @@ class Web_Jira:
         js_code =   """
                         $('.command-bar'            ).hide();
                         $('#header'                 ).hide();
+                        $('.aui-sidebar'            ).hide()
                         $('#viewissuesidebar'       ).hide();
                         $('#attachmentmodule'       ).hide();
-                        $('#addcomment'             ).hide();
+                        $('#addcomment'             ).hide();                        
                         $('#footer'                 ).hide();
-                        $('.aui-page-header-actions').hide();
+                        $('.aui-page-header-actions').hide();                        
                                              
                         $('#resolution-val'  )      .parent().hide();
                         $('#priority-val'    )      .parent().hide();
                         $('.remote-link'     ).eq(0).parent().hide();
                     """
         self.page.javascript_eval(js_code)
+        return self

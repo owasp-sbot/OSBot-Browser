@@ -9,7 +9,7 @@ from osbot_browser.browser.sites.Web_Jira import Web_Jira
 
 class test_Web_Jira(TestCase):
     def setUp(self):
-        self.headless   = False
+        self.headless   = True
         self.result     = None
         self.png_data   = None
         self.new_page   = True
@@ -32,14 +32,13 @@ class test_Web_Jira(TestCase):
 
     def test_issue(self):
         #self.web_jira.logout()
-        #self.result = self.web_jira.login()
+        self.web_jira.login()
         #self.web_jira.fix_set_list_view()
-        self.png_data = self.web_jira.issue('GSP-95').screenshot()
+        self.png_data = self.web_jira.issue('GSP-95').fix_issue_remove_ui_elements().screenshot()
 
 
     def test_login(self):
         self.result = self.web_jira.logout().login()
-        self.web_jira.fix_issue_remove_ui_elements()
         self.png_data = self.web_jira.screenshot()
 
     def test_open(self):
