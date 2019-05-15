@@ -80,7 +80,7 @@ class Go_Js_Views:
             edges.append({ 'from': edge[0],'to': edge[2]})
 
         js_code = 'relayoutLanes()'
-        return go_js.render(nodes, edges, js_code=js_code, width=1400, team_id=team_id, channel=channel)
+        return go_js.render(nodes, edges, js_code=js_code, width=2400, team_id=team_id, channel=channel)
 
     @staticmethod
     def mindmap_issue(team_id=None, channel=None, params=None):
