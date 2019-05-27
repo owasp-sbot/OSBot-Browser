@@ -44,18 +44,23 @@ class Node_Format:
     @staticmethod
     def status_color(node, issue, set_label=True):
         if issue:
+            #['red', 'orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'black']
             colors = ['darkred', 'red', 'orange', 'darkgreen', 'green']
             rating = issue.get('Status')
             if set_label:
                 node['label'] = rating
             color      = '#9EC2F7'
             font_color = 'Black'
-            if rating == 'False Positive / Not issue'                       : color = 'black'   ; font_color='white'
-            if rating == 'Awaiting Acceptance'                              : color = colors[0] ; font_color='white'
+            if rating == 'False Positive / Not issue'                       : color = 'black'       ; font_color='white'
+            if rating == 'Awaiting Acceptance'                              : color = colors[0]     ; font_color='white'
             if rating in ['To VULN Assess' ,'To Risk Assess','To Validate'] : color = colors[2]
             if rating == 'Allocated for Fix'                                : color = colors[2]
-            if rating == 'Fixed'                                            : color = colors[4] ; font_color='white'
-            if rating in ['To Do','Open']                                   : color = 'Gray'    ; font_color='white'
+            if rating == 'Fixed'                                            : color = colors[4]     ; font_color='white'
+            if rating in ['To Do','Open']                                   : color = 'Gray'        ; font_color='white'
+            if rating == 'Completed'                                        : color = 'LightGreen'
+            if rating == 'In Progress'                                      : color = 'Teal'        ; font_color='white'
+            if rating == 'Pending'                                          : color = 'LightYellow'
+            if rating == 'Backlog'                                          : color = 'LightGray'
             node['color'] = color
             node['font' ] = {'color' : font_color}
         return Node_Format

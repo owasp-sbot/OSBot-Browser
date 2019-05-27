@@ -2,8 +2,9 @@ from unittest import TestCase
 
 from osbot_aws.apis.Lambda import Lambda
 
-from browser import Browser_Lamdba_Helper
 from pbx_gs_python_utils.utils.Dev import Dev
+
+from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 from osbot_browser.view_helpers.Vis_Js_Views import Vis_Js_Views
 
 
@@ -29,9 +30,9 @@ class Test_Vis_Js_Views(TestCase):
         self.png_data = Vis_Js_Views.default(params=[graph_name])
         return
 
-        browser_helper = Browser_Lamdba_Helper(headless=False).setup()
-        pngData = browser_helper.get_screenshot_png()
-        browser_helper.save_png_data(pngData)
+        # browser_helper = Browser_Lamdba_Helper(headless=False).setup()
+        # pngData = browser_helper.get_screenshot_png()
+        # browser_helper.save_png_data(pngData)
 
         #return
 
@@ -56,8 +57,8 @@ class Test_Vis_Js_Views(TestCase):
         #self.png_data = None
 
     def test_by_status(self):
-        graph_name = 'graph_LGK' #'graph_9CP'#
-        self.png_data = Vis_Js_Views.by_status(params=[graph_name])
+        graph_name = 'graph_TAP' #'graph_9CP'#
+        self.png_data = Vis_Js_Views.by_status(params=[graph_name],headless=False)
         self.png_data = None
 
     def test_by_rating(self):

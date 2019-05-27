@@ -105,8 +105,8 @@ class Vis_Js_Views:
                           .browser_width(3000)
                           .send_screenshot_to_slack(team_id, channel) )
 
-    def by_status(team_id=None, channel=None, params=None):
-        (graph_name,nodes, edges, graph_data,vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+    def by_status(team_id=None, channel=None, params=None, headless=True):
+        (graph_name,nodes, edges, graph_data,vis_js) = Vis_Js_Views.default(params=params, no_render=True,headless=headless)
         graph_name += ' | by_status'
         issues = graph_data.get('nodes')
 
