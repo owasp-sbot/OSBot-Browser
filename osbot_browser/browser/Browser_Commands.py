@@ -41,15 +41,17 @@ class Browser_Commands:
         url            = params.pop(0).replace('<', '').replace('>', '')  # fix extra chars added by Slack
         width          = Misc.to_int(Misc.array_pop(params,0))
         height         = Misc.to_int(Misc.array_pop(params,0))
+        delay          = Misc.to_int(Misc.array_pop(params, 0))
         message = ":point_right: taking screenshot of url: {0}".format(url)
         if width : message += ", with width `{0}`".format(width)
-        if height: message += ", with height (at least) `{0}`".format(height)
+        if height: message += ", with height `{0}` (min height)".format(height)
+        if delay : message += ", with delay of  `{0}` seconds".format(delay)
         slack_message(message,[], channel,team_id)
 
         browser_helper = Browser_Lamdba_Helper().setup()
         if width:
             browser_helper.api_browser.sync__browser_width(width,height)
-        png_data       = browser_helper.get_screenshot_png(url,full_page=True)
+        png_data       = browser_helper.get_screenshot_png(url,full_page=True,delay=delay)
         return browser_helper.send_png_data_to_slack(team_id,channel,url, png_data)
 
     @staticmethod

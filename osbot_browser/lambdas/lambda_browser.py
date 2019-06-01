@@ -20,8 +20,8 @@ def run(event, context):
         channel = data.get('channel')
         team_id = 'TAULHPATC' #data.get('team_id')
     
-    data,_ = Slack_Commands_Helper(Browser_Commands).invoke(team_id, channel, params)
+    result,_ = Slack_Commands_Helper(Browser_Commands).invoke(team_id, channel, params)
 
     cleanup_chrome_processes_and_tmp_files()
     if channel is None:
-        return data
+        return result
