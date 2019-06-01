@@ -210,7 +210,7 @@ class API_Browser:
             asyncio.get_event_loop().run_until_complete(self.browser_connect())
             return self
 
-        load_dependency('pyppeteer')
+        #load_dependency('pyppeteer')
         path_headless_shell          = '/tmp/lambdas-dependencies/pyppeteer/headless_shell'     # path to headless_shell AWS Linux executable
         os.environ['PYPPETEER_HOME'] = '/tmp'                                                   # tell pyppeteer to use this read-write path in Lambda aws
 

@@ -1,6 +1,6 @@
 import json
 
-from osbot_aws.apis.Lambda import load_dependency, load_dependencies
+#from osbot_aws.apis.Lambda import load_dependency
 
 from osbot_browser.browser.Browser_Lamdba_Helper                          import Browser_Lamdba_Helper
 from pbx_gs_python_utils.utils.Files                        import Files
@@ -9,6 +9,24 @@ from pbx_gs_python_utils.utils.Misc                         import Misc
 from pbx_gs_python_utils.utils.Process                      import Process
 from pbx_gs_python_utils.utils.slack.Slack_Commands_Helper  import Slack_Commands_Helper
 
+def load_dependency(target):
+    from osbot_aws.apis.S3 import S3
+    import shutil
+    import sys
+    s3         = S3()
+    s3_bucket  = 'oss-bot-lambdas'
+    s3_key     = 'lambdas-dependencies/{0}.zip'.format(target)
+    tmp_dir    = Files.path_combine('/tmp/lambdas-dependencies', target)
+    #return s3.file_exists(s3_bucket,s3_key)
+
+    if s3.file_exists(s3_bucket,s3_key) is False:
+        raise Exception("In Lambda load_dependency, could not find dependency for: {0}".format(target))
+
+    if Files.not_exists(tmp_dir):                               # if the tmp folder doesn't exist it means that we are loading this for the first time (on a new Lambda execution environment)
+        zip_file = s3.file_download(s3_bucket, s3_key,False)    # download zip file with dependencies
+        shutil.unpack_archive(zip_file, extract_dir = tmp_dir)  # unpack them
+        sys.path.append(tmp_dir)                                # add tmp_dir to the path that python uses to check for dependencies
+    return Files.exists(tmp_dir)
 
 class Browser_Commands:
 
@@ -16,8 +34,12 @@ class Browser_Commands:
 
     @staticmethod
     def screenshot(team_id=None, channel=None, params=[]):
-        url          = params.pop(0).replace('<', '').replace('>', '')  # fix extra chars added by Slack
-        delay        = Misc.to_int(Misc.array_pop(params,0))
+        load_dependency('syncer');
+        load_dependency('requests')
+        load_dependency('pyppeteer')
+
+        url            = params.pop(0).replace('<', '').replace('>', '')  # fix extra chars added by Slack
+        delay          = Misc.to_int(Misc.array_pop(params,0))
         slack_message(":point_right: taking screenshot of url: {0}".format(url),[], channel,team_id)
         browser_helper = Browser_Lamdba_Helper().setup()
         png_data       = browser_helper.get_screenshot_png(url,full_page=True, delay=delay)
