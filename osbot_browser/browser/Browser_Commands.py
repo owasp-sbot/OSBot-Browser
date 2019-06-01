@@ -30,7 +30,7 @@ def load_dependency(target):
 
 class Browser_Commands:
 
-    current_version = 'v0.32'
+    current_version = 'v0.32 (oss)'
 
     @staticmethod
     def screenshot(team_id=None, channel=None, params=[]):
@@ -39,10 +39,17 @@ class Browser_Commands:
         load_dependency('pyppeteer')
 
         url            = params.pop(0).replace('<', '').replace('>', '')  # fix extra chars added by Slack
-        delay          = Misc.to_int(Misc.array_pop(params,0))
-        slack_message(":point_right: taking screenshot of url: {0}".format(url),[], channel,team_id)
+        width          = Misc.to_int(Misc.array_pop(params,0))
+        height         = Misc.to_int(Misc.array_pop(params,0))
+        message = ":point_right: taking screenshot of url: {0}".format(url)
+        if width : message += ", with width `{0}`".format(width)
+        if height: message += ", with height (at least) `{0}`".format(height)
+        slack_message(message,[], channel,team_id)
+
         browser_helper = Browser_Lamdba_Helper().setup()
-        png_data       = browser_helper.get_screenshot_png(url,full_page=True, delay=delay)
+        if width:
+            browser_helper.api_browser.sync__browser_width(width,height)
+        png_data       = browser_helper.get_screenshot_png(url,full_page=True)
         return browser_helper.send_png_data_to_slack(team_id,channel,url, png_data)
 
     @staticmethod
