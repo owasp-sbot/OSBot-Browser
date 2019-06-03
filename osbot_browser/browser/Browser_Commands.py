@@ -12,7 +12,7 @@ from pbx_gs_python_utils.utils.slack.Slack_Commands_Helper  import Slack_Command
 
 class Browser_Commands:
 
-    current_version = 'v0.32'
+    current_version = 'v0.35'
 
     @staticmethod
     def screenshot(team_id=None, channel=None, params=[]):
