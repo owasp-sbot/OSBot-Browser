@@ -30,7 +30,39 @@ def load_dependency(target):
 
 class Browser_Commands:
 
-    current_version = 'v0.32 (oss)'
+    current_version = 'v0.33 (oss)'
+
+    @staticmethod
+    def oss_today(team_id=None, channel=None, params=[]):
+
+        # here is the jscode tha cleans up the oss schedule ui
+        js_code = """$('.inner_main_schedule').height(130)
+                     $('.center_heading').height(-50)     
+                     $('footer').hide()                   
+                     $('.edit-link').hide()               
+                     $('#no-room-booked').hide() 
+                     $('#schedule-by-day').hide()
+                     $('#Villas #AM_1').hide()
+                     $('#Villas #PM_1').hide()
+                     $('#Villas #PM_2').hide()          
+                     $('#Villas #PM_3').hide()                     
+                     $('#Main_conference_Hall #KN_1').hide()         
+                     $('#Main_conference_Hall #DS_1').hide()
+                     $('#Main_conference_Hall #DS_2').hide()
+                     $('#Main_conference_Hall #DS_3').hide()"""
+
+
+        load_dependency('syncer');
+        load_dependency('requests')
+        load_dependency('pyppeteer')
+        url = 'https://opensecsummit.org/schedule/day/mon/'
+        from osbot_browser.browser.Browser_Page import Browser_Page
+        page = Browser_Page(headless=True, new_page=True).setup()
+        page.open(url).width(1200)
+        page.javascript_eval(js_code)
+
+        png_data = page.screenshot()
+        return page.browser_helper.send_png_data_to_slack(team_id, channel, url, png_data)
 
     @staticmethod
     def screenshot(team_id=None, channel=None, params=[]):
@@ -182,7 +214,8 @@ class Browser_Commands:
         params = ' '.join(params).replace('“','"').replace('”','"')
         data = json.loads(params)
 
-        load_dependencies(['syncer', 'requests'])
+        load_dependency('syncer')
+        load_dependency('requests')
 
         nodes   = data.get('nodes'  )
         edges   = data.get('edges'  )

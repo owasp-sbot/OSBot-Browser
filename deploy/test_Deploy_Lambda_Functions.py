@@ -5,7 +5,8 @@ from osbot_browser.Deploy import Deploy
 from pbx_gs_python_utils.utils.Dev import Dev
 from pbx_gs_python_utils.utils.Lambdas_Helpers import slack_message
 
-
+# NOTE, when in this OSS FORK don't run this from here,
+# use the oss fork browser deploy functions
 class test_Deploy_Lambda_Functions(TestCase):
 
     def test_deploy_lambda_functions(self):
