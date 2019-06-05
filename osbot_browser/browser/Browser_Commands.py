@@ -45,8 +45,7 @@ class Browser_Commands:
                      $('#Villas #AM_1').hide()
                      $('#Villas #PM_1').hide()
                      $('#Villas #PM_2').hide()          
-                     $('#Villas #PM_3').hide()                     
-                     $('#Main_conference_Hall #KN_1').hide()         
+                     $('#Villas #PM_3').hide()                                                   
                      $('#Main_conference_Hall #DS_1').hide()
                      $('#Main_conference_Hall #DS_2').hide()
                      $('#Main_conference_Hall #DS_3').hide()"""
@@ -55,7 +54,7 @@ class Browser_Commands:
         load_dependency('syncer');
         load_dependency('requests')
         load_dependency('pyppeteer')
-        url = 'https://opensecsummit.org/schedule/day/mon/'
+        url = 'https://opensecsummit.org/schedule/day/wed/'
         from osbot_browser.browser.Browser_Page import Browser_Page
         page = Browser_Page(headless=True, new_page=True).setup()
         page.open(url).width(1200)
