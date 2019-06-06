@@ -9,6 +9,7 @@ from pbx_gs_python_utils.utils.Misc                         import Misc
 from pbx_gs_python_utils.utils.Process                      import Process
 from pbx_gs_python_utils.utils.slack.Slack_Commands_Helper  import Slack_Commands_Helper
 
+
 def load_dependency(target):
     from osbot_aws.apis.S3 import S3
     import shutil
@@ -30,7 +31,7 @@ def load_dependency(target):
 
 class Browser_Commands:
 
-    current_version = 'v0.33 (oss)'
+    current_version = 'v0.37 (oss)'
 
     @staticmethod
     def oss_today(team_id=None, channel=None, params=[]):
@@ -46,15 +47,14 @@ class Browser_Commands:
                      $('#Villas #PM_1').hide()
                      $('#Villas #PM_2').hide()          
                      $('#Villas #PM_3').hide()                                                   
-                     $('#Main_conference_Hall #DS_1').hide()
-                     $('#Main_conference_Hall #DS_2').hide()
+                     $('#Main_conference_Hall #DS_1').hide()                     
                      $('#Main_conference_Hall #DS_3').hide()"""
 
 
         load_dependency('syncer');
         load_dependency('requests')
         load_dependency('pyppeteer')
-        url = 'https://opensecsummit.org/schedule/day/wed/'
+        url = 'https://opensecsummit.org/schedule/day/thu/'
         from osbot_browser.browser.Browser_Page import Browser_Page
         page = Browser_Page(headless=True, new_page=True).setup()
         page.open(url).width(1200)
@@ -347,6 +347,17 @@ class Browser_Commands:
 
         if team_id is None:
             return text
+
+
+
+    @staticmethod
+    def maps(team_id=None, channel=None, params=None):
+        load_dependency('syncer')
+        load_dependency('requests')
+        load_dependency('pyppeteer')
+        from osbot_browser.view_helpers.Maps_Views import Maps_Views
+        Slack_Commands_Helper(Maps_Views).invoke('not-used', channel, params)
+
 
     @staticmethod
     def version(team_id=None, channel=None, params=None):

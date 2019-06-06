@@ -7,6 +7,8 @@ from osbot_browser.browser.Browser_Commands import Browser_Commands
 from pbx_gs_python_utils.utils.Dev import Dev
 from pbx_gs_python_utils.utils.Files import Files
 
+from oss_bot.Deploy import Deploy
+
 
 class Test_Browser_Commands(TestCase):
 
@@ -131,3 +133,10 @@ class Test_Browser_Commands(TestCase):
         params =['issue','GSOS-181']
         result = self.browser_commands.table(params=params)
         Dev.pprint(result)
+
+    def test_google_charts(self):
+        Deploy().setup()
+
+        channel = 'DJ8UA0RFT'
+        self.browser_commands.google_charts(None, channel,['default'])
+        #self.browser_commands.oss_today(None, channel)

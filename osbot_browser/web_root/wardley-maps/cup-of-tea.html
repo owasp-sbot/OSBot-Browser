@@ -1,0 +1,82 @@
+
+<!doctype html>
+<html>
+<head>
+  <title>Wardley Map</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+  <script src="./browser-compiler-coffeescript.js"></script>
+
+  <style type="text/css">
+    #mynetwork_ {
+      top      : 5px;
+      bottom   : 5px;
+      left     : 5px;
+      right    : 5px;
+      position : fixed;
+      border:  1px solid lightgray;
+    }
+
+    #mynetwork {
+      width: 880px;
+      height: 600px;
+
+      border:  1px solid lightgray;
+    }
+  </style>
+</head>
+<body>
+<div id="mynetwork"></div>
+<script type="text/javascript">
+  // create an array with nodes
+  var nodes = new vis.DataSet([
+    // {id: 1, label: 'Node 1', shape: 'box'  , fixed: true , x:0, y:0 },
+    // {id: 2, label: 'Node 2', color: 'blue' , fixed: true , x:-100, y:0},
+    // {id: 3, label: 'Node 3'},
+    // {id: 4, label: 'Node 4'},
+    // {id: 5, label: 'Node 5'}
+  ]);
+
+  // create an array with edges
+  var edges = new vis.DataSet([
+    // {from: 1, to: 3},
+    // {from: 1, to: 2},
+    // {from: 2, to: 4},
+    // {from: 2, to: 5},
+    // {from: 3, to: 3}
+  ]);
+
+  // create a network
+  var container = document.getElementById('mynetwork');
+  var data = {
+    nodes: nodes,
+    edges: edges
+  };
+  var options = {};
+
+  var network = new vis.Network(container, data, options);
+
+  network.on('startStabilizing', function (data) {
+      console.log('startStabilizing',data)
+  })
+  network.on('stabilizationProgress', function (data) {
+      console.log('stabilizationProgress',data)
+  })
+  network.on('stabilizationIterationsDone', function (data) {
+      console.log('stabilizationIterationsDone',data)
+  })
+  network.on('stabilized', function (data) {
+      console.log('stabilized',data)
+  })
+
+</script>
+
+
+<script type="text/coffeescript" src="./api-visjs.coffee"></script>
+<script type="text/coffeescript" src="./map-cup-of-tea.coffee"></script>
+<!--
+    <script type="text/coffeescript" src="./map-2.coffee"></script>
+-->
+
+</body>
+</html>
