@@ -54,7 +54,7 @@ class Browser_Commands:
         load_dependency('syncer');
         load_dependency('requests')
         load_dependency('pyppeteer')
-        url = 'https://opensecsummit.org/schedule/day/thu/'
+        url = 'https://opensecsummit.org/schedule/day/fri/'
         from osbot_browser.browser.Browser_Page import Browser_Page
         page = Browser_Page(headless=True, new_page=True).setup()
         page.open(url).width(1200)
@@ -356,7 +356,9 @@ class Browser_Commands:
         load_dependency('requests')
         load_dependency('pyppeteer')
         from osbot_browser.view_helpers.Maps_Views import Maps_Views
-        Slack_Commands_Helper(Maps_Views).invoke('not-used', channel, params)
+        (text,attachments) = Slack_Commands_Helper(Maps_Views).invoke('not-used', channel, params)
+        if team_id is None:
+            return text
 
 
     @staticmethod

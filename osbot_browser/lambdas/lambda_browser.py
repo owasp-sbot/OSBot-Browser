@@ -24,4 +24,4 @@ def run(event, context):
 
     cleanup_chrome_processes_and_tmp_files()
     if channel is None:
-        return "result: {0}".format(result)
+        return result
