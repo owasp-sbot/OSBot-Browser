@@ -36,7 +36,13 @@ class test_jira_web(unittest.TestCase):
 
     def test_invoke(self):
         self._lambda.update_code()
-        payload ={ 'issue_id':  'GSP-95', 'channel': 'GDL2EC3EE', 'team_id': 'T7F3AUXGV'}
+        issue_id = 'SEC-10965' # 'GSP-95'
+
+        payload = { 'issue_id': issue_id   ,
+                    'channel': 'DDKUZTK6X' ,            # gsbot
+                    'team_id': 'T7F3AUXGV' ,            # GS-CST
+                    'width'  : 2000,
+                    'height' : 300 }
         self.result = self._lambda.invoke(payload)
         #self.png_data = self._lambda.invoke(payload)
 

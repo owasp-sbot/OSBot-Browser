@@ -39,8 +39,8 @@ class Browser_Page:
         self.browser.sync__open(url,self.page)
         return self
 
-    def width(self, width):
-        self.browser.sync__browser_width(width)
+    def width(self, width, height=None):
+        self.browser.sync__browser_width(width,height)
         return self
 
     def select(self, selector):

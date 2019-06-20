@@ -77,9 +77,9 @@ class Web_Jira:
         url = "{0}{1}".format(self.server_url, path)
         return self.page.open(url)
 
-    def screenshot(self,width=None):
+    def screenshot(self,width=None, height=None):
         if width:
-            self.page.width(width)
+            self.page.width(width, height)
         return self.page.screenshot()
 
 

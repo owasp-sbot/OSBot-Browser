@@ -114,10 +114,11 @@ class Test_Browser_Commands(TestCase):
         #graph_name = 'graph_HDS' # very large graph
         #graph_name = 'graph_37V' # with `1617` nodes and `2907` edges,
         #graph_name = 'graph_VQW'
+        graph_name = 'graph_56M'
         params = [graph_name,'default']
         result = self.browser_commands.viva_graph(params=params)
-        Dev.pprint(result)
-        #self._save_png_data(result)
+        #Dev.pprint(result)
+        self._save_png_data(result)
 
     def test_go_js(self):
         graph_name = 'graph_XKW'
