@@ -21,7 +21,7 @@ def run(event, context):
     if width is None:
         width = 1200
     if height is None:
-        height = 500
+        height = 300
     png_data =  web_jira.screenshot(width, height)
 
     if channel:
