@@ -81,4 +81,57 @@ class Browser_Page:
         self.browser.sync__wait_for_navigation(self.page)
         return self
 
+    #document.getElementsByClassName('c-message__bodya').length
+    ## NOTE: One solution to handle the probs caused by Session/Page timeout is to reconnect to the browser  (need to check if the reconnect works in AWS)
+    #          self.browser.sync__setup_browser()
+    #          #self.page = self.browser.sync__page()
+    def wait_for_element__class_name(self, element_id, exists=True,wait_for=0.25, max_attempts=20):
+        for i in range(0,max_attempts):
+            if exists:
+                result = self.javascript_eval("document.getElementsByClassName('{0}').length > 0".format(element_id))
+            else:
+                result = self.javascript_eval("document.getElementsByClassName('{0}').length == 0".format(element_id))
+            #print('wait_for_element__class_name',element_id, exists, i, result)
+            if result:
+                return True
+            sleep(wait_for)
+        return False
+
+    def wait_for_element__id(self, element_id, exists=True, wait_for=0.25, max_attempts=20):
+        for i in range(0,max_attempts):
+            if exists:
+                result = self.javascript_eval("document.getElementById('{0}') != null".format(element_id))
+            else:
+                result = self.javascript_eval("document.getElementById('{0}') == null".format(element_id))
+            #print('wait_for_element_by_id',element_id, exists, i, result)
+            if result:
+                return True
+            sleep(wait_for)
+        return False
+        #return self.browser.sync__await_for_element(element, page=self.page,visible=visible, hidden=hidden)
+
+    def wait_for_element__tag_name(self, element_id, exists=True, wait_for=0.25, max_attempts=20):
+        for i in range(0,max_attempts):
+            if exists:
+                result = self.javascript_eval("document.getElementsByTagName('{0}').length > 0".format(element_id))
+            else:
+                result = self.javascript_eval("document.getElementsByTagName('{0}').length == 0".format(element_id))
+            #print('wait_for_element__getElementsByTagName',element_id, exists, i, result)
+            if result:
+                return True
+            sleep(wait_for)
+        return False
+
+
+
+    def wait_for_jQuery(self, wait_for=0.25, max_attempts=20):
+        for i in range(0,max_attempts):
+            result = self.javascript_eval("typeof(jQuery)")
+            print(i, result)
+            if result == 'function':
+                return True
+            sleep(wait_for)
+        return False
+
+
 

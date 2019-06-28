@@ -14,7 +14,12 @@ class Test_Browser_Commands(TestCase):
         self.browser_commands = Browser_Commands()
         self.png_file         = '/tmp/lambda_png_file.png'
         self.team_id          = 'T7F3AUXGV'
-        self.channel          = 'GDL2EC3EE'
+        self.channel          = 'DDKUZTK6X' #''GDL2EC3EE'
+        self.result           = None
+
+    def tearDown(self):
+        if self.result is not None:
+            Dev.pprint(self.result)
 
     def _save_png_data(self, png_data):
         png_file = '/tmp/lambda_png_file.png'
@@ -33,6 +38,11 @@ class Test_Browser_Commands(TestCase):
         #os.environ['OSX_CHROME'] = 'True'
         url = 'https://www.google.co.uk'
         self.browser_commands.screenshot(self.team_id, self.channel, [url])
+
+    def test_slack(self):
+        #os.environ['OSX_CHROME'] = 'True'
+        params = ['random', 2000]
+        self.result = self.browser_commands.slack(self.team_id, self.channel, params)
 
     @unittest.skip("needs server running locally")
     def test_screenshot__localhost(self):

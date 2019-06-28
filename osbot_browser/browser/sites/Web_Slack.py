@@ -9,17 +9,24 @@ from osbot_browser.browser.Browser_Page import Browser_Page
 
 
 class Web_Slack:
-    def __init__(self,headless=True, new_page=True):
+    def __init__(self, team_id, headless=True, new_page=True):
         self._browser               = None
         self._browser_helper        = None
         self.server_details         = None
         self.server_url             = None
-        self.secrets_id             = 'gs_bot_gs_Jira'
+        self.team_id                = team_id
+        self.secrets_id             = self.resolve_secret_id()
         self.headless               = headless
         self.new_page               = new_page
         self.page : Browser_Page    = None
 
+    def resolve_secret_id(self):
+        if self.team_id == 'T7F3AUXGV' : return 'gs_bot_slack_web'
+        if self.team_id == 'TAULHPATC' : return 'gs_bot_slack_web_oss'
+
     def setup(self):
+        if self.secrets_id is None:
+            raise Exception('in Web_Slack no slack team provided')
         self.page           = Browser_Page(headless = self.headless, new_page=self.new_page).setup()
         self.server_details = Secrets(self.secrets_id).value_from_json_string()
         self.server_url     = self.server_details.get('server')
@@ -30,28 +37,65 @@ class Web_Slack:
         #return self
 
 
-    def login(self):
-        path = '/login' # check
+    def login(self,wait_for_load=False):
+        path = '/'
         self.open(path)
+
         page_text = self.page.text()
 
         if "Sign in to" in page_text:
-            self.page.type('#email'   , self.server_details.get('username'))
-            self.page.type('#password', self.server_details.get('password'))
-            self.page.click('#signin_btn')
-            self.page.wait_for_navigation()
+            email = self.server_details.get('email')
+            password = self.server_details.get('password')
+            js_code = """
+                          $('#email').val('{0}');
+                          $('#password').val('{1}');
+                          $('#signin_btn').click();
+            """.format(email,password)
+            self.page.javascript_eval(js_code)
+            if wait_for_load:
+                self.page.wait_for_element__id('msg_input')
+                self.page.wait_for_element__id('loading_welcome_msg', exists=False)
+
+
+            # misc tests to find optimal elements to wait
+            #for i in range(0,3):
+                #self.page.wait_for_element__id        ('msg_input'                                         )
+                #self.page.wait_for_element__id        ('msg_input'          , max_attempts=4,exists=False )
+                #self.page.wait_for_element__id        ('loading_welcome_msg', max_attempts=4, exists=True)
+                #self.page.wait_for_element__id        ('loading_welcome_msg', max_attempts=4, exists=False)
+                #self.page.wait_for_element__class_name('c-message__body'     , max_attempts=4, exists=True)
+                #self.page.wait_for_element__class_name('c-message__body'     , max_attempts=4, exists=False)
+                #self.page.wait_for_element__tag_name  ('button'              , max_attempts=4, exists=True)
+                #self.page.wait_for_element__tag_name  ('button'              , max_attempts=4, exists=False)
+
+                #print('****')
+
 
 
     def logout(self):
-        raise Exception('to do')
-        # self.open('/logout')
-        # if self.page.exists('#confirm-logout-submit'):
-        #     self.page.click('#confirm-logout-submit')
-        # return self
+        logout_link_path_1 = "$('.ts_icon_sign_out').parent().parent().find('a').attr('href')"
+        logout_link_path_2 = "$('#team_menu_user').click(); $('#logout a').attr('href')"
+        logout_link      = self.page.javascript_eval(logout_link_path_1)
+        if logout_link is None:
+            logout_link = self.page.javascript_eval(logout_link_path_2)
+        if logout_link and logout_link.startswith('https://slack.com/signout'):
+            self.page.open(logout_link)
+        else:
+            print("didn't find logout link")
+        return self
 
-    def open(self, path):
+    def open(self, path=None):
+        if path is None:
+            path = ''
         url = "{0}{1}".format(self.server_url, path)
-        return self.page.open(url)
+
+        page = self.page.open(url)
+        self.page.wait_for_element__id('loading_welcome_msg', exists=False)
+        return page
+
+    def wait(self,seconds):
+        self.page.wait(seconds)
+        return self
 
     def screenshot(self,width=None):
         if width:
@@ -64,11 +108,17 @@ class Web_Slack:
         self.page.javascript_eval("$('.aui-list-item-link').eq(1).click()")
         return self
 
-    def fix_issue_remove_ui_elements(self):
-        js_code =   """
-                        //$('.input').hide()
-                        $('.banner').hide()
-                        $('.client_channels_list_container').hide()
-                    """
+    def fix_ui_for_screenshot(self):
+        js_code = """
+                        $('.client_channels_list_container').hide();
+        """
         self.page.javascript_eval(js_code)
         return self
+    # def fix_issue_remove_ui_elements(self):
+    #     js_code =   """
+    #                     //$('.input').hide()
+    #                     $('.banner').hide()
+    #                     $('.client_channels_list_container').hide()
+    #                 """
+    #     self.page.javascript_eval(js_code)
+    #     return self

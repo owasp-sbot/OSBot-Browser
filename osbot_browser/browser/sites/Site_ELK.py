@@ -73,7 +73,6 @@ class Site_ELK:
 
     async def open(self, path,wait_until=None):
         url = self.server_url + path
-        Dev.print(url)
         await self.browser().open(url,wait_until=wait_until)
 
     def screenshot(self):
