@@ -7,22 +7,22 @@ from pbx_gs_python_utils.utils.Lambdas_Helpers import slack_message
 
 # NOTE, when in this OSS FORK don't run this from here,
 # use the oss fork browser deploy functions
-class test_Deploy_Lambda_Functions(TestCase):
+#class test_Deploy_Lambda_Functions(TestCase):
 
-    def test_deploy_lambda_functions(self):
-        targets = [
-                    'osbot_browser.lambdas.lambda_browser'    ,
-                   ]
-        result = ""
-        for target in targets:
-            Deploy(target).deploy()
-            result += " • {0}\n".format(target)
+    # def test_deploy_lambda_functions(self):
+    #     targets = [
+    #                 'osbot_browser.lambdas.lambda_browser'    ,
+    #                ]
+    #     result = ""
+    #     for target in targets:
+    #         Deploy(target).deploy()
+    #         result += " • {0}\n".format(target)
+    #
+    #     text        = ":hotsprings: [osbot-gsuite] updated lambda functions"
+    #     attachments = [{'text': result, 'color': 'good'}]
+    #     slack_message(text, attachments)  # gs-bot-tests
+    #     Dev.pprint(text, attachments)
 
-        text        = ":hotsprings: [osbot-gsuite] updated lambda functions"
-        attachments = [{'text': result, 'color': 'good'}]
-        slack_message(text, attachments)  # gs-bot-tests
-        Dev.pprint(text, attachments)
 
-
-if __name__ == '__main__':
-    unittest.main()
+#if __name__ == '__main__':
+#    unittest.main()
