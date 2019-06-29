@@ -38,7 +38,11 @@ class API_Browser:
         if url_chrome and WS_is_open(url_chrome):
             self._browser = await connect({'browserWSEndpoint': url_chrome})
         else:
-            self._browser = await launch(headless=self.headless, autoClose = self.auto_close)
+            self._browser = await launch(headless=self.headless,
+                                         autoClose = self.auto_close,
+                                         args=['--no-sandbox',
+                                               '--single-process',
+                                               '--disable-dev-shm-usage'])
             self.set_last_chrome_session({'url_chrome': self._browser.wsEndpoint})
         return self._browser
 
@@ -218,7 +222,10 @@ class API_Browser:
             from pyppeteer import launch                                                        # import pyppeteer dependency
             Process.run("chmod", ['+x', path_headless_shell])                                   # set the privs of path_headless_shell to execute
             self._browser = await launch(executablePath=path_headless_shell,                    # lauch chrome (i.e. headless_shell)
-                                         args=['--no-sandbox'              ,                                               '--single-process'         ])                             # two key settings or the requests will not work
+                                         args=['--no-sandbox'              ,
+                                               '--single-process'          ,
+                                               #'--disable-dev-shm-usage'
+                                               ])                             # two key settings or the requests will not work
         asyncio.get_event_loop().run_until_complete(set_up_browser())
         return self
 
@@ -346,13 +353,14 @@ class API_Browser:
         return base64.b64encode(open(screenshot_file, 'rb').read()).decode()
 
     @sync
-    async def sync__await_for_element(self, selector, timeout=10000):
-        page = await self.page()
+    async def sync__await_for_element(self, selector, timeout=10000,page=None, visible=False ,hidden=False):
+        if page is None:
+            page = await self.page()
         try:
-            await page.waitForSelector(selector, {'timeout': timeout })
+            await page.waitForSelector(selector, {'timeout': timeout ,'visible':visible, 'hidden': hidden})
             return True
         except Exception as error:
-            Dev.print("[Errpr][sync__await_for_element] {0}".format(error))
+            Dev.print("[Error][sync__await_for_element] {0}".format(error))
             return False
     @sync
     async def sync__wait_for_navigation(self, page=None):

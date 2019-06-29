@@ -79,6 +79,24 @@ some text  and 'single quotes'
 
 class test_workflows_API_Browser(TestCase):
 
+    def setUp(self):
+        self.api = API_Browser(headless = False)
+        self.png_file = '/tmp/tmp-jira-screenshot.png'
+
+    def test_open_jira_slack(self):
+        #url = 'https://os-summit.slack.com/messages/DJ8UA0RFT/'
+        url = 'https://os-summit.slack.com/messages/CK475UCJY/'
+        self.api.sync__open(url)
+        email = 'asd@asd.asd'
+        password = "bbb"
+        js_code = """$('#email').val('{0}')
+                     $('#password').val('{1}')
+                     $('#signin_btn').click()
+                  """.format(email, password)
+
+        self.api.sync__js_execute(js_code)
+
+        #await self.api.screenshot(file_screenshot=self.png_file)
 
     @sync
     async def test_open_jira_page(self):

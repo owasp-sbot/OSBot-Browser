@@ -12,8 +12,7 @@ from osbot_browser.view_helpers.Node_Format import Node_Format
 class VivaGraph_Js_Views:
 
     @staticmethod
-    def default(team_id=None, channel=None, params=None, no_render=False,headless=True):
-
+    def default(team_id=None, channel=None, params=None, no_render=False,headless=True):        
         load_dependencies(['syncer', 'requests']);
         from osbot_browser.view_helpers.VivaGraph_Js import VivaGraph_Js
 
