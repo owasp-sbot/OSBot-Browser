@@ -30,7 +30,7 @@ def load_dependency(target):
 
 class Browser_Commands:
 
-    current_version = 'v0.38 (oss)'
+    current_version = 'v0.39 (oss)'
 
     @staticmethod
     def oss_today(team_id=None, channel=None, params=[]):

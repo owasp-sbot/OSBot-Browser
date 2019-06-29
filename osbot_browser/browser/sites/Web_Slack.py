@@ -36,6 +36,8 @@ class Web_Slack:
         raise Exception('to do')
         #return self
 
+    def js_invoke(self,js_code):
+        return self.page.javascript_eval(js_code)
 
     def login(self,wait_for_load=False):
         path = '/'
@@ -102,6 +104,9 @@ class Web_Slack:
             self.page.width(width)
         return self.page.screenshot()
 
+    def set_browser_size(self,width, height):
+        self.page.width(width, height)
+        return self
 
     def fix_set_list_view(self):
         self.open('/issues/?filter=-1')
@@ -114,11 +119,10 @@ class Web_Slack:
         """
         self.page.javascript_eval(js_code)
         return self
-    # def fix_issue_remove_ui_elements(self):
-    #     js_code =   """
-    #                     //$('.input').hide()
-    #                     $('.banner').hide()
-    #                     $('.client_channels_list_container').hide()
-    #                 """
-    #     self.page.javascript_eval(js_code)
-    #     return self
+
+    def scroll_messages_by(self,value):
+        js_code = """
+        value = $('.c-scrollbar__hider').eq(1).scrollTop() + {0}
+        $('.c-scrollbar__hider').eq(1).scrollTop(value)""".format(value)
+        return self.js_invoke(js_code)
+        return self
