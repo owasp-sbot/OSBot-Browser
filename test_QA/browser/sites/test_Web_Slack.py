@@ -61,11 +61,15 @@ class test_Web_Slack(TestCase):
     def test_open(self):
         #path ='/messages/oss-helpdesk'
         path = '/messages/t-wardley-maps'
-        path  = '/messages/oss-general'
+        #path  = '/messages/oss-general'
         self.result = self.web_slack.open(path)
         #self.web_slack.set_browser_size(400,700)
         #self.web_slack.wait(1)
-        self.web_slack.scroll_messages_by('-1600')
+        self.web_slack.fix_ui_for_screenshot()
+
+        self.web_slack.scroll_messages_by(16501)
+        #self.web_slack.scroll_messages_by(1000)
+        #self.web_slack.scroll_messages_by(2000)
 
         self.png_data = self.web_slack.screenshot()
 

@@ -30,7 +30,7 @@ def load_dependency(target):
 
 class Browser_Commands:
 
-    current_version = 'v0.39 (oss)'
+    current_version = 'v0.40 (oss)'
 
     @staticmethod
     def oss_today(team_id=None, channel=None, params=[]):
@@ -67,28 +67,34 @@ class Browser_Commands:
     def slack(team_id=None, channel=None, params=None):
 
 
-        target = Misc.array_pop(params,0)
-        height = Misc.to_int(Misc.array_pop(params, 0))
-        width  = Misc.to_int(Misc.array_pop(params, 0))
+        target    = Misc.array_pop(params,0)
+        height    = Misc.to_int(Misc.array_pop(params, 0))
+        width     = Misc.to_int(Misc.array_pop(params, 0))
+        scroll_by = Misc.to_int(Misc.array_pop(params, 0))
+        delay     = Misc.to_int(Misc.array_pop(params, 0))
 
-        if target is None: target = 'general'
-        if width  is None: width = 800
-        if height is None: height = 1000
+        if target    is None: target = 'general'
+        if width     is None: width = 800
+        if height    is None: height = 1000
+        if scroll_by is None: scroll_by = 0
+        if delay     is None: delay = 0
 
         target_url = '/messages/{0}'.format(target)
 
-        slack_message(":point_right: taking screenshot of slack channel: `{0}` with height `{1}` and width `{2}`".format(target, height,width), [], channel, team_id)
+        slack_message(":point_right: Taking screenshot of slack channel: `{0}` with height `{1}`, width `{2}`, scroll_by `{3}` and delay `{4}`".format(target, height,width,scroll_by,delay), [], channel, team_id)
 
-        payload = {'target' : target_url,
-                   'channel': channel,
-                   'team_id': team_id,
-                   'width'  : width,
-                   'height' : height}
+        payload = {'target'    : target_url,
+                   'channel'   : channel,
+                   'team_id'   : team_id,
+                   'width'     : width,
+                   'height'    : height,
+                   'scroll_by' : scroll_by,
+                   'delay'     : delay}
         aws_lambda      = Lambda('osbot_browser.lambdas.slack_web')
-        png_data        = aws_lambda.invoke(payload)
+        aws_lambda.invoke_async(payload)
 
-        browser_helper  = Browser_Lamdba_Helper()
-        return browser_helper.send_png_data_to_slack(team_id, channel, target, png_data)
+        #browser_helper  = Browser_Lamdba_Helper()
+        #return browser_helper.send_png_data_to_slack(team_id, channel, target, png_data)
 
 
     @staticmethod

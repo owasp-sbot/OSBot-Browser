@@ -224,7 +224,7 @@ class API_Browser:
             self._browser = await launch(executablePath=path_headless_shell,                    # lauch chrome (i.e. headless_shell)
                                          args=['--no-sandbox'              ,
                                                '--single-process'          ,
-                                               #'--disable-dev-shm-usage'
+                                               '--disable-dev-shm-usage'                        # one use case where this made the difference is when taking large Slack screenshots
                                                ])                             # two key settings or the requests will not work
         asyncio.get_event_loop().run_until_complete(set_up_browser())
         return self

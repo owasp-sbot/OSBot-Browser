@@ -48,17 +48,18 @@ class test_jira_web(unittest.TestCase):
     def test_invoke_oss(self):
         self.test_update_lambda()
         #target = '/messages/oss-helpdesk'
-        target = '/messages/oss-general'
+        #target = '/messages/oss-general'
+        target  ='/messages/t-wardley-maps'
 
         payload = {'target'   : target      ,
                    'channel'  : 'DJ8UA0RFT' ,   # OSS - gsbot
                    'team_id'  : 'TAULHPATC' ,   # OSS
-                   'width'    : 800         ,
-                   'height'   : 600         ,
-                   'delay'    : 0           ,
-                   'scroll_by': '0'         }
-        #self.result = self._lambda.invoke(payload)
-        self.png_data = self._lambda.invoke(payload)
+                   'width'    : 1000        ,
+                   'height'   : 6000       ,
+                   'delay'    : 3           ,
+                   'scroll_by': 15000       }
+        self.result = self._lambda.invoke(payload)
+        #self.png_data = self._lambda.invoke(payload)
 
     def test_update_lambda(self):
         Deploy().setup().deploy_lambda__slack_web()
