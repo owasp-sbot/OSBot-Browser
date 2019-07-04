@@ -16,8 +16,18 @@ class Test_Lambda_lambda_browser(unittest.TestCase):
     def setUp(self):
         self.lambda_name = 'osbot_browser.lambdas.lambda_browser'
         self.lambda_browser = Lambda(self.lambda_name) #lambdas.browser.lambda_browser')
+        self.result = None
+        self.png_data = None
+
 
         #Deploy(lambda_name).deploy()
+
+    def tearDown(self):
+        if self.result is not None:
+            Dev.pprint(self.result)
+        if self.png_data is not None:
+            self._save_png_file(self.png_data)
+
 
     def _save_png_file(self, png_data):
         try:
@@ -152,3 +162,33 @@ class Test_Lambda_lambda_browser(unittest.TestCase):
         png_data = self.lambda_browser.invoke(payload)
         Dev.pprint(png_data)
         self._save_png_file(png_data)
+
+
+    def test_am_chars_time_line_via_lambda(self):
+        data = [{"x": "1", "y": 1,
+                 "text": "[bold]2018 Q1[/]\nThere seems to be some furry animal living in the neighborhood.",
+                 "center": "bottom"}, {
+                    "x": "2",
+                    "y": 1,
+                    "text": "[bold]2018 Q2[/]\nWe're now mostly certain it's a fox.",
+                    "center": "top"
+                }, {
+                    "x": "3",
+                    "y": 1,
+                    "text": "[bold]2018 Q3[/]\nOur dog does not seem to mind the newcomer at all.",
+                    "center": "bottom"
+                }, {
+                    "x": "4",
+                    "y": 1,
+                    "text": "[bold]2018 Q4[/]\nThe quick brown fox jumps over the lazy dog.",
+                    "center": "top"
+                }];
+        data = json.dumps(data).split(' ')
+        payload = {'params': ['am_charts','aaa', 'timeline'] }
+        payload.get('params').extend(data)
+
+        #Deploy(self.lambda_name).deploy()
+
+        self.png_data = self.lambda_browser.invoke(payload)
+
+
