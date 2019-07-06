@@ -35,10 +35,6 @@ class Web_Slack:
         self.server_url     = self.server_details.get('server')
         return self
 
-    def channel(self,issue_id):
-        raise Exception('to do')
-        #return self
-
     def js_invoke(self,js_code):
         return self.page.javascript_eval(js_code)
 
