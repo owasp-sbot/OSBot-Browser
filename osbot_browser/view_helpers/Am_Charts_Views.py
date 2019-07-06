@@ -113,7 +113,9 @@ chart.___data = ""
         Misc.array_pop(params,0)        # remove the graph name (which is not used)
         width  = Misc.to_int(Misc.array_pop(params, 0))
         height = Misc.to_int(Misc.array_pop(params, 0))
-        clip = None
+        clip = {'x': 0, 'y': 50, 'width': width, 'height': height-100}
+        #clip  = None
+
         am_charts.browser().sync__browser_width(width, height)
         try:
             data = json.loads(" ".join(params))

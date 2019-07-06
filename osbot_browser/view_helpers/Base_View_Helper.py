@@ -33,13 +33,13 @@ class Base_View_Helpers:
             self.render_page.open_file_in_browser(self.web_page)
         return self
 
-    def create_dashboard_screenshot(self):
+    def create_dashboard_screenshot(self,clip=None):
         #clip = {'x': 1, 'y': 1, 'width': 945, 'height': 465}
-        clip = None
+        #clip = None
         return self.browser().sync__screenshot(clip=clip)
 
     def send_screenshot_to_slack(self, team_id=None, channel=None, clip = None):
-        png_file = self.create_dashboard_screenshot()
+        png_file = self.create_dashboard_screenshot(clip)
         return Browser_Lamdba_Helper().send_png_file_to_slack(team_id, channel, self.title, png_file)
 
     def get_graph_data(self, graph_name):

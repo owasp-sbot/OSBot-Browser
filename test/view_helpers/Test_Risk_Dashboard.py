@@ -1,6 +1,7 @@
+import base64
 from unittest import TestCase
 
-from browser import Browser_Lamdba_Helper
+from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 from osbot_browser.view_helpers.Risk_Dashboard import Risk_Dashboard
 from pbx_gs_python_utils.utils.Dev import Dev
 
@@ -9,10 +10,19 @@ class Test_risk_dashboard(TestCase):
     def setUp(self):
         self.reload_page    = False
         self.risk_dashboard = Risk_Dashboard().show_chrome().load_page(self.reload_page)
-        self.browser = self.risk_dashboard.browser()
-        #self.view_examples  = View_Examples()
-        #self.browser        = self.view_examples.render_page.api_browser
-        #self.browser.sync__close_browser()
+        self.browser        = self.risk_dashboard.browser()
+        self.result         = None
+        self.png_data       = None
+
+    def tearDown(self):
+        if self.result is not None:
+            Dev.pprint(self.result)
+
+        if self.png_data:
+            self.png_file = '/tmp/lambda_png_file.png'
+            with open(self.png_file, "wb") as fh:
+                fh.write(base64.decodebytes(self.png_data.encode()))
+                Dev.pprint('Saved png file with size {0} to {1}'.format(len(self.png_data), self.png_file))
 
     def test_get_dashboard_data(self):
         data = self.risk_dashboard.get_dashboard_data('gs-dashboard.json')
@@ -93,8 +103,11 @@ class Test_risk_dashboard(TestCase):
         #root_node ='GSSP-119'
         graph_name = 'graph_JIE'
         root_node = 'GSP-92'
-        result = self.risk_dashboard.create_dashboard_for_graph(graph_name, root_node)
-        Dev.pprint(result)
+        with_diffs = True
+        risk_dashboard = self.risk_dashboard.create_dashboard_for_graph(graph_name, root_node)
+        self.png_data = risk_dashboard.create_dashboard_screenshot(with_diffs)
+
+
 
     def test_create_dashboard_for_jira_key(self):
         jira_key = 'GSSP-118'
