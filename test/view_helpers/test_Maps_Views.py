@@ -5,7 +5,7 @@ from pbx_gs_python_utils.utils.Dev import Dev
 
 from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 from osbot_browser.view_helpers.Maps_Views import Maps_Views
-from oss_bot.Deploy import Deploy
+from gw_bot.Deploy import Deploy
 
 
 class Test_Full_Calendar_Views(TestCase):

@@ -7,7 +7,7 @@ from pbx_gs_python_utils.utils.Misc import Misc
 from osbot_browser.browser.API_Browser import API_Browser
 from osbot_browser.browser.Render_Page import Render_Page
 from osbot_browser.view_helpers.Base_View_Helper import Base_View_Helpers
-#from oss_bot.lambdas.png_to_slack import load_dependency
+#from gw_bot.lambdas.png_to_slack import load_dependency
 
 class Maps(Base_View_Helpers):
     def __init__(self,headless=True, page=None):

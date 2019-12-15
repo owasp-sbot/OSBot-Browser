@@ -2,7 +2,7 @@
 
 
 def run(event, context):
-    from oss_bot.lambdas.png_to_slack import load_dependency
+    from gw_bot.lambdas.png_to_slack import load_dependency
     load_dependency('syncer')
     load_dependency('requests')
     load_dependency('pyppeteer')
