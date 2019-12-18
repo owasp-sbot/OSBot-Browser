@@ -4,7 +4,7 @@ import unittest
 
 from osbot_aws.apis.Lambda import Lambda
 
-from osbot_browser.Deploy import Deploy
+from gw_bot.Deploy import Deploy
 from pbx_gs_python_utils.utils.Misc import Misc
 
 from osbot_browser.browser.Browser_Commands import Browser_Commands
@@ -16,8 +16,6 @@ class Test_Lambda_lambda_browser(unittest.TestCase):
     def setUp(self):
         self.lambda_name = 'osbot_browser.lambdas.lambda_browser'
         self.lambda_browser = Lambda(self.lambda_name) #lambdas.browser.lambda_browser')
-
-        #Deploy(lambda_name).deploy()
 
     def _save_png_file(self, png_data):
         try:
@@ -50,8 +48,12 @@ class Test_Lambda_lambda_browser(unittest.TestCase):
         self._save_png_file(png_data)
 
     def test_screenshot(self):
-        team_id = 'T7F3AUXGV'
-        channel = 'DDKUZTK6X'
+        deploy = Deploy()
+        deploy.oss_setup.setup_test_environment()
+        deploy.deploy_lambda__browser()
+
+        team_id = 'TRQU3V52S'  # filetrust Slack Workspace
+        channel = 'DRE51D4EM'
         url = 'https://www.google.co.uk/aaa'
         #url = 'https://news.bbc.co.uk/aaa'
         #url = 'http://visjs.org/'

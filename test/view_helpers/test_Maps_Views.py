@@ -52,4 +52,4 @@ class Test_Full_Calendar_Views(TestCase):
         Deploy().setup().deploy_lambda__browser()
         
     def test_update_lambda_oss_bot(self):
-        Deploy().setup().deploy_lambda__oss_bot()
+        Deploy().setup().deploy_lambda__gw_bot()

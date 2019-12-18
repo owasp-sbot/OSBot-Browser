@@ -37,7 +37,7 @@ class Browser_Lamdba_Helper:
     def send_png_file_to_slack(self, team_id, channel, target, png_file):
         if team_id and channel:
             #s3_bucket    = 'gs-lambda-tests'
-            s3_bucket    = 'oss-bot-lambdas'
+            s3_bucket    = 'gw-bot-lambdas'
             s3_key       = S3().file_upload_as_temp_file(png_file, s3_bucket)
             png_to_slack = Lambda('utils.png_to_slack')
             payload = {'s3_bucket': s3_bucket, 's3_key': s3_key, 'team_id': team_id, 'channel': channel, 'title': target }
