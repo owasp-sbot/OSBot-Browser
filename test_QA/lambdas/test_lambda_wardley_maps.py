@@ -5,9 +5,10 @@ from osbot_aws.apis.Lambda import Lambda
 from pbx_gs_python_utils.utils.Dev import Dev
 
 from gw_bot.Deploy import Deploy
+from gw_bot.helpers.Test_Helper import Test_Helper
 
 
-class test_lambda_wardley_maps(TestCase):
+class test_lambda_wardley_maps(Test_Helper):
 
     def setUp(self):
         self.lambda_name = 'osbot_browser.lambdas.lambda_browser'
@@ -32,5 +33,13 @@ class test_lambda_wardley_maps(TestCase):
 
     def test_render__cup_of_tea(self):
         payload = {"params": ['render','examples/wardley_map/cup-of-tea.html']}
-        self.png_data = self.lambda_browser.invoke(payload)
+        #self.png_data = self.lambda_browser.invoke(payload)
+        self.result = self.lambda_browser.invoke(payload)
+
+    # def test_invoke_teamplate(self):
+    #     super().setUp()
+    #     aws_lambda = Lambda('osbot_browser.lambdas.lambda_browser')
+    #     payload = {"params": ["maps", "version"],
+    #                'data': {}}
+    #     self.result = aws_lambda.invoke(payload)
 

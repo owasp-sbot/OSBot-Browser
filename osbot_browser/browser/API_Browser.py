@@ -35,7 +35,7 @@ class API_Browser:
         url_chrome = None
         if not self.url_chrome:
             url_chrome = self.get_last_chrome_session().get('url_chrome')
-        if url_chrome and WS_is_open(url_chrome):
+        if url_chrome and WS_is_open(url_chrome):                           # needs pip install websocket-client
             self._browser = await connect({'browserWSEndpoint': url_chrome})
         else:
             self._browser = await launch(headless=self.headless,

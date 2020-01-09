@@ -8,7 +8,7 @@ from osbot_browser.view_helpers.Maps_Views import Maps_Views
 from gw_bot.Deploy import Deploy
 
 
-class Test_Full_Calendar_Views(TestCase):
+class Test_Maps_Views(TestCase):
 
     def setUp(self):
         Deploy().setup()                    # set local ossbot environment
@@ -28,7 +28,7 @@ class Test_Full_Calendar_Views(TestCase):
 
     def test_exec_js(self):
         channel = 'DJ8UA0RFT'
-        #channel = None
+        channel = None
         params = ["maps.add_component('aaa 123' , 2, 1)"]
 
         self.result = self.maps_views.exec_js(headless=False ,channel=channel, params=params)
