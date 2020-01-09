@@ -151,3 +151,12 @@ class Test_Browser_Commands(TestCase):
         channel = 'DJ8UA0RFT'
         self.browser_commands.google_charts(None, channel,['default'])
         #self.browser_commands.oss_today(None, channel)
+
+    def test_sow(self):
+        result = self.browser_commands.sow(None, None,['default'])
+        Dev.pprint(result)
+        #self.browser_commands.oss_today(None, channel)
+
+
+    def test_deploy(self):
+        Deploy().setup().deploy_lambda__browser()
