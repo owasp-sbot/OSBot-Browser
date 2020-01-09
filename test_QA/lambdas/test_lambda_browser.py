@@ -28,6 +28,11 @@ class Test_Lambda_lambda_browser(unittest.TestCase):
             Dev.print("[_save_png_file][Error] {0}".format(error))
             Dev.print(png_data)
 
+    def test_deploy(self):
+        deploy = Deploy()
+        deploy.oss_setup.setup_test_environment()
+        deploy.deploy_lambda__browser()
+
     def test_invoke_directly(self):
         result = run({},{})
         assert result == '*Here are the `Browser_Commands` commands available:*'
@@ -81,6 +86,9 @@ class Test_Lambda_lambda_browser(unittest.TestCase):
         png_data = self.lambda_browser.invoke(payload)
         self._save_png_file(png_data)
 
+    # def test_invoke_directly_render(self):
+    #     png_data = run({"params": ['render','/']},{})
+    #     self._save_png_file(png_data)
 
     def test_elk(self):
         payload = {"params": ['elk','dashboards']}

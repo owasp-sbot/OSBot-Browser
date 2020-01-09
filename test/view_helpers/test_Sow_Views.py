@@ -26,3 +26,9 @@ class Test_Sow_Views(TestCase):
 
     def test_default(self):
         self.png_data = self.sow_views.default(headless=False)#,channel='DJ8UA0RFT')
+
+    def test_using_lambda(self):
+        payload = {"params": ['render','/sow/simple.html',0,0,600,50]}
+        self.lambda_name = 'osbot_browser.lambdas.lambda_browser'
+        self.lambda_browser = Lambda(self.lambda_name)
+        self.png_data  = self.lambda_browser.invoke(payload)

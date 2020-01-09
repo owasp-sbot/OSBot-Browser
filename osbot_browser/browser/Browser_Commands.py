@@ -30,7 +30,7 @@ def load_dependency(target):
 
 class Browser_Commands:
 
-    current_version = 'v0.40 (oss)'
+    current_version = 'v0.41 (gw)'
 
     @staticmethod
     def oss_today(team_id=None, channel=None, params=[]):
@@ -149,7 +149,9 @@ class Browser_Commands:
 
     @staticmethod
     def render(team_id, channel, params):
-
+        load_dependency('syncer');
+        load_dependency('requests')
+        load_dependency('pyppeteer')
         if params:
             target = params.pop(0)
             delay  = Misc.to_int(Misc.array_pop(params,0))
