@@ -23,40 +23,57 @@
         <table>
             <thead class="table_header" >
                 <th>Requirement Number</th>
-                <th>1A - Determine File Type</th>
+                <th id="requirement_number"></th>
             </thead>
             <tbody>
                 <tr>
-                    <th class="first_row">Requirement language</th> <td>N/A</td>
+                    <th class="first_row">Requirement language</th>
+                    <td id="requirement_language"></td>
                 </tr>
                 <tr>
-                    <th class="first_row">Verification Method</th> <td>Test</td>
+                    <th class="first_row">Verification Method</th>
+                    <td id="verification_method"></td>
                 </tr>
                 <tr>
-                    <th class="first_row">Setup</th> <td></td>
+                    <th class="first_row">Setup</th>
+                    <td id="setup"></td>
                 </tr>
                 <tr>
                     <th class="first_row">Execution Steps</th>
-                    <td>
-                        <ol><li></li><li></li><li></li><li></li><li></li></ol>
-                    </td>
+                    <td id="execution_steps"></td>
                 </tr>
                 <tr>
-                    <th class="first_row">Expected Result</th> <td></td>
+                    <th class="first_row">Expected Result</th>
+                    <td id="expected_result"></td>
                 </tr>
                 <tr class="separator"> <td colspan="2"></td>
                 </tr>
                 <tr>
-                    <th class="first_row">Compliance</th> <td>&lt;Compliant | Partially Compliant | Non-Compliant  &gt;</td>
+                    <th class="first_row">Compliance</th>
+                    <td id="compliance"></td>
                 </tr>
                 <tr>
-                    <th class="first_row">Results</th> <td></td>
+                    <th class="first_row">Results</th>
+                    <td id="results"></td>
                 </tr>
             </tbody>
         </table>
 
         <h1>SOW (original) </h1>
         <img width="750" src="https://user-images.githubusercontent.com/656739/72048784-76186100-32b5-11ea-8264-6bd9bf155310.png"/>
+
+        <script>
+            function set_data(data)
+                {
+                    window.data = data
+                    Object.keys(data).forEach(function(index)
+                    {
+                        element_id   = index
+                        element_data = data[index]
+                        document.getElementById(element_id).innerHTML = element_data
+                    })
+                }
+        </script>
     </body>
 
 </html>
