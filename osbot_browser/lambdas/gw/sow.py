@@ -5,6 +5,8 @@ from osbot_browser.browser.Browser_Page import Browser_Page
 def run(event, context):
     headless = event.get('headless') is None
     web_root = event.get('web_root')
+    page     = event.get('page')
+    js_code  = event.get('js_code')
 
     from osbot_browser.browser.Browser_Commands import load_dependencies
     load_dependencies('syncer , requests , pyppeteer')
@@ -18,7 +20,10 @@ def run(event, context):
     web_server  = Web_Server(web_root)
     render_page = Render_Page(api_browser=api_browser, web_server=web_server)
 
-    render_page.open_file_in_browser('/')
+    render_page.open_file_in_browser(page)
+
+    if js_code:
+        api_browser.sync__js_execute(js_code)
 
     return api_browser.sync__screenshot_base64()
 

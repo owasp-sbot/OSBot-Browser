@@ -86,4 +86,7 @@ class Maps extends window.Api_VisJs
           #.create_map_for_tea_original()
 
 #new Maps().setup().create_map_test_nodes()
-new Maps().setup().create_map_for_tea_original()
+
+window.maps = new Maps()
+
+maps.setup().create_map_for_tea_original()

@@ -22,15 +22,47 @@ class test_sow(Test_Helper):
     def test_update_lambda(self):
         Deploy().setup().deploy_lambda__browser(self.lambda_name)
 
-    def test__invoke(self):
-        self.test_update_lambda()
-        payload       = { "web_root": "/" , "headless": False}
+    def test_invoke_directly(self):
+        web_root = '../../../osbot_browser/web_root'
+        page     = 'wardley-maps/cup-of-tea.html'
+        title    = 'AAA_BBB'
+        js_code = f"""maps.add_component('{title}', 1.2, 5);
+                      maps.add_connection('TEA', '{title}')""" ;
+
+        payload = {
+                    "web_root": web_root ,
+                    "page"    : page     ,
+                    "js_code" : js_code  ,
+                    "headless": False}
+
+        self.png_data = run(payload, None)
+
+
+    def test__invoke_in_lambda(self):
+        #self.test_update_lambda()
+        web_root      = './osbot_browser/web_root'
+        page          = 'wardley-maps/cup-of-tea.html'
+        title         = 'Tea in Lambda'
+        js_code       = f"""maps.add_component('{title}', 1.2, 5);
+                            maps.add_connection('TEA', '{title}')""";
+
+        payload = {
+            "web_root"  : web_root,
+            "page"      : page    ,
+            "js_code"   : js_code }
+        
         self.png_data = self.aws_lambda.invoke(payload)
 
 
-    def test_invoke_directly(self):
-        payload = { "web_root": "." , "headless": False}
-        self.png_data = run(payload, None)
+
+
+
+
+
+
+
+
+
 
 
 
