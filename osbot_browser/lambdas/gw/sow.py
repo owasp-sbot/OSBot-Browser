@@ -1,5 +1,21 @@
+from osbot_browser.browser.Browser_Page import Browser_Page
+
 def run(event, context):
-    return 'hello from lambda 123'
+
+    page = Browser_Page().setup_with_dependencies()
+
+    page.open(event.get('url'))
+
+    return page.screenshot()
+
+
+
+
+
+
+
+
+
 
 
 

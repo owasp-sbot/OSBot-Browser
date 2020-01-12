@@ -12,6 +12,13 @@ class Browser_Page:
         self.new_page       = new_page
         self.page           = None
 
+    def setup_with_dependencies(self):
+        from osbot_browser.browser.Browser_Commands import load_dependency
+        load_dependency('syncer')
+        load_dependency('requests')
+        load_dependency('pyppeteer')
+        return self.setup()
+
     def setup(self):
         self.browser_helper = Browser_Lamdba_Helper(headless=self.headless).setup()
         self.browser        = self.browser_helper.api_browser

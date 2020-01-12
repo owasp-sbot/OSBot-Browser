@@ -1,6 +1,4 @@
-from osbot_aws.apis.Lambda import load_dependency
-
-
+from osbot_browser.browser.Browser_Commands import load_dependency
 
 
 def run(event, context):
