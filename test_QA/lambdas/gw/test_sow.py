@@ -23,34 +23,34 @@ class test_sow(Test_Helper):
         Deploy().setup().deploy_lambda__browser(self.lambda_name)
 
     def test_invoke_directly(self):
-        web_root = '../../../osbot_browser/web_root'
-        page     = 'wardley-maps/cup-of-tea.html'
-        title    = 'AAA_BBB'
-        js_code = f"""maps.add_component('{title}', 1.2, 5);
-                      maps.add_connection('TEA', '{title}')""" ;
-
-        payload = {
-                    "web_root": web_root ,
-                    "page"    : page     ,
-                    "js_code" : js_code  ,
-                    "headless": False}
-
+        issue_data = {
+            "requirement_number": "1A - Determine File Type",
+            "requirement_language": "N/A",
+            "verification_method": "Test",
+            "setup": "",
+            "execution_steps": "<ol><li></li><li></li><li></li><li></li><li></li></ol>",
+            "expected_result": '',
+            "compliance": '&lt;Compliant | Partially Compliant | Non-Compliant &gt;',
+            "results": "{0}".format({})
+        }
+        payload = { "headless" : False, "issue_data" : issue_data}
         self.png_data = run(payload, None)
 
 
     def test__invoke_in_lambda(self):
-        #self.test_update_lambda()
-        web_root      = './osbot_browser/web_root'
-        page          = 'wardley-maps/cup-of-tea.html'
-        title         = 'Tea in Lambda'
-        js_code       = f"""maps.add_component('{title}', 1.2, 5);
-                            maps.add_connection('TEA', '{title}')""";
+        self.test_update_lambda()
+        issue_data = {
+            "requirement_number": "1A - Determine File Type AAAAAAA",
+            "requirement_language": "N/A",
+            "verification_method": "Test",
+            "setup": "",
+            "execution_steps": "<ol><li></li><li></li><li></li><li></li><li></li></ol>",
+            "expected_result": '',
+            "compliance": '&lt;Compliant | Partially Compliant | Non-Compliant &gt;',
+            "results": "{0}".format({})
+        }
 
-        payload = {
-            "web_root"  : web_root,
-            "page"      : page    ,
-            "js_code"   : js_code }
-        
+        payload = { "issue_data" : issue_data }
         self.png_data = self.aws_lambda.invoke(payload)
 
 
