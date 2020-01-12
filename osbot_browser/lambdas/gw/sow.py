@@ -1,12 +1,26 @@
 from osbot_browser.browser.Browser_Page import Browser_Page
 
+
+
 def run(event, context):
+    headless = event.get('headless') is None
+    web_root = event.get('web_root')
 
-    page = Browser_Page().setup_with_dependencies()
+    from osbot_browser.browser.Browser_Commands import load_dependencies
+    load_dependencies('syncer , requests , pyppeteer')
 
-    page.open(event.get('url'))
 
-    return page.screenshot()
+    from osbot_browser.browser.API_Browser import API_Browser
+    from osbot_browser.browser.Render_Page import Render_Page
+    from osbot_browser.browser.Web_Server import Web_Server
+
+    api_browser = API_Browser(headless=headless).sync__setup_browser()
+    web_server  = Web_Server(web_root)
+    render_page = Render_Page(api_browser=api_browser, web_server=web_server)
+
+    render_page.open_file_in_browser('/')
+
+    return api_browser.sync__screenshot_base64()
 
 
 
@@ -51,4 +65,4 @@ def run(event, context):
     # }
     # maps.invoke_js('set_data', issue_data)
 
-    return { 'png_file': maps.create_dashboard_screenshot() }
+    #return { 'png_file': maps.create_dashboard_screenshot() }

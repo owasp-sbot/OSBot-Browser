@@ -28,6 +28,10 @@ def load_dependency(target):
         sys.path.append(tmp_dir)                                # add tmp_dir to the path that python uses to check for dependencies
     return Files.exists(tmp_dir)
 
+def load_dependencies(targets):
+    for target in targets.split(','):
+        load_dependency(target.strip())
+
 class Browser_Commands:
 
     current_version = 'v0.41 (gw)'

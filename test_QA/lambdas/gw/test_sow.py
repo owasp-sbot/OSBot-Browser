@@ -23,14 +23,19 @@ class test_sow(Test_Helper):
         Deploy().setup().deploy_lambda__browser(self.lambda_name)
 
     def test__invoke(self):
-        #self.test_update_lambda()
-        payload       = {"url" : "https://news.bbc.co.uk"}
+        self.test_update_lambda()
+        payload       = { "web_root": "/" , "headless": False}
         self.png_data = self.aws_lambda.invoke(payload)
 
 
-
     def test_invoke_directly(self):
-        assert run({}, None) == 'hello locally'
+        payload = { "web_root": "." , "headless": False}
+        self.png_data = run(payload, None)
+
+
+
+
+
 
 
 
