@@ -10,6 +10,8 @@ def setup(event):
 
 def get_issue_data(jira_id):
     jira_data = Lambda('osbot_jira.lambdas.gw.gw_jira').invoke({"issue_id": jira_id})
+    if jira_data is None:
+        return {}
 
     enhancement_id  = jira_data.get('EnhancementId')
     title           = jira_data.get('Summary')

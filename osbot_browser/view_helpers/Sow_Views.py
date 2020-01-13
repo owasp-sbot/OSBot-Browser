@@ -32,3 +32,21 @@ class Sow_Views:
         }
         maps.invoke_js('set_data', issue_data)
         return maps.send_screenshot_to_slack('not-used', channel)
+
+    @staticmethod
+    def view(team_id=None, channel=None, params=None, no_render=False, headless=True):
+        if params and len(params) ==1:
+            issue_id = params.pop()
+            from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
+            from osbot_aws.apis.Lambda import Lambda
+
+            lambda_name = 'osbot_browser.lambdas.gw.sow'
+            png_data    = Lambda(lambda_name).invoke({'issue_id': issue_id})
+            if channel is None:
+                return png_data
+            else:
+                title = f'howing issue: {issue_id}'
+                Browser_Lamdba_Helper().send_png_data_to_slack(team_id, channel, title, png_data)
+        else:
+            return f":red_circle: Missing `jira_id` param, try SOW-121"
+
