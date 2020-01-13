@@ -19,18 +19,13 @@ class test_sow(Test_Helper):
         Deploy().setup().deploy_lambda__browser(self.lambda_name)
 
     def test_invoke_directly(self):
-        issue_data = {
-            "requirement_number": "1A - Determine File Type",
-            "requirement_language": "N/A",
-            "verification_method": "Test",
-            "setup": "",
-            "execution_steps": "<ol><li></li><li></li><li></li><li></li><li></li></ol>",
-            "expected_result": '',
-            "compliance": '&lt;Compliant | Partially Compliant | Non-Compliant &gt;',
-            "results": "{0}".format({})
-        }
-        payload = { "headless" : False, "issue_data" : issue_data}
+        issue_id = 'SOW-121'
+        payload = {"headless": False, "issue_id": issue_id}
         self.png_data = run(payload, None)
+
+
+
+
 
 
     def test__invoke_in_lambda(self):
