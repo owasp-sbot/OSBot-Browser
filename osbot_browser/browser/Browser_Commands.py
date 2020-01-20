@@ -1,9 +1,11 @@
 import json
 
 from osbot_aws.apis.Lambda                                  import Lambda
+
+from gw_bot.helpers.Lambda_Helpers                          import slack_message
 from osbot_browser.browser.Browser_Lamdba_Helper            import Browser_Lamdba_Helper
 from pbx_gs_python_utils.utils.Files                        import Files
-from pbx_gs_python_utils.utils.Lambdas_Helpers              import slack_message
+#from pbx_gs_python_utils.utils.Lambdas_Helpers              import slack_message
 from pbx_gs_python_utils.utils.Misc                         import Misc
 from pbx_gs_python_utils.utils.Process                      import Process
 from pbx_gs_python_utils.utils.slack.Slack_Commands_Helper  import Slack_Commands_Helper
@@ -34,37 +36,37 @@ def load_dependencies(targets):
 
 class Browser_Commands:
 
-    current_version = 'v0.41 (gw)'
+    current_version = 'v0.42 (gw)'
 
-    @staticmethod
-    def oss_today(team_id=None, channel=None, params=[]):
-
-        # here is the jscode tha cleans up the oss schedule ui
-        js_code = """$('.inner_main_schedule').height(130)
-                     $('.center_heading').height(-50)     
-                     $('footer').hide()                   
-                     $('.edit-link').hide()               
-                     $('#no-room-booked').hide() 
-                     $('#schedule-by-day').hide()
-                     $('#Villas #AM_1').hide()
-                     $('#Villas #PM_1').hide()
-                     $('#Villas #PM_2').hide()          
-                     $('#Villas #PM_3').hide()                                                   
-                     $('#Main_conference_Hall #DS_1').hide()                     
-                     $('#Main_conference_Hall #DS_3').hide()"""
-
-
-        load_dependency('syncer');
-        load_dependency('requests')
-        load_dependency('pyppeteer')
-        url = 'https://opensecsummit.org/schedule/day/fri/'
-        from osbot_browser.browser.Browser_Page import Browser_Page
-        page = Browser_Page(headless=True, new_page=True).setup()
-        page.open(url).width(1200)
-        page.javascript_eval(js_code)
-
-        png_data = page.screenshot()
-        return page.browser_helper.send_png_data_to_slack(team_id, channel, url, png_data)
+    # @staticmethod
+    # def oss_today(team_id=None, channel=None, params=[]):
+    #
+    #     # here is the jscode tha cleans up the oss schedule ui
+    #     js_code = """$('.inner_main_schedule').height(130)
+    #                  $('.center_heading').height(-50)
+    #                  $('footer').hide()
+    #                  $('.edit-link').hide()
+    #                  $('#no-room-booked').hide()
+    #                  $('#schedule-by-day').hide()
+    #                  $('#Villas #AM_1').hide()
+    #                  $('#Villas #PM_1').hide()
+    #                  $('#Villas #PM_2').hide()
+    #                  $('#Villas #PM_3').hide()
+    #                  $('#Main_conference_Hall #DS_1').hide()
+    #                  $('#Main_conference_Hall #DS_3').hide()"""
+    #
+    #
+    #     load_dependency('syncer');
+    #     load_dependency('requests')
+    #     load_dependency('pyppeteer')
+    #     url = 'https://opensecsummit.org/schedule/day/fri/'
+    #     from osbot_browser.browser.Browser_Page import Browser_Page
+    #     page = Browser_Page(headless=True, new_page=True).setup()
+    #     page.open(url).width(1200)
+    #     page.javascript_eval(js_code)
+    #
+    #     png_data = page.screenshot()
+    #     return page.browser_helper.send_png_data_to_slack(team_id, channel, url, png_data)
 
 
     @staticmethod
@@ -106,22 +108,25 @@ class Browser_Commands:
         load_dependency('syncer');
         load_dependency('requests')
         load_dependency('pyppeteer')
+        try:
+            url            = params.pop(0).replace('<', '').replace('>', '')  # fix extra chars added by Slack
+            width          = Misc.to_int(Misc.array_pop(params,0))
+            height         = Misc.to_int(Misc.array_pop(params,0))
+            delay          = Misc.to_int(Misc.array_pop(params, 0))
+            message = ":point_right: taking screenshot of url: {0}".format(url)
+            if width : message += ", with width `{0}`".format(width)
+            if height: message += ", with height `{0}` (min height)".format(height)
+            if delay : message += ", with delay of  `{0}` seconds".format(delay)
+            slack_message(message,[], channel,team_id)
 
-        url            = params.pop(0).replace('<', '').replace('>', '')  # fix extra chars added by Slack
-        width          = Misc.to_int(Misc.array_pop(params,0))
-        height         = Misc.to_int(Misc.array_pop(params,0))
-        delay          = Misc.to_int(Misc.array_pop(params, 0))
-        message = ":point_right: taking screenshot of url: {0}".format(url)
-        if width : message += ", with width `{0}`".format(width)
-        if height: message += ", with height `{0}` (min height)".format(height)
-        if delay : message += ", with delay of  `{0}` seconds".format(delay)
-        slack_message(message,[], channel,team_id)
-
-        browser_helper = Browser_Lamdba_Helper().setup()
-        if width:
-            browser_helper.api_browser.sync__browser_width(width,height)
-        png_data       = browser_helper.get_screenshot_png(url,full_page=True,delay=delay)
-        return browser_helper.send_png_data_to_slack(team_id,channel,url, png_data)
+            browser_helper = Browser_Lamdba_Helper().setup()
+            if width:
+                browser_helper.api_browser.sync__browser_width(width,height)
+            png_data       = browser_helper.get_screenshot_png(url,full_page=True,delay=delay)
+            return browser_helper.send_png_data_to_slack(team_id,channel,url, png_data)
+        except Exception as error:
+            message = f':red_circle: Browser Error: {error}'
+            return slack_message(message,[], channel,team_id)
 
     @staticmethod
     def lambda_status(team_id, channel, params):
