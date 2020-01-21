@@ -13,21 +13,28 @@ def get_issue_data(jira_id):
     if jira_data is None:
         return {}
 
-    enhancement_id  = jira_data.get('EnhancementId')
-    title           = jira_data.get('Summary')
-    description     = jira_data.get('Description')
-    status          = jira_data.get('Status')
-    issue_links     = jira_data.get('Issue Links')
+    enhancement_id     = jira_data.get('EnhancementId')
+    title              = jira_data.get('Summary')
+    description         = jira_data.get('Description')
+    setup               = jira_data.get('Setup')
+    verification_method = jira_data.get('Verification Method')
+    execution_steps     = jira_data.get('Execution Steps')
+    expected_result     = jira_data.get('Expected Results')
+    status              = jira_data.get('Status')
+    issue_links         = jira_data.get('Issue Links')
+    results             = jira_data.get('Actual results')
 
     issue_data = {
-        "requirement_number"    : f"{enhancement_id} - {title}",
-        "requirement_language"  : "",
-        "verification_method"   : "Test",
-        "setup"                 : f"{issue_links}",
-        "execution_steps"       : f'{description}',
-        "expected_result"       : '',
-        "compliance"            : f'&lt;Compliant | Partially Compliant | Non-Compliant &gt;',
-        "results"               : f'{status}'
+        "requirement_number"    : enhancement_id,
+        "requirement_language"  : title,
+        "verification_method"   : verification_method,
+        "setup"                 : setup,
+        "execution_steps"       : execution_steps,
+        "expected_result"       : expected_result,
+        "compliance"            : f'{status}-' ,
+        "results"               : results ,
+        "issue_links"           : f'{issue_links}' ,
+        "jira_id"               : jira_id
     }
     return issue_data
 

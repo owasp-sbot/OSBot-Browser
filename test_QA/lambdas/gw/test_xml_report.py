@@ -1,12 +1,12 @@
 from osbot_aws.apis.Lambda import Lambda
 from gw_bot.helpers.Test_Helper import Test_Helper
-from osbot_browser.lambdas.gw.sow import run, get_issue_data
+from osbot_browser.lambdas.gw.xml_report import run
 from gw_bot.Deploy import Deploy
 
 class test_sow(Test_Helper):
     def setUp(self):
         super().setUp()
-        self.lambda_name = 'osbot_browser.lambdas.gw.sow'
+        self.lambda_name = 'osbot_browser.lambdas.gw.xml_report'
         self.aws_lambda  = Lambda(self.lambda_name)
         self.result      = None
         self.png_data    = None
@@ -19,44 +19,12 @@ class test_sow(Test_Helper):
         Deploy().setup().deploy_lambda__browser(self.lambda_name)
 
     def test_invoke_directly(self):
-        issue_id = 'SOW-121'
-        payload = {"headless": False, "issue_id": issue_id}
-        self.png_data = run(payload, None)
-
-    def test_get_issue_data(self):
-        issue_id = 'SOW-121'
-        self.result = get_issue_data(issue_id)
+        payload = {"headless": False}
+        self.result = run(payload, None)
+        #self.png_data = run(payload, None)
 
     def test__invoke_in_lambda(self):
-        #self.test_update_lambda()
-        issue_id = 'SOW-121'
-        payload = { "issue_id" : issue_id }
+        self.test_update_lambda()
+        payload = { }
         self.png_data = self.aws_lambda.invoke(payload)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
