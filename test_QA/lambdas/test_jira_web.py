@@ -4,13 +4,13 @@ import unittest
 
 from osbot_aws.apis.Lambda import Lambda
 from osbot_aws.helpers.Lambda_Package import Lambda_Package
-
-from osbot_browser.Deploy import Deploy
 from pbx_gs_python_utils.utils.Misc import Misc
 
+from gw_bot.Deploy import Deploy
 from osbot_browser.browser.Browser_Commands import Browser_Commands
-from osbot_browser.lambdas.lambda_browser   import run
 from pbx_gs_python_utils.utils.Dev          import Dev
+
+from osbot_browser.lambdas.jira_web import run
 
 
 class test_jira_web(unittest.TestCase):
@@ -29,23 +29,24 @@ class test_jira_web(unittest.TestCase):
         if self.result:
             Dev.print(self.result)
 
+    def test_update_lambda(self):
+        Deploy().setup().deploy_lambda__browser('osbot_browser.lambdas.jira_web')
+
     def test_invoke_directly(self):
-        result = run({},{})
-        assert result == '*Here are the `Browser_Commands` commands available:*'
+        issue_id = 'PERSON-1'
+        payload = { 'issue_id' : issue_id }
+        self.result = run(payload,{})
+        #assert result == '*Here are the `Browser_Commands` commands available:*'
 
 
     def test_invoke(self):
-        self._lambda.update_code()
-        issue_id = 'SEC-10965' # 'GSP-95'
+        issue_id = 'PERSON-1'
 
         payload = { 'issue_id': issue_id   ,
-                    'channel': 'DDKUZTK6X' ,            # gsbot
-                    'team_id': 'T7F3AUXGV' ,            # GS-CST
+                    'channel': 'DRE51D4EM' ,            # gwbot
                     'width'  : 2000,
                     'height' : 300 }
         self.result = self._lambda.invoke(payload)
         #self.png_data = self._lambda.invoke(payload)
 
-    def test_update_lambda(self):
-        self._lambda.update_code()
 

@@ -4,11 +4,13 @@ from unittest import TestCase
 
 from pbx_gs_python_utils.utils.Dev import Dev
 
+from gw_bot.helpers.Test_Helper import Test_Helper
 from osbot_browser.browser.sites.Web_Jira import Web_Jira
 
 
-class test_Web_Jira(TestCase):
+class test_Web_Jira(Test_Helper):
     def setUp(self):
+        super().setUp()
         self.headless   = True
         self.result     = None
         self.png_data   = None
@@ -34,7 +36,7 @@ class test_Web_Jira(TestCase):
         #self.web_jira.logout()
         self.web_jira.login()
         #self.web_jira.fix_set_list_view()
-        self.png_data = self.web_jira.issue('GSP-95').fix_issue_remove_ui_elements().screenshot()
+        self.png_data = self.web_jira.issue('PERSON-1').fix_issue_remove_ui_elements().screenshot()
 
 
     def test_login(self):
