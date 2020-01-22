@@ -5,7 +5,7 @@ from gw_bot.helpers.Test_Helper import Test_Helper
 from osbot_browser.lambdas.gw.xml_report import run
 from gw_bot.Deploy import Deploy
 
-class test_sow(Test_Helper):
+class test_xml_report(Test_Helper):
     def setUp(self):
         super().setUp()
         self.lambda_name = 'osbot_browser.lambdas.gw.xml_report'
@@ -26,8 +26,8 @@ class test_sow(Test_Helper):
         self.png_data = run(payload, None).get('png_data')
 
     def test__invoke_in_lambda(self):
-        #self.test_update_lambda()
-        payload = { "file_name": "the file via lambda", "json_data": self.json_report()}
+        self.test_update_lambda()
+        payload = { "file_name": "file.txt", "json_data": self.json_report()}
         self.png_data = self.aws_lambda.invoke(payload).get('png_data')
 
 

@@ -1,4 +1,5 @@
 import json
+import os
 
 from osbot_aws.apis.Lambda                                  import Lambda
 
@@ -12,6 +13,8 @@ from pbx_gs_python_utils.utils.slack.Slack_Commands_Helper  import Slack_Command
 
 
 def load_dependency(target):
+    if os.getenv('AWS_REGION') is None:
+        return
     from osbot_aws.apis.S3 import S3
     import shutil
     import sys

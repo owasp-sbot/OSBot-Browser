@@ -4,31 +4,35 @@
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="  crossorigin="anonymous"></script>
         <link rel="icon" href="data:;base64,=">
         <style>
-
+            body     { padding: 20px ; background-color: #F0F0F0}
+            table    { border: 1px solid ; margin: 0px ; background-color: white}
+            thead th { background-color: #39766e; color: white; }
+            tbody td { padding: 5px !important}
+            .title   { font-weight: bold;  width:120px}
+            .badge   { margin: 10px; font-size: 17px}
         </style>
     </head>
     <body>
+    <h1><img src="glasswall-logo.png" height="80"/> scan report</h1>
+    <div id="threats"></div>
     <table class="table">
-      <thead class="thead-dark">
+      <thead>
         <tr>
           <th scope="col" colspan="2" style="text-align: center">File Attributes</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <th scope="row">File Name:</th>
+          <td class="title">File Name:</td>
           <td id="file_name"></td>
         </tr>
         <tr>
-          <th scope="row">File Size:</th>
+          <td class="title">File Size:</td>
           <td id="file_size"></td>
         </tr>
         <tr>
-          <th scope="row">Type:</th>
+          <td class="title">Type:</td>
           <td id="file_type"></td>
         </tr>
       </tbody>
-    </table>
-
-
-</html>
+    </table></body></html>

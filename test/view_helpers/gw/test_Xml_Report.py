@@ -32,7 +32,7 @@ class Test_Xml_Report(TestCase):
 
     def test_render_exec_summary(self):
         test_file  = '/tmp/macros.xml-report.xml'
-        file_name  = Files.file_name(test_file)
+        file_name  = 'Macros.xsl'
         json_report = self.json_report(test_file)
         self.result = self.xml_report.gw_exec_summary(file_name, json_report)
 

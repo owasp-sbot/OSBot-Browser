@@ -12,7 +12,7 @@ class Xml_Report(Base_View_Helpers):
 
     def html_table(self, div_id, title):
         return  f"""<table class="table">
-                        <thead class="thead-dark">
+                        <thead>
                             <tr>
                                 <th scope="col" style="text-align: center">{title}</th>
                             </tr>
@@ -34,6 +34,16 @@ class Xml_Report(Base_View_Helpers):
     def set_field(self, field_id, value):
         self.invoke_js(f"$('#{field_id}').html", value)
 
+    def add_threat(self, item):
+        html_threat = f'<span class="badge badge-danger">{item}</span>'
+        self.invoke_js(f"$('#threats').append", html_threat)
+
+    def add_threats(self, items):
+        if "Macros present in Type" in items:
+            self.add_threat('Macros Detected and Removed')
+        if "Javascript content present." in items:
+            self.add_threat('Javascript Detected and Removed')
+
     def gw_exec_summary(self, file_name, json_data):
         self.load_page(True)
         self.set_field('file_name', file_name)
@@ -41,6 +51,9 @@ class Xml_Report(Base_View_Helpers):
         self.set_field('file_type', json_data.get('file_type'))
         self.add_table("sanitised_content", "Active content that has been Sanitised (removed)", json_data.get('sanitisation_items'))
         self.add_table("remedy_items", "Objects & Structures that have been repaired", json_data.get('remedy_items'))
+
+        self.add_threats(json_data.get('sanitisation_items'))
+        #self.browser().sync__browser_width(600,10)
 
         return self.browser().sync__screenshot_base64()
 
