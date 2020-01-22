@@ -3,13 +3,12 @@ import os
 
 from osbot_aws.apis.Lambda                                  import Lambda
 
+from gw_bot.api.Slack_Commands_Helper import Slack_Commands_Helper
 from gw_bot.helpers.Lambda_Helpers                          import slack_message
 from osbot_browser.browser.Browser_Lamdba_Helper            import Browser_Lamdba_Helper
 from pbx_gs_python_utils.utils.Files                        import Files
-#from pbx_gs_python_utils.utils.Lambdas_Helpers              import slack_message
 from pbx_gs_python_utils.utils.Misc                         import Misc
 from pbx_gs_python_utils.utils.Process                      import Process
-from pbx_gs_python_utils.utils.slack.Slack_Commands_Helper  import Slack_Commands_Helper
 
 
 def load_dependency(target):
@@ -39,7 +38,7 @@ def load_dependencies(targets):
 
 class Browser_Commands:
 
-    current_version = 'v0.42 (gw)'
+    current_version = 'v0.43 (gw)'
 
     # @staticmethod
     # def oss_today(team_id=None, channel=None, params=[]):
@@ -305,6 +304,7 @@ class Browser_Commands:
 
     @staticmethod
     def go_js(team_id=None, channel=None, params=None):
+        load_dependencies('syncer,requests,pyppeteer')
         if len(params) < 2:
             text = ':red_circle: Hi, for the `go_js` command, you need to provide 2 parameters: '
             attachment_text = '*graph name* - the nodes and edges you want to view\n' \
@@ -321,6 +321,7 @@ class Browser_Commands:
 
     @staticmethod
     def graph(team_id=None, channel=None, params=None):
+        load_dependencies('syncer,requests,pyppeteer')
         if len(params) < 2:
             text = ':red_circle: Hi, for the `graph` command, you need to provide 2 parameters: '
             attachment_text = '*graph name* - the nodes and edges you want to view\n' \

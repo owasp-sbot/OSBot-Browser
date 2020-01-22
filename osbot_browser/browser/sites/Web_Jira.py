@@ -19,7 +19,7 @@ class Web_Jira:
         self.server_url     = self.server_details.get('server')
 
         self.page.on_dialog__always_accept()
-        #self.page.on_request__block_these(['jira.photobox.com','jeditor','tinymce'])
+        #self.page.on_request__block_these(['glasswall.atlassian.net','jeditor','tinymce'])
         return self
 
     # def browser(self):

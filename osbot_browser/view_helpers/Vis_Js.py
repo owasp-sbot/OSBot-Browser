@@ -59,10 +59,10 @@ class Vis_Js:
     # @use_local_cache_if_available
     def get_graph_data(self, graph_name):
         params = {'params': ['raw_data', graph_name, 'details'], 'data': {}}
-        data = Lambda('lambdas.gsbot.gsbot_graph').invoke(params)
+        data = Lambda('osbot_jira.lambdas.graph').invoke(params)
         if type(data) is str:
             s3_key = data
-            s3_bucket = 'gs-lambda-tests'
+            s3_bucket = 'gw-bot-lambdas'
             tmp_file = S3().file_download_and_delete(s3_bucket, s3_key)
             data = Json.load_json_and_delete(tmp_file)
             return data

@@ -133,15 +133,17 @@ class Test_Browser_Commands(TestCase):
         self._save_png_data(result)
 
     def test_go_js(self):
-        graph_name = 'graph_XKW'
+        self.test_update_lambda()
+        graph_name = 'graph_J2O'
         params = [graph_name,'default']
         result = self.browser_commands.go_js(params=params)
         Dev.pprint(result)
-        self._save_png_data(result)
+        #self._save_png_data(result)
 
 
     def test_table(self):
-        params =['issue','GSOS-181']
+        #self.test_update_lambda()
+        params =['issue','Person-1']
         result = self.browser_commands.table(params=params)
         Dev.pprint(result)
 
@@ -158,5 +160,5 @@ class Test_Browser_Commands(TestCase):
         #self.browser_commands.oss_today(None, channel)
 
 
-    def test_deploy(self):
+    def test_update_lambda(self):
         Deploy().setup().deploy_lambda__browser()
