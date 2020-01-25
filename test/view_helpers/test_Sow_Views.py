@@ -3,15 +3,16 @@ from unittest import TestCase
 from osbot_aws.apis.Lambda import Lambda
 from pbx_gs_python_utils.utils.Dev import Dev
 
+from gw_bot.helpers.Test_Helper import Test_Helper
 from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 from gw_bot.Deploy import Deploy
 from osbot_browser.view_helpers.Sow_Views import Sow_Views
 
 
-class Test_Sow_Views(TestCase):
+class Test_Sow_Views(Test_Helper):
 
     def setUp(self):
-        Deploy().setup()                    # set local ossbot environment
+        super().setUp()
         self.lambda_name    = 'osbot_browser.lambdas.lambda_browser'
         self.lambda_browser = Lambda(self.lambda_name)
         self.sow_views      = Sow_Views()
@@ -28,7 +29,7 @@ class Test_Sow_Views(TestCase):
     def test_directly_default(self):
         self.png_data = self.sow_views.default(headless=False)
 
-    def test_view(self):
+    def test_directly_view(self):
         self.png_data = self.sow_views.view(headless=False, params=['SOW-121'])
 
     def test_using_lambda_view(self):

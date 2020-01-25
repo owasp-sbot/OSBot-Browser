@@ -31,7 +31,7 @@ def get_issue_data(jira_id):
         "setup"                 : setup,
         "execution_steps"       : execution_steps,
         "expected_result"       : expected_result,
-        "compliance"            : f'{status}-' ,
+        "compliance"            : f'{status}' ,
         "results"               : results ,
         "issue_links"           : f'{issue_links}' ,
         "jira_id"               : jira_id
@@ -43,4 +43,4 @@ def run(event, context):
     issue_data = get_issue_data(event.get('issue_id'))
     sow.load_page(reload=True)
     sow.invoke_js('set_data', issue_data)
-    return sow.api_browser.sync__screenshot_base64()
+    return sow.api_browser.sync__screenshot_base64(delay=15)

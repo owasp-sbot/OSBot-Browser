@@ -132,7 +132,11 @@ class Test_Lambda_lambda_browser(Test_Helper):
         png_data = self.lambda_browser.invoke(payload)
         Dev.pprint(png_data)
 
-
+    def test_sow_view(self):
+        #self.test_update_lambda()
+        payload = {"params": ['sow', 'view', 'SOW-135']}
+        png_data = self.lambda_browser.invoke(payload)
+        Dev.pprint(png_data)
 
 
     @unittest.skip('needs fixing (api has moved since this test)')

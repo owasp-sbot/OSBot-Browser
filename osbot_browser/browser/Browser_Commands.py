@@ -416,10 +416,14 @@ class Browser_Commands:
         load_dependency('syncer')
         load_dependency('requests')
         load_dependency('pyppeteer')
-        from osbot_browser.view_helpers.Sow_Views import Sow_Views
-        (text, attachments) = Slack_Commands_Helper(Sow_Views).invoke('not-used', channel, params)
-        if team_id is None:
-            return text
+        try:
+            from osbot_browser.view_helpers.Sow_Views import Sow_Views
+            (text, attachments) = Slack_Commands_Helper(Sow_Views).invoke('not-used', channel, params)
+            if channel is None:
+                return text
+        except Exception as error:
+            return f'[sow error] {error}'
+
 
 
     @staticmethod

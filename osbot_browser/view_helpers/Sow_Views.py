@@ -34,14 +34,18 @@ class Sow_Views:
         return maps.send_screenshot_to_slack('not-used', channel)
 
     @staticmethod
-    def view(team_id=None, channel=None, params=None, no_render=False, headless=True):
+    def view(team_id=None, channel=None, params=None):
+
         if params and len(params) ==1:
             issue_id = params.pop()
             from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
             from osbot_aws.apis.Lambda import Lambda
 
             lambda_name = 'osbot_browser.lambdas.gw.sow'
+
             png_data    = Lambda(lambda_name).invoke({'issue_id': issue_id})
+            if png_data is None:
+                return f':red_circle: No png data created for {issue_id}'
             if channel is None:
                 return png_data
             else:

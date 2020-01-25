@@ -155,7 +155,7 @@ class Test_Browser_Commands(TestCase):
         #self.browser_commands.oss_today(None, channel)
 
     def test_sow(self):
-        result = self.browser_commands.sow(None, None,['default'])
+        result = self.browser_commands.sow(None, None,['view', 'SOW-135'])
         Dev.pprint(result)
         #self.browser_commands.oss_today(None, channel)
 
