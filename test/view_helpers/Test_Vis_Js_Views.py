@@ -23,7 +23,7 @@ class Test_Vis_Js_Views(Test_Helper):
 
 
     def test_default(self):
-        graph_name = 'graph_J2O'   # (199 nodes, 236 edges)
+        graph_name = 'graph_IQB'
         self.result = Vis_Js_Views.default(params=[graph_name],headless=False)
         return
 

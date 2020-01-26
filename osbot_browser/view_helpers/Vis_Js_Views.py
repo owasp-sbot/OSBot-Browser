@@ -8,7 +8,7 @@ from osbot_browser.view_helpers.Node_Format import Node_Format
 class Vis_Js_Views:
 
     @staticmethod
-    def default(team_id=None, channel=None, params=None, no_render=False, headless=True):
+    def default(team_id=None, channel=None, params=None, no_render=False, take_screenshot=True, headless=True):
 
         load_dependencies('syncer,requests') ; from osbot_browser.view_helpers.Vis_Js import Vis_Js
 
@@ -37,7 +37,10 @@ class Vis_Js_Views:
         if no_render is True:
             return (graph_name,nodes, edges, graph_data,vis_js)
 
-        return vis_js.send_screenshot_to_slack(team_id, channel)
+        if take_screenshot:
+            return vis_js.send_screenshot_to_slack(team_id, channel)
+        else:
+            return vis_js
 
     @staticmethod
     def no_labels(team_id=None, channel=None, params=None):

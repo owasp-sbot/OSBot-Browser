@@ -20,6 +20,8 @@ class Vis_Js:
         self.web_root    = Files.path_combine(Files.parent_folder(__file__), '../web_root')
         self.api_browser = API_Browser(headless=headless).sync__setup_browser()
         self.render_page = Render_Page(api_browser=self.api_browser, web_root=self.web_root)
+        self.bot_name    = 'GS_Bot'
+        self.options     = None
 
 
 
@@ -92,13 +94,13 @@ class Vis_Js:
             if graph_name is None:
                 graph_name = ''
             today = datetime.date.today().strftime('%d %b %Y')
-            self.exec_js("$('#message').html('{0} | {1} nodes {2} edges | created on {3} | by GSBot')".format(graph_name, len(nodes), len(edges), today))
-
+            self.exec_js(f"$('#message').html('{graph_name} | {len(nodes)} nodes {len(edges)} edges | created on {today} | by {self.bot_name}')")
             self.exec_js("$('#status').html('Loading Graph')")
 
         self.load_page(True)
+
         if options is None or options == {}:
-            options = self.get_default_options()
+            options = self.options or self.get_default_options()
             #options = self.get_advanced_options()
 
         data = {'nodes': nodes, 'edges': edges}
@@ -201,6 +203,8 @@ class Vis_Js:
                                  'dragView' : True  } }
         return options
 
+    def show_gs_graph(self, gs_graph, label_key=None,show_key=False):
+        self.create_graph(gs_graph.view_nodes_and_edges(label_key, show_key))
 
 
     def show_jira_graph(self, graph_name, label_key='Summary'):

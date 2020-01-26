@@ -100,20 +100,20 @@ class VivaGraph_Js:
 
         self.invoke_js("set_layout",layout)
         js_code = ""
-        #for key,issue in nodes.items():
+
         for node in nodes:
             key       = node.get('key'     )
             label     = node.get('label'   )
-            img_url   = node.get('img_url' )
-            img_size  = node.get('img_size')
+            img_url   = node.get('img_url' ) or 'icons/project.svg'
+            img_size  = node.get('img_size') or 50
             params = { "label" : label, "img_url": img_url, 'img_size':img_size}
-            js_code += 'graph.addNode("{0}",{1});'.format(key,Misc.json_dumps(params))
+            js_code += 'graph.addNode("{0}",{1});\n'.format(key,Misc.json_dumps(params))
         for edge in edges:
             js_code += 'graph.addLink("{0}","{1}");\n'.format(edge[0],edge[2])
         js_code += "run_graph()"
+
         self.exec_js(js_code)
         self.web_server.stop()
-        return 42
 
     def resolve_icon_from_issue_type(self, issue,key):
         label    = key
@@ -157,3 +157,4 @@ class VivaGraph_Js:
             #img_size = 10
 
         return label,img_size,icon
+
