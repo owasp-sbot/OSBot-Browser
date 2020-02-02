@@ -4,30 +4,20 @@ import unittest
 
 from osbot_aws.apis.Lambda import Lambda
 
-from osbot_browser.Deploy import Deploy
+from gw_bot.Deploy import Deploy
 from pbx_gs_python_utils.utils.Misc import Misc
 
+from gw_bot.helpers.Test_Helper import Test_Helper
 from osbot_browser.browser.Browser_Commands import Browser_Commands
 from osbot_browser.lambdas.lambda_browser   import run
 from pbx_gs_python_utils.utils.Dev          import Dev
 
 
-class Test_Lambda_lambda_browser(unittest.TestCase):
+class Test_Lambda_lambda_browser(Test_Helper):
     def setUp(self):
+        super().setUp()
         self.lambda_name = 'osbot_browser.lambdas.lambda_browser'
         self.lambda_browser = Lambda(self.lambda_name) #lambdas.browser.lambda_browser')
-        self.result = None
-        self.png_data = None
-
-
-        #Deploy(lambda_name).deploy()
-
-    def tearDown(self):
-        if self.result is not None:
-            Dev.pprint(self.result)
-        if self.png_data is not None:
-            self._save_png_file(self.png_data)
-
 
     def _save_png_file(self, png_data):
         try:
@@ -39,6 +29,9 @@ class Test_Lambda_lambda_browser(unittest.TestCase):
         except Exception as error:
             Dev.print("[_save_png_file][Error] {0}".format(error))
             Dev.print(png_data)
+
+    def test_update_lambda(self):
+        Deploy().setup().deploy_lambda__browser()
 
     def test_invoke_directly(self):
         result = run({},{})
@@ -60,8 +53,12 @@ class Test_Lambda_lambda_browser(unittest.TestCase):
         self._save_png_file(png_data)
 
     def test_screenshot(self):
-        team_id = 'T7F3AUXGV'
-        channel = 'DDKUZTK6X'
+        deploy = Deploy()
+        deploy.oss_setup.setup_test_environment()
+        deploy.deploy_lambda__browser()
+
+        team_id = 'TRQU3V52S'  # filetrust Slack Workspace
+        channel = 'DRE51D4EM'
         url = 'https://www.google.co.uk/aaa'
         #url = 'https://news.bbc.co.uk/aaa'
         #url = 'http://visjs.org/'
@@ -89,6 +86,9 @@ class Test_Lambda_lambda_browser(unittest.TestCase):
         png_data = self.lambda_browser.invoke(payload)
         self._save_png_file(png_data)
 
+    # def test_invoke_directly_render(self):
+    #     png_data = run({"params": ['render','/']},{})
+    #     self._save_png_file(png_data)
 
     def test_elk(self):
         payload = {"params": ['elk','dashboards']}
@@ -126,6 +126,19 @@ class Test_Lambda_lambda_browser(unittest.TestCase):
         Dev.pprint(png_data)
         self._save_png_file(png_data)
 
+    def test_go_js(self):
+        #self.test_update_lambda()
+        payload = {"params": ['go_js', 'graph_J2O', 'default']}
+        png_data = self.lambda_browser.invoke(payload)
+        Dev.pprint(png_data)
+
+    def test_sow_view(self):
+        #self.test_update_lambda()
+        payload = {"params": ['sow', 'view', 'SOW-135']}
+        png_data = self.lambda_browser.invoke(payload)
+        Dev.pprint(png_data)
+
+
     @unittest.skip('needs fixing (api has moved since this test)')
     def test_graph(self):
         graph_name = 'graph_XKW'        # 7 nodes
@@ -149,6 +162,19 @@ class Test_Lambda_lambda_browser(unittest.TestCase):
         png_data = self.lambda_browser.invoke(payload)
         #Dev.pprint(png_data)
         self._save_png_file(png_data)
+
+
+
+    def test_graph__graph_default(self):
+        self.test_deploy()
+        graph_name = 'graph_J2O'        # 7 nodes
+        view_name = 'default'
+        payload = {"params": ['graph', graph_name, view_name]}
+        #png_data = run(payload, {})
+        png_data = self.lambda_browser.invoke(payload)
+        #Dev.pprint(png_data)
+        self.result = png_data
+        #self._save_png_file(png_data)
 
     # todo: fix: it is throwing '_AttributeError("\'NoneType\' object has no attribute \'get\'",)_')
     def test_table(self):

@@ -35,7 +35,7 @@ class API_Browser:
         url_chrome = None
         if not self.url_chrome:
             url_chrome = self.get_last_chrome_session().get('url_chrome')
-        if url_chrome and WS_is_open(url_chrome):
+        if url_chrome and WS_is_open(url_chrome):                           # needs pip install websocket-client
             self._browser = await connect({'browserWSEndpoint': url_chrome})
         else:
             self._browser = await launch(headless=self.headless,
@@ -214,7 +214,7 @@ class API_Browser:
             asyncio.get_event_loop().run_until_complete(self.browser_connect())
             return self
 
-        load_dependency('pyppeteer')
+        #load_dependency('pyppeteer')
         path_headless_shell          = '/tmp/lambdas-dependencies/pyppeteer/headless_shell'     # path to headless_shell AWS Linux executable
         os.environ['PYPPETEER_HOME'] = '/tmp'                                                   # tell pyppeteer to use this read-write path in Lambda aws
 
@@ -224,7 +224,7 @@ class API_Browser:
             self._browser = await launch(executablePath=path_headless_shell,                    # lauch chrome (i.e. headless_shell)
                                          args=['--no-sandbox'              ,
                                                '--single-process'          ,
-                                               #'--disable-dev-shm-usage'
+                                               '--disable-dev-shm-usage'                        # one use case where this made the difference is when taking large Slack screenshots
                                                ])                             # two key settings or the requests will not work
         asyncio.get_event_loop().run_until_complete(set_up_browser())
         return self

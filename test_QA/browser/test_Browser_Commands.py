@@ -7,6 +7,8 @@ from osbot_browser.browser.Browser_Commands import Browser_Commands
 from pbx_gs_python_utils.utils.Dev import Dev
 from pbx_gs_python_utils.utils.Files import Files
 
+from gw_bot.Deploy import Deploy
+
 
 class Test_Browser_Commands(TestCase):
 
@@ -131,14 +133,32 @@ class Test_Browser_Commands(TestCase):
         self._save_png_data(result)
 
     def test_go_js(self):
-        graph_name = 'graph_XKW'
+        self.test_update_lambda()
+        graph_name = 'graph_J2O'
         params = [graph_name,'default']
         result = self.browser_commands.go_js(params=params)
         Dev.pprint(result)
-        self._save_png_data(result)
+        #self._save_png_data(result)
 
 
     def test_table(self):
-        params =['issue','GSOS-181']
+        #self.test_update_lambda()
+        params =['issue','Person-1']
         result = self.browser_commands.table(params=params)
         Dev.pprint(result)
+
+    def test_google_charts(self):
+        Deploy().setup()
+
+        channel = 'DJ8UA0RFT'
+        self.browser_commands.google_charts(None, channel,['default'])
+        #self.browser_commands.oss_today(None, channel)
+
+    def test_sow(self):
+        result = self.browser_commands.sow(None, None,['view', 'SOW-135'])
+        Dev.pprint(result)
+        #self.browser_commands.oss_today(None, channel)
+
+
+    def test_update_lambda(self):
+        Deploy().setup().deploy_lambda__browser()

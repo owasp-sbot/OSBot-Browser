@@ -58,22 +58,25 @@ class test_Web_Slack(TestCase):
         #print(self.web_slack.wait(0.5).page.javascript_eval("$('#msg_input').length"))
         #print(self.web_slack.page.javascript_eval("typeof($)"))
 
-
     def test_open(self):
-        path ='/messages/oss-helpdesk'
+        #path ='/messages/oss-helpdesk'
+        path = '/messages/t-wardley-maps'
+        #path  = '/messages/oss-general'
         self.result = self.web_slack.open(path)
+        #self.web_slack.set_browser_size(400,700)
+        #self.web_slack.wait(1)
+        self.web_slack.fix_ui_for_screenshot()
+
+        self.web_slack.scroll_messages_by(16501)
+        #self.web_slack.scroll_messages_by(1000)
+        #self.web_slack.scroll_messages_by(2000)
+
         self.png_data = self.web_slack.screenshot()
 
 
-    def test_create_secret(self):
-        import json
-        from osbot_aws.apis.Secrets import Secrets
-        data = { "email"    : "..",
-                 "password" : "...",
-                 "server"   : "https://os-summit.slack.com"}
 
-        Secrets('gs_bot_slack_web_oss').create(json.dumps(data))
-        self.result = Secrets('gs_bot_slack_web_oss').value_from_json_string()
+
+
 
 
 

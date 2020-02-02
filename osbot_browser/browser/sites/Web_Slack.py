@@ -2,6 +2,7 @@ from time import sleep
 
 from osbot_aws.apis.Secrets import Secrets
 from pbx_gs_python_utils.utils.Dev import Dev
+from pbx_gs_python_utils.utils.Misc import Misc
 from syncer import sync
 
 from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
@@ -12,6 +13,7 @@ class Web_Slack:
     def __init__(self, team_id, headless=True, new_page=True):
         self._browser               = None
         self._browser_helper        = None
+        self.scroll_split           = 1500
         self.server_details         = None
         self.server_url             = None
         self.team_id                = team_id
@@ -19,6 +21,7 @@ class Web_Slack:
         self.headless               = headless
         self.new_page               = new_page
         self.page : Browser_Page    = None
+
 
     def resolve_secret_id(self):
         if self.team_id == 'T7F3AUXGV' : return 'gs_bot_slack_web'
@@ -32,10 +35,8 @@ class Web_Slack:
         self.server_url     = self.server_details.get('server')
         return self
 
-    def channel(self,issue_id):
-        raise Exception('to do')
-        #return self
-
+    def js_invoke(self,js_code):
+        return self.page.javascript_eval(js_code)
 
     def login(self,wait_for_load=False):
         path = '/'
@@ -102,6 +103,9 @@ class Web_Slack:
             self.page.width(width)
         return self.page.screenshot()
 
+    def set_browser_size(self,width, height):
+        self.page.width(width, height)
+        return self
 
     def fix_set_list_view(self):
         self.open('/issues/?filter=-1')
@@ -114,11 +118,21 @@ class Web_Slack:
         """
         self.page.javascript_eval(js_code)
         return self
-    # def fix_issue_remove_ui_elements(self):
-    #     js_code =   """
-    #                     //$('.input').hide()
-    #                     $('.banner').hide()
-    #                     $('.client_channels_list_container').hide()
-    #                 """
-    #     self.page.javascript_eval(js_code)
-    #     return self
+
+    def scroll_messages_by(self,value):
+        value = Misc.to_int(value)
+        if value:
+            # split the scroll in chunks since it was not working as expected when the
+            # scroll amount was bigger than the current browser page window height
+            while value > 0:
+                if value < self.scroll_split:
+                    scroll_by = value
+                else:
+                    scroll_by = self.scroll_split
+                value -= scroll_by
+                js_code = """value = $('.c-scrollbar__hider').eq(1).scrollTop() - {0} ;
+                             $('.c-scrollbar__hider').eq(1).scrollTop(value);""".format(scroll_by)
+                self.js_invoke(js_code)
+                self.wait(0.25)             # wait a little bit before sending the next scroll event (this needs a better solution)
+
+        return self

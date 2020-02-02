@@ -1,54 +1,134 @@
 import json
+import os
 
-from osbot_aws.apis.Lambda import load_dependency, load_dependencies, Lambda
+from osbot_aws.apis.Lambda                                  import Lambda
 
+from gw_bot.api.Slack_Commands_Helper import Slack_Commands_Helper
+from gw_bot.helpers.Lambda_Helpers                          import slack_message
 from osbot_browser.browser.Browser_Lamdba_Helper            import Browser_Lamdba_Helper
 from pbx_gs_python_utils.utils.Files                        import Files
-from pbx_gs_python_utils.utils.Lambdas_Helpers              import slack_message
 from pbx_gs_python_utils.utils.Misc                         import Misc
 from pbx_gs_python_utils.utils.Process                      import Process
-from pbx_gs_python_utils.utils.slack.Slack_Commands_Helper  import Slack_Commands_Helper
 
+
+def load_dependency(target):
+    if os.getenv('AWS_REGION') is None:
+        return
+    from osbot_aws.apis.S3 import S3
+    import shutil
+    import sys
+    s3         = S3()
+    s3_bucket  = 'gw-bot-lambdas'
+    s3_key     = 'lambdas-dependencies/{0}.zip'.format(target)
+    tmp_dir    = Files.path_combine('/tmp/lambdas-dependencies', target)
+    #return s3.file_exists(s3_bucket,s3_key)
+
+    if s3.file_exists(s3_bucket,s3_key) is False:
+        raise Exception("In Lambda load_dependency, could not find dependency for: {0}".format(target))
+
+    if Files.not_exists(tmp_dir):                               # if the tmp folder doesn't exist it means that we are loading this for the first time (on a new Lambda execution environment)
+        zip_file = s3.file_download(s3_bucket, s3_key,False)    # download zip file with dependencies
+        shutil.unpack_archive(zip_file, extract_dir = tmp_dir)  # unpack them
+        sys.path.append(tmp_dir)                                # add tmp_dir to the path that python uses to check for dependencies
+    return Files.exists(tmp_dir)
+
+def load_dependencies(targets):
+    for target in targets.split(','):
+        load_dependency(target.strip())
 
 class Browser_Commands:
 
-    current_version = 'v0.41 (GSBot)'
+    current_version = 'v0.43 (gw)'
+
+    # @staticmethod
+    # def oss_today(team_id=None, channel=None, params=[]):
+    #
+    #     # here is the jscode tha cleans up the oss schedule ui
+    #     js_code = """$('.inner_main_schedule').height(130)
+    #                  $('.center_heading').height(-50)
+    #                  $('footer').hide()
+    #                  $('.edit-link').hide()
+    #                  $('#no-room-booked').hide()
+    #                  $('#schedule-by-day').hide()
+    #                  $('#Villas #AM_1').hide()
+    #                  $('#Villas #PM_1').hide()
+    #                  $('#Villas #PM_2').hide()
+    #                  $('#Villas #PM_3').hide()
+    #                  $('#Main_conference_Hall #DS_1').hide()
+    #                  $('#Main_conference_Hall #DS_3').hide()"""
+    #
+    #
+    #     load_dependency('syncer');
+    #     load_dependency('requests')
+    #     load_dependency('pyppeteer')
+    #     url = 'https://opensecsummit.org/schedule/day/fri/'
+    #     from osbot_browser.browser.Browser_Page import Browser_Page
+    #     page = Browser_Page(headless=True, new_page=True).setup()
+    #     page.open(url).width(1200)
+    #     page.javascript_eval(js_code)
+    #
+    #     png_data = page.screenshot()
+    #     return page.browser_helper.send_png_data_to_slack(team_id, channel, url, png_data)
+
 
     @staticmethod
     def slack(team_id=None, channel=None, params=None):
 
 
-        target = Misc.array_pop(params,0)
-        height = Misc.to_int(Misc.array_pop(params, 0))
-        width  = Misc.to_int(Misc.array_pop(params, 0))
+        target    = Misc.array_pop(params,0)
+        height    = Misc.to_int(Misc.array_pop(params, 0))
+        width     = Misc.to_int(Misc.array_pop(params, 0))
+        scroll_by = Misc.to_int(Misc.array_pop(params, 0))
+        delay     = Misc.to_int(Misc.array_pop(params, 0))
 
-        if target is None: target = 'general'
-        if width  is None: width = 800
-        if height is None: height = 1000
+        if target    is None: target = 'general'
+        if width     is None: width = 800
+        if height    is None: height = 1000
+        if scroll_by is None: scroll_by = 0
+        if delay     is None: delay = 0
 
         target_url = '/messages/{0}'.format(target)
 
-        slack_message(":point_right: taking screenshot of slack channel: `{0}` with height `{1}` and width `{2}`".format(target, height,width), [], channel, team_id)
+        slack_message(":point_right: Taking screenshot of slack channel: `{0}` with height `{1}`, width `{2}`, scroll_by `{3}` and delay `{4}`".format(target, height,width,scroll_by,delay), [], channel, team_id)
 
-        payload = {'target' : target_url,
-                   'channel': channel,
-                   'team_id': team_id,
-                   'width'  : width,
-                   'height' : height}
+        payload = {'target'    : target_url,
+                   'channel'   : channel,
+                   'team_id'   : team_id,
+                   'width'     : width,
+                   'height'    : height,
+                   'scroll_by' : scroll_by,
+                   'delay'     : delay}
         aws_lambda      = Lambda('osbot_browser.lambdas.slack_web')
-        png_data        = aws_lambda.invoke(payload)
+        aws_lambda.invoke_async(payload)
 
-        browser_helper  = Browser_Lamdba_Helper()
-        return browser_helper.send_png_data_to_slack(team_id, channel, target, png_data)
+        #browser_helper  = Browser_Lamdba_Helper()
+        #return browser_helper.send_png_data_to_slack(team_id, channel, target, png_data)
+
 
     @staticmethod
     def screenshot(team_id=None, channel=None, params=[]):
-        url          = params.pop(0).replace('<', '').replace('>', '')  # fix extra chars added by Slack
-        delay        = Misc.to_int(Misc.array_pop(params,0))
-        slack_message(":point_right: taking screenshot of url: {0}".format(url),[], channel,team_id)
-        browser_helper = Browser_Lamdba_Helper().setup()
-        png_data       = browser_helper.get_screenshot_png(url,full_page=True, delay=delay)
-        return browser_helper.send_png_data_to_slack(team_id,channel,url, png_data)
+        load_dependency('syncer');
+        load_dependency('requests')
+        load_dependency('pyppeteer')
+        try:
+            url            = params.pop(0).replace('<', '').replace('>', '')  # fix extra chars added by Slack
+            width          = Misc.to_int(Misc.array_pop(params,0))
+            height         = Misc.to_int(Misc.array_pop(params,0))
+            delay          = Misc.to_int(Misc.array_pop(params, 0))
+            message = ":point_right: taking screenshot of url: {0}".format(url)
+            if width : message += ", with width `{0}`".format(width)
+            if height: message += ", with height `{0}` (min height)".format(height)
+            if delay : message += ", with delay of  `{0}` seconds".format(delay)
+            slack_message(message,[], channel,team_id)
+
+            browser_helper = Browser_Lamdba_Helper().setup()
+            if width:
+                browser_helper.api_browser.sync__browser_width(width,height)
+            png_data       = browser_helper.get_screenshot_png(url,full_page=True,delay=delay)
+            return browser_helper.send_png_data_to_slack(team_id,channel,url, png_data)
+        except Exception as error:
+            message = f':red_circle: Browser Error: {error}'
+            return slack_message(message,[], channel,team_id)
 
     @staticmethod
     def lambda_status(team_id, channel, params):
@@ -80,7 +160,9 @@ class Browser_Commands:
 
     @staticmethod
     def render(team_id, channel, params):
-
+        load_dependency('syncer');
+        load_dependency('requests')
+        load_dependency('pyppeteer')
         if params:
             target = params.pop(0)
             delay  = Misc.to_int(Misc.array_pop(params,0))
@@ -178,7 +260,8 @@ class Browser_Commands:
         params = ' '.join(params).replace('“','"').replace('”','"')
         data = json.loads(params)
 
-        load_dependencies(['syncer', 'requests'])
+        load_dependency('syncer')
+        load_dependency('requests')
 
         nodes   = data.get('nodes'  )
         edges   = data.get('edges'  )
@@ -221,6 +304,7 @@ class Browser_Commands:
 
     @staticmethod
     def go_js(team_id=None, channel=None, params=None):
+        load_dependencies('syncer,requests,pyppeteer')
         if len(params) < 2:
             text = ':red_circle: Hi, for the `go_js` command, you need to provide 2 parameters: '
             attachment_text = '*graph name* - the nodes and edges you want to view\n' \
@@ -237,6 +321,7 @@ class Browser_Commands:
 
     @staticmethod
     def graph(team_id=None, channel=None, params=None):
+        load_dependencies('syncer,requests,pyppeteer')
         if len(params) < 2:
             text = ':red_circle: Hi, for the `graph` command, you need to provide 2 parameters: '
             attachment_text = '*graph name* - the nodes and edges you want to view\n' \
@@ -311,6 +396,35 @@ class Browser_Commands:
 
         if team_id is None:
             return text
+
+
+
+
+
+    @staticmethod
+    def maps(team_id=None, channel=None, params=None):
+        load_dependency('syncer')
+        load_dependency('requests')
+        load_dependency('pyppeteer')
+        from osbot_browser.view_helpers.Maps_Views import Maps_Views
+        (text,attachments) = Slack_Commands_Helper(Maps_Views).invoke('not-used', channel, params)
+        if team_id is None:
+            return text
+
+    @staticmethod
+    def sow(team_id=None, channel=None, params=None):
+        load_dependency('syncer')
+        load_dependency('requests')
+        load_dependency('pyppeteer')
+        try:
+            from osbot_browser.view_helpers.Sow_Views import Sow_Views
+            (text, attachments) = Slack_Commands_Helper(Sow_Views).invoke('not-used', channel, params)
+            if channel is None:
+                return text
+        except Exception as error:
+            return f'[sow error] {error}'
+
+
 
     @staticmethod
     def version(team_id=None, channel=None, params=None):

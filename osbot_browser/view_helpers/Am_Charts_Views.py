@@ -1,17 +1,17 @@
 import json
 from time import sleep
 
-from osbot_aws.apis.Lambda import load_dependencies
-
 from pbx_gs_python_utils.utils.Dev import Dev
 from pbx_gs_python_utils.utils.Misc import Misc
+
+from gw_bot.lambdas.png_to_slack import load_dependencies
 
 
 class Am_Charts_Views:
 
     @staticmethod
     def _get_graph_data(params,layout=None, headless=True):
-        load_dependencies(['syncer', 'requests']);
+        load_dependencies('syncer,requests');
         from osbot_browser.view_helpers.Am_Charts import Am_Charts
 
         am_charts  = Am_Charts(headless=headless,layout=layout)

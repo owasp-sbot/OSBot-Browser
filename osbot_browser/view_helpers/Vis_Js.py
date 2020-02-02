@@ -20,6 +20,8 @@ class Vis_Js:
         self.web_root    = Files.path_combine(Files.parent_folder(__file__), '../web_root')
         self.api_browser = API_Browser(headless=headless).sync__setup_browser()
         self.render_page = Render_Page(api_browser=self.api_browser, web_root=self.web_root)
+        self.bot_name    = 'GS_Bot'
+        self.options     = None
 
 
 
@@ -59,10 +61,10 @@ class Vis_Js:
     # @use_local_cache_if_available
     def get_graph_data(self, graph_name):
         params = {'params': ['raw_data', graph_name, 'details'], 'data': {}}
-        data = Lambda('lambdas.gsbot.gsbot_graph').invoke(params)
+        data = Lambda('osbot_jira.lambdas.graph').invoke(params)
         if type(data) is str:
             s3_key = data
-            s3_bucket = 'gs-lambda-tests'
+            s3_bucket = 'gw-bot-lambdas'
             tmp_file = S3().file_download_and_delete(s3_bucket, s3_key)
             data = Json.load_json_and_delete(tmp_file)
             return data
@@ -92,13 +94,13 @@ class Vis_Js:
             if graph_name is None:
                 graph_name = ''
             today = datetime.date.today().strftime('%d %b %Y')
-            self.exec_js("$('#message').html('{0} | {1} nodes {2} edges | created on {3} | by GSBot')".format(graph_name, len(nodes), len(edges), today))
-
+            self.exec_js(f"$('#message').html('{graph_name} | {len(nodes)} nodes {len(edges)} edges | created on {today} | by {self.bot_name}')")
             self.exec_js("$('#status').html('Loading Graph')")
 
         self.load_page(True)
+
         if options is None or options == {}:
-            options = self.get_default_options()
+            options = self.options or self.get_default_options()
             #options = self.get_advanced_options()
 
         data = {'nodes': nodes, 'edges': edges}
@@ -201,6 +203,8 @@ class Vis_Js:
                                  'dragView' : True  } }
         return options
 
+    def show_gs_graph(self, gs_graph, label_key=None,show_key=False):
+        self.create_graph(gs_graph.view_nodes_and_edges(label_key, show_key))
 
 
     def show_jira_graph(self, graph_name, label_key='Summary'):

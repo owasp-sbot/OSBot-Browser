@@ -217,7 +217,7 @@ class Risk_Dashboard:
 
 
     def create_dashboard_for_jira_key(self,jira_key):
-        lambda_graph = Lambda('lambdas.gsbot.gsbot_graph')
+        lambda_graph = Lambda('osbot_jira.lambdas.graph')
 
         payload = { 'data': {}, "params": ['expand', jira_key, 9, 'delivered by,risks_up']}
         result           = lambda_graph.invoke(payload)

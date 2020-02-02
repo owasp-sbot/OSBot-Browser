@@ -22,7 +22,7 @@ class Create_Dashboard_From_Slides:
     #@use_local_cache_if_available
     def get_r1_r2_r3_issues(self):
         params = ['search', 'label', 'R1,R2,R3']
-        return Lambda('gs.elk_to_slack').invoke({"params": params})
+        return Lambda('osbot_jira.lambdas.elk_to_slack').invoke({"params": params})
 
     def get_r1_r2_r3_model(self):
         print()

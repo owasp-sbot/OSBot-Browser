@@ -1,6 +1,6 @@
 import json
 
-from osbot_aws.apis.Lambda import load_dependencies
+from gw_bot.lambdas.png_to_slack import load_dependencies
 
 from pbx_gs_python_utils.utils.Dev import Dev
 from pbx_gs_python_utils.utils.Misc import Misc
@@ -74,7 +74,7 @@ class DataTable_Js_Views:
 
     @staticmethod
     def graph_tasks(team_id=None, channel=None, params=None):
-        load_dependencies(['syncer', 'requests']);
+        load_dependencies('syncer,requests');
         graph_name = params.pop(0)
         table_width = "1200px"
         headers = ['Key', 'Summary', 'Latest_Information','Status', 'Issue Type']  # without issue links
@@ -91,7 +91,7 @@ class DataTable_Js_Views:
 
     @staticmethod
     def graph_all_fields(team_id=None, channel=None, params=None):
-        load_dependencies(['syncer', 'requests']);
+        load_dependencies('syncer,requests');
         graph_data = DataTable_Js_Views._get_data(params.pop(0))
 
         if graph_data:
@@ -110,7 +110,7 @@ class DataTable_Js_Views:
             return DataTable_Js_Views._create_table(headers, rows, team_id, channel)
 
     def issue(team_id=None, channel=None, params=None):
-        load_dependencies(['syncer', 'requests']);
+        load_dependencies('syncer,requests');
 
 
         graph_data = DataTable_Js_Views._get_data(params.pop(0))
@@ -136,7 +136,7 @@ class DataTable_Js_Views:
     @staticmethod
     def test_data(team_id=None, channel=None, params=None):
 
-        load_dependencies(['syncer', 'requests']);
+        load_dependencies('syncer,requests');
 
         from osbot_browser.view_helpers.DataTable_Js import DataTable_Js
         headers = ['Header AAA','Header BBB']

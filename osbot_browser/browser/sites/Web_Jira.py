@@ -1,10 +1,4 @@
-from time import sleep
-
 from osbot_aws.apis.Secrets import Secrets
-from pbx_gs_python_utils.utils.Dev import Dev
-from syncer import sync
-
-from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 from osbot_browser.browser.Browser_Page import Browser_Page
 
 
@@ -25,7 +19,7 @@ class Web_Jira:
         self.server_url     = self.server_details.get('server')
 
         self.page.on_dialog__always_accept()
-        self.page.on_request__block_these(['jira.photobox.com','jeditor','tinymce'])
+        #self.page.on_request__block_these(['glasswall.atlassian.net','jeditor','tinymce'])
         return self
 
     # def browser(self):

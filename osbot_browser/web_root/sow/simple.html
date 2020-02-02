@@ -1,0 +1,102 @@
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <title>Sow Item</title>
+        <style>
+            body            {   font-size        : 13px             ; padding: 20px;
+                                font-family      : Arial,serif      ;background-color: #F0F0F0}
+            table           {   border           : 2px solid black;
+                                width            : 100% ;
+                                padding          : 2px}
+            th,td           {   border           : 1px solid black;  text-align: left ; vertical-align: top; padding:5px}
+            td              {   background-color:#FDFDFD}
+            .table_header   {   background-color : #39766e  ; color: white }
+            .first_row      {   max-width        : 100px ; background-color : #f3f3f3 ;vertical-align: center}
+            .separator td   {   height           : 1px ;background-color: black  ; column-span: 2 ; font-size: 1px}
+            #title          {   font-size        :  20px; margin-bottom: 60px ; text-: center}
+            table img       {   width            : 600px }
+        </style>
+    </head>
+    <body>
+        <div id="md_html_2"></div>
+
+        <h1><img src="../gw/glasswall-logo.png" height="80" /> sow item</h1>
+        <table>
+            <thead class="table_header" >
+                <th>Requirement Number</th>
+                <th id="requirement_number"></th>
+            </thead>
+            <tbody>
+                <tr>
+                    <th class="first_row">Requirement language</th>
+                    <td id="requirement_language"></td>
+                </tr>
+                <tr>
+                    <th class="first_row">Verification Method</th>
+                    <td id="verification_method"></td>
+                </tr>
+                <tr>
+                    <th class="first_row">Setup</th>
+                    <td id="setup"></td>
+                </tr>
+                <tr>
+                    <th class="first_row">Execution Steps</th>
+                    <td id="execution_steps"></td>
+                </tr>
+                <tr>
+                    <th class="first_row">Expected Result</th>
+                    <td id="expected_result"></td>
+                </tr>
+                <tr class="separator"> <td colspan="2"></td>
+                </tr>
+                <tr>
+                    <th class="first_row">Compliance</th>
+                    <td id="compliance"></td>
+                </tr>
+                <tr>
+                    <th class="first_row">Results</th>
+                    <td id="results"></td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <div>
+            <b>Jira ID:</b>     <span id="jira_id" />  <br/>
+        </div>
+        <div>
+            <b>Issue Links:</b> <span id="issue_links" />
+        </div>
+
+        <!--<h1>SOW (original) </h1>
+        <img width="750" src="https://user-images.githubusercontent.com/656739/72048784-76186100-32b5-11ea-8264-6bd9bf155310.png"/>
+        -->
+        <script>
+            // function markdown_write(item_id, markdown)
+            //     {
+            //         var converter = new showdown.Converter()
+            //         html      = converter.makeHtml(markdown);
+            //         #document.getElementById(item_id).innerHTML = html
+            //     }
+
+            //markdown_write('md_html_2', '# hello!!!, markdown!\nfrom lambda')
+            function set_data(data)
+                {
+                    var converter = new showdown.Converter()
+                    window.data = data
+                    Object.keys(data).forEach(function(index)
+                    {
+                        element_id   = index
+                        element_data = converter.makeHtml(data[index])
+                        document.getElementById(element_id).innerHTML = element_data
+                    })
+                }
+
+
+        </script>
+    </body>
+
+</html>

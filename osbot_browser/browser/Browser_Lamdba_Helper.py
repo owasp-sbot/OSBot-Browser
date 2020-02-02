@@ -14,8 +14,8 @@ class Browser_Lamdba_Helper:
         self.headless    = headless
 
     def get_screenshot_png(self,url=None, clip=None,full_page=None, delay=None):
-        load_dependency('syncer')
         return self.api_browser.sync__screenshot_base64(url, clip=clip,full_page=full_page,delay=delay)
+        #load_dependency('syncer')
 
     def open_local_file(self, path, js_code=None):
         return self.open_local_page_and_get_html(path,js_code)
@@ -36,7 +36,8 @@ class Browser_Lamdba_Helper:
 
     def send_png_file_to_slack(self, team_id, channel, target, png_file):
         if team_id and channel:
-            s3_bucket    = 'gs-lambda-tests'
+            #s3_bucket    = 'gs-lambda-tests'
+            s3_bucket    = 'gw-bot-lambdas'
             s3_key       = S3().file_upload_as_temp_file(png_file, s3_bucket)
             png_to_slack = Lambda('utils.png_to_slack')
             payload = {'s3_bucket': s3_bucket, 's3_key': s3_key, 'team_id': team_id, 'channel': channel, 'title': target }
@@ -53,12 +54,9 @@ class Browser_Lamdba_Helper:
 
     def setup(self):
 
-        if os.getenv('AWS_REGION'):
-            load_dependency('syncer')
-            load_dependency('requests')
-            #self.setup_AWS()
-        # else:
-        #     self.setup_local()
+        #if os.getenv('AWS_REGION'):
+        #    load_dependency('syncer')
+        #    load_dependency('requests')
 
         from osbot_browser.browser.API_Browser import API_Browser
         from osbot_browser.browser.Render_Page import Render_Page

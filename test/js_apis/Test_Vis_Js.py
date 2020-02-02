@@ -1,14 +1,16 @@
 import json
 from unittest import TestCase
 
-from browser import Browser_Lamdba_Helper
+from gw_bot.helpers.Test_Helper import Test_Helper
+from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 from osbot_browser.view_helpers.Vis_Js import Vis_Js
 from pbx_gs_python_utils.utils.Assert import Assert
 from pbx_gs_python_utils.utils.Dev import Dev
 
 
-class Test_Vis_Js(TestCase):
+class Test_Vis_Js(Test_Helper):
     def setUp(self):
+        super().setUp()
         self.headless = False
         self.vis_js   = Vis_Js(self.headless)
         self.browser  = self.vis_js.browser()

@@ -1,19 +1,12 @@
-from time import sleep
-
-from osbot_aws.apis.Lambda import load_dependencies
-
-from pbx_gs_python_utils.utils.Dev import Dev
-from pbx_gs_python_utils.utils.Lambdas_Helpers import slack_message
-from pbx_gs_python_utils.utils.Misc import Misc
-from osbot_browser.view_helpers.Edge_Format import Edge_Format
-from osbot_browser.view_helpers.Node_Format import Node_Format
+from gw_bot.helpers.Lambda_Helpers import slack_message
+from gw_bot.lambdas.png_to_slack import load_dependencies
 
 
 class VivaGraph_Js_Views:
 
     @staticmethod
     def default(team_id=None, channel=None, params=None, no_render=False,headless=True):        
-        load_dependencies(['syncer', 'requests']);
+        load_dependencies('syncer,requests');
         from osbot_browser.view_helpers.VivaGraph_Js import VivaGraph_Js
 
         graph_name = params.pop(0)
