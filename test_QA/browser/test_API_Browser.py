@@ -76,6 +76,9 @@ some text  and 'single quotes'
         file = await self.api.screenshot()
         assert Files.exists(file)
 
+    def test_open(self):
+        page = 'chrome://settings/help'
+        self.api.sync__open(page)
 
 class test_workflows_API_Browser(TestCase):
 

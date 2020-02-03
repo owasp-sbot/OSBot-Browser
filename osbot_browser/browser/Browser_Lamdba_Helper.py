@@ -53,11 +53,6 @@ class Browser_Lamdba_Helper:
         return self.send_png_file_to_slack(team_id, channel,target, png_file)
 
     def setup(self):
-
-        #if os.getenv('AWS_REGION'):
-        #    load_dependency('syncer')
-        #    load_dependency('requests')
-
         from osbot_browser.browser.API_Browser import API_Browser
         from osbot_browser.browser.Render_Page import Render_Page
         self.api_browser = API_Browser(headless=self.headless).sync__setup_browser()

@@ -20,7 +20,7 @@ def run(event, context):
 
     if data:
         channel = data.get('channel')
-        team_id = 'TRQU3V52S'  # filetrust Slack Workspace
+        team_id = 'TRQU3V52S'  # filetrust Slack Workspace #todo: move this to a environment variable (or AWS Secret)
 
     result,_ = Slack_Commands_Helper(Browser_Commands).invoke(team_id, channel, params)
 

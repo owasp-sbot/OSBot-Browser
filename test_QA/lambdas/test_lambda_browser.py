@@ -16,8 +16,14 @@ from pbx_gs_python_utils.utils.Dev          import Dev
 class Test_Lambda_lambda_browser(Test_Helper):
     def setUp(self):
         super().setUp()
-        self.lambda_name = 'osbot_browser.lambdas.lambda_browser'
-        self.lambda_browser = Lambda(self.lambda_name) #lambdas.browser.lambda_browser')
+        self.lambda_name    = 'osbot_browser.lambdas.lambda_browser'
+        self.lambda_browser = Lambda(self.lambda_name)
+        self.png_data       = None
+
+    def tearDown(self):
+        super().tearDown()
+        if self.png_data:
+            self._save_png_file(self.png_data)
 
     def _save_png_file(self, png_data):
         try:
@@ -53,16 +59,12 @@ class Test_Lambda_lambda_browser(Test_Helper):
         self._save_png_file(png_data)
 
     def test_screenshot(self):
-        deploy = Deploy()
-        deploy.oss_setup.setup_test_environment()
-        deploy.deploy_lambda__browser()
-
-        team_id = 'TRQU3V52S'  # filetrust Slack Workspace
+        #Deploy().setup().deploy_lambda__browser()
         channel = 'DRE51D4EM'
         url = 'https://www.google.co.uk/aaa'
         #url = 'https://news.bbc.co.uk/aaa'
         #url = 'http://visjs.org/'
-        payload = {"params": ['screenshot', url,], 'data': {'channel':channel, 'team_id': team_id}}
+        payload = {"params": ['screenshot', url,], 'data': {'channel':channel}}
         result = self.lambda_browser.invoke(payload)
         Dev.pprint(result)
 
@@ -217,4 +219,53 @@ class Test_Lambda_lambda_browser(Test_Helper):
 
         self.png_data = self.lambda_browser.invoke(payload)
 
+    def test_screenshot__settings_help(self):
+        #self.test_update_lambda()
+        #url = 'https://www.google.co.uk/aaaa'
+        url = 'https://www.whatismybrowser.com/'
+        url = 'http://glasswall.atlassian.net/'
+        #url = 'chrome://settings/help'
+        payload = {"params": ['screenshot', url,], 'data': {}}
+        self.png_data = self.lambda_browser.invoke(payload)
 
+
+    def test_invoke_directly__screenshot___settings_help(self):
+
+        url = 'https://www.whatismybrowser.com/'
+        url = 'https://glasswall.atlassian.net'
+        payload = {"params": ['screenshot', url, ], 'data': {}}
+        self.png_data = run(payload, {})
+
+
+
+
+
+def use_upgraded_chromium_version(self):
+        # updating this programatically didn't work, using the code below
+        # # original version is 575458
+        # new_revision = '664010'
+        # new_revision = '77812'
+        # import pyppeteer
+        # import pyppeteer.chromium_downloader
+        # import os
+        # original_version = pyppeteer.__chromium_revision__
+        #
+        # os.environ['PYPPETEER_CHROMIUM_REVISION']  = new_revision
+        # pyppeteer.__chromium_revision__            = new_revision
+        # pyppeteer.chromium_downloader.REVISION     = new_revision
+        # #pyppeteer.chromium_downloader.downloadURLs = {
+        # #                                                'linux': f'{downloads_folder}/{new_revision}/chrome-linux/chrome',
+        # #                                                'mac'  : f'{downloads_folder}/{new_revision}/chrome-mac/Chromium.app/Contents/MacOS/Chromium',
+        # #                                                'win32': f'{downloads_folder}/{new_revision}/chrome-win32/chrome.exe',
+        # #                                                'win64': f'{downloads_folder}/{new_revision}/chrome-win32/chrome.exe',
+        # #                                            }
+        # from pathlib import Path
+        # pyppeteer.chromium_downloader.chromiumExecutable["mac"] = Path(str(pyppeteer.chromium_downloader.chromiumExecutable["mac"]).replace(original_version, new_revision))
+        # pyppeteer.chromium_downloader.downloadURLs["mac"]       = Path(str(pyppeteer.chromium_downloader.downloadURLs["mac"]).replace(original_version, new_revision))
+        #
+        # so ended up changing these values directly on the source code
+        # __chromium_revision__ = '575458'       # v69 original one
+        # __chromium_revision__ = '628590'       # v74
+        # __chromium_revision__ = '664010'       # v76
+        # __chromium_revision__ = '701274'       # 79.0.3929
+        __chromium_revision__ = '737645'  # v82  latest

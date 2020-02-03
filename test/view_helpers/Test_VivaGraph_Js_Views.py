@@ -17,8 +17,8 @@ class Test_VivaGraph_Js_Views(Test_Helper):
             Browser_Lamdba_Helper(headless=False).save_png_data(self.png_data)
 
     def test_default(self):
-        graph_name = 'graph_J2O'
-        self.png_data = VivaGraph_Js_Views.default(params=[graph_name])
+        graph_name = 'graph_2XQ'
+        self.png_data = VivaGraph_Js_Views.default(params=[graph_name], headless=False)
         #self.png_data = False
 
         #return

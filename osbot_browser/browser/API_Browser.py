@@ -208,13 +208,27 @@ class API_Browser:
 
     # helper sync functions
 
+    #todo: this is a hack to get the latest version, not only we should be compiling this ourselves, at the moment this is replacing the version installed from the pyppeteer.zip (which means that the first time takes a couple more seconds)
+    #  binary downloaded from https://github.com/alixaxel/chrome-aws-lambda/releases (which was the most recent compilation of chrome for AWS that I could find
+    #  file created using: brotli -d chromium.br
+    # refefences: https://medium.com/@marco.luethy/running-headless-chrome-on-aws-lambda-fa82ad33a9eb#a2fb
+    def load_latest_version_of_chrome(self):
+        source_file = '/tmp/lambdas-dependencies_chromium-2_0_2'            # 134994840
+        target_file = '/tmp/lambdas-dependencies/pyppeteer/headless_shell'  # 104854024
+        if Files.not_exists(source_file):
+            s3_bucket = 'gw-bot-lambdas'
+            s3_key = 'lambdas-dependencies/chromium-2_0_2'
+            from osbot_aws.apis.S3 import S3
+            S3().file_download(s3_bucket, s3_key)
+            Files.copy(source_file, target_file)
+
     def sync__setup_browser(self):                                                          # weirdly this works but the version below (using @sync) doesn't (we get an 'Read-only file system' error)
         import asyncio
         if os.getenv('AWS_REGION') is None:                                                 # we not in AWS so run the normal browser connect using pyppeteer normal method
             asyncio.get_event_loop().run_until_complete(self.browser_connect())
             return self
 
-        #load_dependency('pyppeteer')
+        self.load_latest_version_of_chrome()
         path_headless_shell          = '/tmp/lambdas-dependencies/pyppeteer/headless_shell'     # path to headless_shell AWS Linux executable
         os.environ['PYPPETEER_HOME'] = '/tmp'                                                   # tell pyppeteer to use this read-write path in Lambda aws
 

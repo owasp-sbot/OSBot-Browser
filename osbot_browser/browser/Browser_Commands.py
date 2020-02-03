@@ -10,6 +10,10 @@ from pbx_gs_python_utils.utils.Files                        import Files
 from pbx_gs_python_utils.utils.Misc                         import Misc
 from pbx_gs_python_utils.utils.Process                      import Process
 
+def load_dependencies(targets):
+    for target in targets.split(','):
+        load_dependency(target.strip())
+
 
 def load_dependency(target):
     if os.getenv('AWS_REGION') is None:
@@ -32,9 +36,6 @@ def load_dependency(target):
         sys.path.append(tmp_dir)                                # add tmp_dir to the path that python uses to check for dependencies
     return Files.exists(tmp_dir)
 
-def load_dependencies(targets):
-    for target in targets.split(','):
-        load_dependency(target.strip())
 
 class Browser_Commands:
 
@@ -107,13 +108,11 @@ class Browser_Commands:
 
     @staticmethod
     def screenshot(team_id=None, channel=None, params=[]):
-        load_dependency('syncer');
-        load_dependency('requests')
-        load_dependency('pyppeteer')
+        load_dependencies('syncer,requests,pyppeteer');
         try:
             url            = params.pop(0).replace('<', '').replace('>', '')  # fix extra chars added by Slack
-            width          = Misc.to_int(Misc.array_pop(params,0))
-            height         = Misc.to_int(Misc.array_pop(params,0))
+            width          = Misc.to_int(Misc.array_pop(params, 0))
+            height         = Misc.to_int(Misc.array_pop(params, 0))
             delay          = Misc.to_int(Misc.array_pop(params, 0))
             message = ":point_right: taking screenshot of url: {0}".format(url)
             if width : message += ", with width `{0}`".format(width)
