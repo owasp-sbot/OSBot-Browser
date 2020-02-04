@@ -35,7 +35,7 @@ class Browser_Lamdba_Helper:
         return self.send_png_file_to_slack(team_id, channel, 'markdown', png_file)
 
     def send_png_file_to_slack(self, team_id, channel, target, png_file):
-        if team_id and channel:
+        if channel:
             #s3_bucket    = 'gs-lambda-tests'
             s3_bucket    = 'gw-bot-lambdas'
             s3_key       = S3().file_upload_as_temp_file(png_file, s3_bucket)

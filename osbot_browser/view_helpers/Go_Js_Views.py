@@ -13,7 +13,7 @@ class Go_Js_Views:
 
     @staticmethod
     def _get_graph_data(params,layout=None, headless=True):
-        load_dependencies('syncer,requests')
+        load_dependencies('syncer,requests,pyppeteer')
         from osbot_browser.view_helpers.Go_Js import Go_Js
 
         graph_name = params.pop(0)
@@ -151,7 +151,7 @@ class Go_Js_Views:
                     key    = to_key
                     text   = to_key
                 #item = {"key": key, "parent": parent, "text": text, "brush": Misc.get_random_color()}
-                item = {"key": key, "parent": parent, "text": text, "brush": darkseagreen }
+                item = {"key": key, "parent": parent, "text": text, "brush": 'darkseagreen' }
 
                 data['nodeDataArray'].append(item)
 

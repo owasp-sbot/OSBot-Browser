@@ -10,7 +10,7 @@ class Vis_Js_Views:
     @staticmethod
     def default(team_id=None, channel=None, params=None, no_render=False, take_screenshot=True, headless=True):
 
-        load_dependencies('syncer,requests') ; from osbot_browser.view_helpers.Vis_Js import Vis_Js
+        load_dependencies('syncer,requests,pyppeteer') ; from osbot_browser.view_helpers.Vis_Js import Vis_Js
 
         graph_name = params.pop(0)
         vis_js = Vis_Js(headless=headless)                               # will start browser

@@ -11,7 +11,7 @@ class Am_Charts_Views:
 
     @staticmethod
     def _get_graph_data(params,layout=None, headless=True):
-        load_dependencies('syncer,requests');
+        load_dependencies('syncer,requests,pyppeteer');
         from osbot_browser.view_helpers.Am_Charts import Am_Charts
 
         am_charts  = Am_Charts(headless=headless,layout=layout)

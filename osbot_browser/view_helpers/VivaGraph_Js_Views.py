@@ -6,7 +6,7 @@ class VivaGraph_Js_Views:
 
     @staticmethod
     def default(team_id=None, channel=None, params=None, no_render=False,headless=True):        
-        load_dependencies('syncer,requests');
+        load_dependencies('syncer,requests,pyppeteer');
         from osbot_browser.view_helpers.VivaGraph_Js import VivaGraph_Js
 
         graph_name = params.pop(0)

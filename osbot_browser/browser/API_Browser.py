@@ -31,17 +31,17 @@ class API_Browser:
         return self._browser
 
     async def browser_connect(self):
-        from pyppeteer import connect, launch                               # we can only import this here or we will have a conflict with the AWS headless version
+        from pyppeteer import connect, launch                                               # we can only import this here or we will have a conflict with the AWS headless version
         url_chrome = None
         if not self.url_chrome:
             url_chrome = self.get_last_chrome_session().get('url_chrome')
-        if url_chrome and WS_is_open(url_chrome):                           # needs pip install websocket-client
+        if url_chrome and WS_is_open(url_chrome):                                           # needs pip install websocket-client
             self._browser = await connect({'browserWSEndpoint': url_chrome})
         else:
             self._browser = await launch(headless=self.headless,
                                          autoClose = self.auto_close,
                                          args=['--no-sandbox',
-                                               '--single-process',
+                                               #'--single-process',   # this option crashed chrome when logging in to Jira
                                                '--disable-dev-shm-usage'])
             self.set_last_chrome_session({'url_chrome': self._browser.wsEndpoint})
         return self._browser
@@ -322,9 +322,13 @@ class API_Browser:
         return await page.close()
 
     @sync
-    async def sync__page_text(self):
-        page = await self.page()
+    async def sync__page_text(self, page=None):
+        #try:
+        if page is None:
+            page = await self.page()
         return await page.evaluate('() => document.body.innerText')
+        #except:
+        #    return ""
         #return await self.page().plainText()
 
     # @sync
