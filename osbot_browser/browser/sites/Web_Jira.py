@@ -123,5 +123,13 @@ class Web_Jira:
                         $('#priority-val'    )      .parent().hide();
                         $('.remote-link'     ).eq(0).parent().hide();
                     """
+        js_code = """   
+                        document.getElementsByClassName('css-gim7cw')[0].remove()
+                        document.getElementsByClassName('sc-gzVnrw cioKcY')[0].remove()                        
+                        document.getElementsByClassName('css-t8rfas')[0].remove()
+                        document.getElementsByClassName('sc-eNNmBn')[0].remove()
+                        
+                        document.getElementsByClassName('sc-dnqmqq zNcfk')[0].remove()
+                        """
         self.page.javascript_eval(js_code)
         return self

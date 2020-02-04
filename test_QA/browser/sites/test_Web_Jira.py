@@ -37,10 +37,11 @@ class test_Web_Jira(Test_Helper):
         #self.web_jira.login()
         #self.web_jira.fix_set_list_view()
         #self.png_data = self.web_jira.issue('PERSON-1').fix_issue_remove_ui_elements().screenshot()
-        self.result = 'asd'
+        self.web_jira.issue('PERSON-1')
 
     def test_fix_issue_remove_ui_elements(self):
-        self.web_jira.fix_issue_remove_ui_elements()
+        self.web_jira.issue('PERSON-42')
+        self.result = self.web_jira.fix_issue_remove_ui_elements()
 
     def test_login(self):
         self.result = self.web_jira.logout().login()
