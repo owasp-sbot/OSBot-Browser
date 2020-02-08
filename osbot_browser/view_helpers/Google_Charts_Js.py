@@ -41,30 +41,26 @@ class Google_Charts_Js:
 
     def create_dashboard_screenshot(self):
         #clip = {'x': 1, 'y': 1, 'width': 945, 'height': 465}
-        clip = None
-        return self.browser().sync__screenshot(clip=clip)
+        return self.browser().sync__screenshot()
 
     # main datatable methods
 
-    def create_data_table(self):#, cols, rows):
+    def create_data_table(self, options, data):#, cols, rows):
 
-        cols = [{'id': 'task', 'label': 'Task', 'type': 'string'},
-                {'id': 'hours', 'label': 'Hours per Day', 'type': 'number'}]
-        rows = [{'c': [{'v': 'Work'}, {'v': 11} ]} ,
-                {'c': [{'v': 'Play'}, {'v': 2  }]},
-                {'c': [{'v': 'Other'}, {'v': 5}]}
-                ]
+        # cols = [{'id': 'task', 'label': 'Task', 'type': 'string'},
+        #         {'id': 'hours', 'label': 'Hours per Day', 'type': 'number'},
+        #         {'id': 'hours', 'label': '2nd key', 'type': 'number'}]
+        # rows = [{'c': [{'v': 'Work' }, {'v': 11}, {'v': 2} ]},
+        #         {'c': [{'v': 'Play' }, {'v': 2 }]},
+        #         {'c': [{'v': 'Other'}, {'v': 5  }]}]
+        #
+        # data = { 'cols' : cols, 'rows' : rows}
 
-        data = { 'cols' : cols, 'rows' : rows}
-        options = {'title':'My first chart',
-                   'width': 500,
-                   'height':500  };
+
         chart_type = 'LineChart' #'BarChart' # PieChart'
-        self.js_execute('window.data_table=new google.visualization.DataTable',data)
+        self.js_execute('window.data_table=new google.visualization.arrayToDataTable',data)
         self.js_execute('window.options = ', options)
 
         self.js_eval("""window.chart = new google.visualization.{0}(document.getElementById('chart_div'));
                         chart.draw(data_table, options);""".format(chart_type))
-        #dt = new
-        ##google.visualization.DataTable({
-        #    cols:
+        return self.browser().sync__screenshot_base64()
