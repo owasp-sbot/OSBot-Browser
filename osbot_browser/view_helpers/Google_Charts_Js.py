@@ -45,7 +45,7 @@ class Google_Charts_Js:
 
     # main datatable methods
 
-    def create_data_table(self, options, data):#, cols, rows):
+    def create_data_table(self, chart_type,options, data):#, cols, rows):
 
         # cols = [{'id': 'task', 'label': 'Task', 'type': 'string'},
         #         {'id': 'hours', 'label': 'Hours per Day', 'type': 'number'},
@@ -57,10 +57,20 @@ class Google_Charts_Js:
         # data = { 'cols' : cols, 'rows' : rows}
 
 
-        chart_type = 'LineChart' #'BarChart' # PieChart'
+         #'BarChart' # PieChart'
         self.js_execute('window.data_table=new google.visualization.arrayToDataTable',data)
         self.js_execute('window.options = ', options)
 
         self.js_eval("""window.chart = new google.visualization.{0}(document.getElementById('chart_div'));
                         chart.draw(data_table, options);""".format(chart_type))
-        return self.browser().sync__screenshot_base64()
+
+    def create_chart(self,chart_type, options, width, height, data, clip):
+        if width  is None: width  = 800
+        if height is None: height = 500
+        if clip   is None: clip   = {'x': 100, 'y': 50, 'width': 580, 'height': 450}
+
+        options['height'] = height
+        options['width'] = width
+
+        self.create_data_table(chart_type,options, data)
+        return self.browser().sync__screenshot_base64(clip=clip)

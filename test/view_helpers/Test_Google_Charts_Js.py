@@ -14,6 +14,7 @@ class Test_Google_Charts_Js(Test_Helper):
         self.google_charts = Google_Charts_Js(headless=self.headless)
 
     def tearDown(self):
+        super().tearDown()
         if self.png_data:
             Browser_Lamdba_Helper().save_png_data(self.png_data)
 

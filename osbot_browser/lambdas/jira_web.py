@@ -12,26 +12,14 @@ def run(event, context):
 
     try:
         from osbot_browser.browser.sites.Web_Jira import Web_Jira
-        wait     = event.get('wait',2)
         web_jira = Web_Jira(headless=False).setup()
 
         from time import sleep
-        #sleep(2)                        # still needs this
-        #web_jira.login()
-        #web_jira.issue(issue_id)
-
-        #
-        #sleep(2)
-        #return web_jira.page.url()
-        #return web_jira.screenshot()
         slack_message(':one: Logging in', [] ,channel)
-        web_jira.login()  #web_jira.fix_set_list_view()
+        web_jira.login()
 
         slack_message(f':two: opening issue `{issue_id}` in headless chrome', [], channel)
         web_jira.issue(issue_id)
-        #return web_jira.screenshot()
-
-        #sleep(wait)
 
         web_jira.fix_issue_remove_ui_elements()
         if width is None:
@@ -39,7 +27,6 @@ def run(event, context):
         if height is None:
             height = 300
 
-        #slack_message(':three: taking screenshot', [], channel)
         png_data =  web_jira.screenshot(width, height)
 
         if channel:
