@@ -47,7 +47,7 @@ class DataTable_Js_Views:
                                                     table_title  = "<b>{0}</b> <small><small><i>(data from graph)</i></small></small>".format(graph_name))
     @staticmethod
     def graph(team_id=None, channel=None, params=None):
-        load_dependencies(['syncer', 'requests']);
+        load_dependencies('syncer,requests,pyppeteer');
         graph_name = params.pop(0)
         headers      = ['Issue Type', 'Summary', 'Description', 'Status', 'Rating', 'Key']  # without issue links
         table_width  = "1500px"
@@ -59,7 +59,7 @@ class DataTable_Js_Views:
 
     @staticmethod
     def graph_simple(team_id=None, channel=None, params=None):
-        load_dependencies(['syncer', 'requests']);
+        load_dependencies('syncer,requests,pyppeteer');
         graph_name = params.pop(0)
         table_width = "1200px"
         headers     = ['Key', 'Summary', 'Status', 'Rating', 'Issue Type']  # without issue links

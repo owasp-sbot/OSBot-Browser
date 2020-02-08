@@ -109,27 +109,35 @@ class Web_Jira:
         return self
 
     def fix_issue_remove_ui_elements(self):
-        js_code =   """
-                        $('.command-bar'            ).hide();
-                        $('#header'                 ).hide();
-                        $('.aui-sidebar'            ).hide()
-                        $('#viewissuesidebar'       ).hide();
-                        $('#attachmentmodule'       ).hide();
-                        $('#addcomment'             ).hide();                        
-                        $('#footer'                 ).hide();
-                        $('.aui-page-header-actions').hide();                        
-                                             
-                        $('#resolution-val'  )      .parent().hide();
-                        $('#priority-val'    )      .parent().hide();
-                        $('.remote-link'     ).eq(0).parent().hide();
-                    """
+        # js_code =   """
+        #                 $('.command-bar'            ).hide();
+        #                 $('#header'                 ).hide();
+        #                 $('.aui-sidebar'            ).hide()
+        #                 $('#viewissuesidebar'       ).hide();
+        #                 $('#attachmentmodule'       ).hide();
+        #                 $('#addcomment'             ).hide();
+        #                 $('#footer'                 ).hide();
+        #                 $('.aui-page-header-actions').hide();
+        #
+        #                 $('#resolution-val'  )      .parent().hide();
+        #                 $('#priority-val'    )      .parent().hide();
+        #                 $('.remote-link'     ).eq(0).parent().hide();
+        #             """
         js_code = """   
-                        document.getElementsByClassName('css-gim7cw')[0].remove()
-                        document.getElementsByClassName('sc-gzVnrw cioKcY')[0].remove()                        
-                        document.getElementsByClassName('css-t8rfas')[0].remove()
-                        document.getElementsByClassName('sc-eNNmBn')[0].remove()
+                        contains = function (selector, text)   {   var elements = document.querySelectorAll(selector);
+                                                                   return [].filter.call(elements, function(element){
+                                                                      return RegExp(text).test(element.textContent); });}
+                        remove = function(selector,text,index) {
+                                                                   target = contains(selector,text)[index]
+                                                                   if (target) {target.remove()} }
+                            
+                        remove('div' , 'updating the issue view', 11)
+                        remove('span','Activity' ,0)                            
+                        document.querySelector('[data-testid="Navigation"]').remove()
+                        document.querySelector('#jira-issue-header').children[0].children[0].children[0].children[0].children[0].children[1].remove()
                         
-                        document.getElementsByClassName('sc-dnqmqq zNcfk')[0].remove()
+                        //external share
+                        contains('div', 'External Share').pop().parentElement.parentElement.parentElement.remove()
                         """
         self.page.javascript_eval(js_code)
         return self

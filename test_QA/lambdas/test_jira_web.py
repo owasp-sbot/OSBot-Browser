@@ -44,6 +44,7 @@ class test_jira_web(Test_Helper):
 
 
     def test_invoke(self):
+
         self.test_update_lambda()
         issue_id = 'PERSON-42'
 

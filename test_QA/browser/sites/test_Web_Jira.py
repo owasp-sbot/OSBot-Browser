@@ -40,7 +40,7 @@ class test_Web_Jira(Test_Helper):
         self.web_jira.issue('PERSON-1')
 
     def test_fix_issue_remove_ui_elements(self):
-        self.web_jira.issue('PERSON-42')
+        #self.web_jira.issue('PERSON-42')
         self.result = self.web_jira.fix_issue_remove_ui_elements()
 
     def test_login(self):

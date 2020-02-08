@@ -1,7 +1,9 @@
 from unittest import TestCase
 
-from browser import Browser_Lamdba_Helper
+
 from pbx_gs_python_utils.utils.Dev import Dev
+
+from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 from osbot_browser.view_helpers.DataTable_Js_Views import DataTable_Js_Views
 
 
@@ -24,7 +26,7 @@ class Test_DataTable_Js_Views(TestCase):
         self.png_data = DataTable_Js_Views.graph(params=[graph_name])
 
     def test_graph_simple(self):
-        graph_name = 'graph_9CP'
+        graph_name = 'graph_V76'
         self.png_data = DataTable_Js_Views.graph_simple(params=[graph_name])
 
     def test_graph_tasks(self):
