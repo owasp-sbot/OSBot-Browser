@@ -33,8 +33,8 @@ class test_google_charts(Test_Helper):
             Browser_Lamdba_Helper().save_png_data(self.png_data)
 
     def test_invoke_directly(self):
-        params = { 'chart_type':self.chart_type, 'options': self.options , 'data': self.data}
-        self.png_data = run(params,None)
+        #params = { 'chart_type':self.chart_type, 'options': self.options , 'data': self.data}
+        self.png_data = run(self.params,None)
 
     def test_update_lambda(self):
         Deploy().setup().deploy_lambda__browser(self.lambda_name)
