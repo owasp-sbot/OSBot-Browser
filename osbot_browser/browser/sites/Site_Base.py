@@ -8,6 +8,7 @@ class Site_Base:
         self._browser               = None
         self._browser_helper        = None
         self.server_details         = None
+        self.login_details          = None
         self.server_url             = None
         self.secrets_id             = 'gw-bot-aws-console'
         self.headless               = headless
@@ -18,7 +19,6 @@ class Site_Base:
 
     def setup(self):
         self.page           = Browser_Page(headless = self.headless, new_page=self.new_page).setup()
-        self.server_details = Secrets(self.secrets_id).value_from_json_string()
         return self
 
     def js_invoke(self,js_code):
