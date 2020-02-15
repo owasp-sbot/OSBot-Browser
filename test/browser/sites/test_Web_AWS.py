@@ -1,0 +1,29 @@
+from unittest import TestCase
+
+from gw_bot.helpers.Test_Helper import Test_Helper
+from osbot_browser.browser.sites.Web_AWS import Web_AWS
+
+
+class Test_Web_AWS(Test_Helper):
+    def setUp(self):
+        super().setUp()
+        self.headless = False
+        self.aws = Web_AWS(self.headless).setup()
+
+    def test_setup(self):
+
+        from osbot_aws.apis.Secrets import Secrets
+        self.result = self.aws.secrets_id
+
+        #Secrets
+        #self.result = Secrets(self.aws.secrets_id).value_from_json_string()
+
+    def test_create_iam_user(self):
+        self.result = self.aws.create_iam_user()
+
+    def test_open(self):
+        self.result = self.aws.open()
+
+
+
+
