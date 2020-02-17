@@ -2,11 +2,12 @@ import base64
 import json
 import unittest
 
+from osbot_aws.helpers.Lambda_Package import Lambda_Package
+
 from osbot_aws.apis.Secrets import Secrets
 
 from gw_bot.helpers.Test_Helper import Test_Helper
 from osbot_aws.apis.Lambda import Lambda
-from osbot_aws.helpers.Lambda_Package import Lambda_Package
 from pbx_gs_python_utils.utils.Misc import Misc
 
 from gw_bot.Deploy import Deploy
@@ -36,12 +37,21 @@ class test_jira_web(Test_Helper):
     def test_update_lambda(self):
         Deploy().setup().deploy_lambda__browser('osbot_browser.lambdas.jira_web')
 
+    def test_update_lambda_code(self):
+        from gw_bot.setup.OSS_Setup import OSS_Setup
+        OSS_Setup().lambda_package('osbot_browser.lambdas.jira_web')._lambda.update_lambda_code()
+
     def test_invoke_directly(self):
-        issue_id = 'PERSON-1'
-        payload = { 'issue_id' : issue_id , 'channel': 'DRE51D4EM' }
+        issue_id = 'VP-2'
+        payload = { 'issue_id' : issue_id , 'channel': 'DRE51D4EM' , 'delay': 15}
         self.result = run(payload,{})
         #assert result == '*Here are the `Browser_Commands` commands available:*'
 
+    def test_invoke_lambda(self):
+        self.test_update_lambda()
+        issue_id = 'VP-2'
+        payload = {'issue_id': issue_id, 'channel': 'DRE51D4EM', 'delay': 6}
+        self.result = self._lambda.invoke(payload)
 
     def test_invoke(self):
 

@@ -1,6 +1,7 @@
+from pbx_gs_python_utils.utils.Misc import Misc
 from gw_bot.helpers.Lambda_Helpers import slack_message
 from osbot_browser.browser.Browser_Commands import load_dependencies
-
+from time import sleep
 
 def run(event, context):
     load_dependencies('syncer,requests,pyppeteer')
@@ -9,25 +10,40 @@ def run(event, context):
     team_id  = event.get('team_id')
     width    = event.get('width')
     height   = event.get('height')
+    delay    = Misc.to_int(event.get('delay'))
 
     try:
         from osbot_browser.browser.sites.Web_Jira import Web_Jira
-        web_jira = Web_Jira(headless=False).setup()
+        web_jira = Web_Jira().setup()
 
-        from time import sleep
+
         slack_message(':one: Logging in', [] ,channel)
         web_jira.login()
 
         slack_message(f':two: opening issue `{issue_id}` in headless chrome', [], channel)
         web_jira.issue(issue_id)
 
-        web_jira.fix_issue_remove_ui_elements()
+
         if width is None:
             width = 1200
         if height is None:
             height = 300
+        if delay:
+            slack_message(f':hourglass: Pausing for {delay} seconds before taking the screenshot',[],channel)
+            sleep(delay)
 
-        png_data =  web_jira.screenshot(width, height)
+        web_jira.fix_issue_remove_ui_elements()
+
+        #todo: next line breaks when delay is too big (need to find a way to keep the browser alive)
+
+        png_data = web_jira.screenshot(width, height)
+
+        # try:
+        #     png_data =  web_jira.screenshot(width, height)
+        # except Exception as error:
+        #     slack_message(f'Error in taking screenshot: {error} \nTrying again....',[],channel)
+        #     web_jira = Web_Jira().setup()
+        #     png_data = web_jira.screenshot(width, height)
 
         if channel:
             from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
