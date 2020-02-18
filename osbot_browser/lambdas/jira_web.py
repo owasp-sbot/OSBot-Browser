@@ -21,7 +21,7 @@ def run(event, context):
         web_jira = Web_Jira().setup()
 
 
-        slack_message(':one: Logging in', [] ,channel)
+        slack_message(':one: Logging in...', [] ,channel)
         web_jira.login()
 
         slack_message(f':two: opening issue `{issue_id}` in headless chrome', [], channel)
@@ -47,7 +47,7 @@ def run(event, context):
             title = "Issue: {0}".format(issue_id)
             slack_message(f':three: sending screenshot to slack image with size {len(png_data)}', [], channel)
             Browser_Lamdba_Helper().send_png_data_to_slack(team_id, channel, title, png_data)
-            return "sent png to slack"
+            #return "sent png to slack"
 
     except Exception as error:
         message = f'Error in jira_web lambda: {error}'

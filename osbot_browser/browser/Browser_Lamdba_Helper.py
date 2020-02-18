@@ -1,7 +1,7 @@
 import base64
 import os
 
-from osbot_aws.apis.Lambda import load_dependency, Lambda
+from osbot_aws.apis.Lambda import Lambda
 from osbot_aws.apis.S3 import S3
 
 from pbx_gs_python_utils.utils.Files import Files

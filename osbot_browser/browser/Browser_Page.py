@@ -1,5 +1,6 @@
 from time import sleep
 
+from osbot_aws.Dependencies import load_dependency
 from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 
 
@@ -13,7 +14,6 @@ class Browser_Page:
         self.page           = None
 
     def setup_with_dependencies(self):
-        from osbot_browser.browser.Browser_Commands import load_dependency
         load_dependency('syncer')
         load_dependency('requests')
         load_dependency('pyppeteer')

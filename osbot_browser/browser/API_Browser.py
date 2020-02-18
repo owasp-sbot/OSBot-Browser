@@ -2,8 +2,6 @@ import base64
 import json
 import os
 from time import sleep
-
-from osbot_aws.apis.Lambda import load_dependency
 from syncer import sync
 
 from pbx_gs_python_utils.utils.Dev          import Dev

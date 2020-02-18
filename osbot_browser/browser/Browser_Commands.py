@@ -1,7 +1,7 @@
 import json
-import os
 
-from osbot_aws.apis.Lambda                                  import Lambda
+from osbot_aws.Dependencies import load_dependencies, load_dependency
+from osbot_aws.apis.Lambda  import Lambda
 
 from gw_bot.api.Slack_Commands_Helper import Slack_Commands_Helper
 from gw_bot.helpers.Lambda_Helpers                          import slack_message
@@ -10,67 +10,10 @@ from pbx_gs_python_utils.utils.Files                        import Files
 from pbx_gs_python_utils.utils.Misc                         import Misc
 from pbx_gs_python_utils.utils.Process                      import Process
 
-def load_dependencies(targets):
-    for target in targets.split(','):
-        load_dependency(target.strip())
-
-
-def load_dependency(target):
-    if os.getenv('AWS_REGION') is None:
-        return
-    from osbot_aws.apis.S3 import S3
-    import shutil
-    import sys
-    s3         = S3()
-    s3_bucket  = 'gw-bot-lambdas'
-    s3_key     = 'lambdas-dependencies/{0}.zip'.format(target)
-    tmp_dir    = Files.path_combine('/tmp/lambdas-dependencies', target)
-    #return s3.file_exists(s3_bucket,s3_key)
-
-    if s3.file_exists(s3_bucket,s3_key) is False:
-        raise Exception("In Lambda load_dependency, could not find dependency for: {0}".format(target))
-
-    if Files.not_exists(tmp_dir):                               # if the tmp folder doesn't exist it means that we are loading this for the first time (on a new Lambda execution environment)
-        zip_file = s3.file_download(s3_bucket, s3_key,False)    # download zip file with dependencies
-        shutil.unpack_archive(zip_file, extract_dir = tmp_dir)  # unpack them
-        sys.path.append(tmp_dir)                                # add tmp_dir to the path that python uses to check for dependencies
-    return Files.exists(tmp_dir)
-
 
 class Browser_Commands:
 
     current_version = 'v0.43 (gw)'
-
-    # @staticmethod
-    # def oss_today(team_id=None, channel=None, params=[]):
-    #
-    #     # here is the jscode tha cleans up the oss schedule ui
-    #     js_code = """$('.inner_main_schedule').height(130)
-    #                  $('.center_heading').height(-50)
-    #                  $('footer').hide()
-    #                  $('.edit-link').hide()
-    #                  $('#no-room-booked').hide()
-    #                  $('#schedule-by-day').hide()
-    #                  $('#Villas #AM_1').hide()
-    #                  $('#Villas #PM_1').hide()
-    #                  $('#Villas #PM_2').hide()
-    #                  $('#Villas #PM_3').hide()
-    #                  $('#Main_conference_Hall #DS_1').hide()
-    #                  $('#Main_conference_Hall #DS_3').hide()"""
-    #
-    #
-    #     load_dependency('syncer');
-    #     load_dependency('requests')
-    #     load_dependency('pyppeteer')
-    #     url = 'https://opensecsummit.org/schedule/day/fri/'
-    #     from osbot_browser.browser.Browser_Page import Browser_Page
-    #     page = Browser_Page(headless=True, new_page=True).setup()
-    #     page.open(url).width(1200)
-    #     page.javascript_eval(js_code)
-    #
-    #     png_data = page.screenshot()
-    #     return page.browser_helper.send_png_data_to_slack(team_id, channel, url, png_data)
-
 
     @staticmethod
     def slack(team_id=None, channel=None, params=None):
@@ -101,9 +44,6 @@ class Browser_Commands:
                    'delay'     : delay}
         aws_lambda      = Lambda('osbot_browser.lambdas.slack_web')
         aws_lambda.invoke_async(payload)
-
-        #browser_helper  = Browser_Lamdba_Helper()
-        #return browser_helper.send_png_data_to_slack(team_id, channel, target, png_data)
 
 
     @staticmethod
@@ -159,9 +99,7 @@ class Browser_Commands:
 
     @staticmethod
     def render(team_id, channel, params):
-        load_dependency('syncer');
-        load_dependency('requests')
-        load_dependency('pyppeteer')
+        load_dependencies('syncer,requests,pyppeteer');
         if params:
             target = params.pop(0)
             delay  = Misc.to_int(Misc.array_pop(params,0))
@@ -175,47 +113,7 @@ class Browser_Commands:
         slack_message(":point_right: rendering file `{0}`".format(target), [], channel, team_id)
         return Browser_Lamdba_Helper().setup().render_file(team_id, channel, target,clip=clip, delay=delay)
 
-        #png_file = browser_helper.render_page.screenshot_file_in_folder(browser_helper.web_root(), target, clip=clip)
-        #return browser_helper.send_png_file_to_slack(team_id, channel, target, png_file)
 
-        # return None
-        # load_dependency('syncer')
-        # load_dependency('requests')
-        # from osbot_browser.browser.API_Browser import API_Browser
-        # from osbot_browser.browser.Render_Page import Render_Page
-        #
-        # web_root = './web_root/'
-        # target   = url_path
-        #
-        # api_browser = API_Browser().sync__setup_browser()
-        # render_page = Render_Page(api_browser)
-        #
-        # browser_helper = Browser_Lamdba_Helper().setup()
-        # png_file = render_page.screenshot_file_in_folder(web_root, target, clip=clip)
-        #
-        # return browser_helper.send_png_file_to_slack(team_id, channel, 'markdown', png_file)
-        # #return Browser_Commands._send_to_slack__png_file(team_id, channel, target, png_file)
-
-    # @staticmethod
-    # def risks(team_id=None, channel=None, params=None):
-    #     path = '/gs/risk/r1-and-r2.html'
-    #     data = {}
-    #     if params and len(params) > 0:
-    #         fixed_params = ' '.join(params).replace('```','')
-    #         data = {}
-    #         for items in fixed_params.split(','):
-    #             values = items.split(':')
-    #             data[values[0].strip()] = values[1].strip()
-    #
-    #     js_code = "r1_and_r2.set_risks({0})".format(json.dumps(data))
-    #     clip = {'x': 1, 'y': 1, 'width': 915, 'height': 435}
-    #     browser = Browser_Lamdba_Helper().setup()
-    #     return browser.render_file(team_id, channel, path=path, js_code=js_code, clip=clip)
-
-        #return browser.open_local_page_and_get_screenshot(path, js_code=js_code, png_file=png_file)
-
-        #
-        #.set_risks({'r1_2': '1', 'r2_4': '0', 'r5_4': '2'})
 
     @staticmethod
     def risks(team_id=None, channel=None, params=None):
