@@ -4,7 +4,7 @@ from osbot_browser.browser.Browser_Commands import load_dependencies
 from time import sleep
 
 def run(event, context):
-    load_dependencies('syncer,requests,pyppeteer')
+
     issue_id = event.get('issue_id')
     channel  = event.get('channel')
     team_id  = event.get('team_id')
@@ -12,6 +12,10 @@ def run(event, context):
     height   = event.get('height')
     delay    = Misc.to_int(event.get('delay'))
 
+    if issue_id is None:
+        return { 'error': 'No issue ID provided' }
+
+    load_dependencies('syncer,requests,pyppeteer')
     try:
         from osbot_browser.browser.sites.Web_Jira import Web_Jira
         web_jira = Web_Jira().setup()
@@ -37,13 +41,6 @@ def run(event, context):
         #todo: next line breaks when delay is too big (need to find a way to keep the browser alive)
 
         png_data = web_jira.screenshot(width, height)
-
-        # try:
-        #     png_data =  web_jira.screenshot(width, height)
-        # except Exception as error:
-        #     slack_message(f'Error in taking screenshot: {error} \nTrying again....',[],channel)
-        #     web_jira = Web_Jira().setup()
-        #     png_data = web_jira.screenshot(width, height)
 
         if channel:
             from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper

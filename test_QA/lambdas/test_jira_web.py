@@ -22,24 +22,15 @@ class test_jira_web(Test_Helper):
         super().setUp()
         self.png_data = None
         self.result = None
-        self._lambda = Lambda_Package('osbot_browser.lambdas.jira_web')
-
-
-    def tearDown(self):
-        if self.png_data:
-            png_file = '/tmp/tmp-jira-screenshot.png'
-            with open(png_file, "wb") as fh:
-                fh.write(base64.decodebytes(self.png_data.encode()))
-            Dev.pprint("Png data with size {0} saved to {1}".format(len(self.png_data),png_file))
-        if self.result:
-            Dev.print(self.result)
+        self.aws_lambda = Lambda_Package('osbot_browser.lambdas.jira_web').xrays()
 
     def test_update_lambda(self):
+
         Deploy().setup().deploy_lambda__browser('osbot_browser.lambdas.jira_web')
 
     def test_update_lambda_code(self):
         from gw_bot.setup.OSS_Setup import OSS_Setup
-        OSS_Setup().lambda_package('osbot_browser.lambdas.jira_web')._lambda.update_lambda_code()
+        OSS_Setup().lambda_package('osbot_browser.lambdas.jira_web').aws_lambda.reset()
 
     def test_invoke_directly(self):
         issue_id = 'VP-2'
@@ -49,9 +40,14 @@ class test_jira_web(Test_Helper):
 
     def test_invoke_lambda(self):
         self.test_update_lambda()
+        payload = {}
+        self.png_data = self.aws_lambda.invoke(payload)
+
+    def test_invoke_lambda__screenshot(self):
+        self.test_update_lambda()
         issue_id = 'VP-2'
         payload = {'issue_id': issue_id, 'channel': 'DRE51D4EM', 'delay': 6}
-        self.result = self._lambda.invoke(payload)
+        self.result = self.aws_lambda.invoke(payload)
 
     def test_invoke(self):
 
@@ -64,7 +60,7 @@ class test_jira_web(Test_Helper):
                     'height' : 300 ,
                     'wait'   : 2   }
         #self.result = self._lambda.invoke(payload)
-        self.png_data = self._lambda.invoke(payload)
+        self.png_data = self.aws_lambda.invoke(payload)
 
     def test_send_to_slack(self):
         team_id = None

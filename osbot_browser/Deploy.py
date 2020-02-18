@@ -13,7 +13,7 @@ class Deploy:
         self.setup()
 
     def setup(self):
-        (self.package._lambda.set_s3_bucket(self.tmp_s3_bucket)
+        (self.package.aws_lambda.set_s3_bucket(self.tmp_s3_bucket)
                              .set_s3_key   (self.tmp_s3_key))
         return self
 
