@@ -1,4 +1,4 @@
-from osbot_browser.browser.Browser_Commands import load_dependencies
+from osbot_aws.Dependencies import load_dependencies
 
 def run(event, context):
     load_dependencies('syncer,requests,pyppeteer')

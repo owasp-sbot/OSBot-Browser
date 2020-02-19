@@ -3,7 +3,7 @@
 
 def run(event, context):
     try:
-        from osbot_browser.browser.Browser_Commands import load_dependencies
+        from osbot_aws.Dependencies import load_dependencies
         load_dependencies('syncer,requests,pyppeteer')
         from osbot_browser.view_helpers.gw.Xml_Report import Xml_Report
 

@@ -1,7 +1,7 @@
 from osbot_aws.apis.Lambda import Lambda
 
 def setup(event):
-    from osbot_browser.browser.Browser_Commands import load_dependencies
+    from osbot_aws.Dependencies import load_dependencies
     load_dependencies('syncer , requests , pyppeteer , jira')
 
     from osbot_browser.view_helpers.Sow_Views import Sow

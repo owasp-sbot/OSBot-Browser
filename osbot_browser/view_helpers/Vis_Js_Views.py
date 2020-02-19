@@ -1,6 +1,6 @@
 from pbx_gs_python_utils.utils.Misc import Misc
 
-from gw_bot.lambdas.png_to_slack import load_dependencies
+from osbot_aws.Dependencies import load_dependencies
 from osbot_browser.view_helpers.Edge_Format import Edge_Format
 from osbot_browser.view_helpers.Node_Format import Node_Format
 

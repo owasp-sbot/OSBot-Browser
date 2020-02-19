@@ -39,7 +39,7 @@ class Browser_Lamdba_Helper:
             #s3_bucket    = 'gs-lambda-tests'
             s3_bucket    = 'gw-bot-lambdas'
             s3_key       = S3().file_upload_as_temp_file(png_file, s3_bucket)
-            png_to_slack = Lambda('utils.png_to_slack')
+            png_to_slack = Lambda('gw_bot.lambdas.png_to_slack')
             payload = {'s3_bucket': s3_bucket, 's3_key': s3_key, 'team_id': team_id, 'channel': channel, 'title': target }
             png_to_slack.invoke_async(payload)
             return None, None

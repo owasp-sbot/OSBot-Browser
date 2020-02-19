@@ -1,5 +1,5 @@
 from gw_bot.helpers.Lambda_Helpers import slack_message
-from gw_bot.lambdas.png_to_slack import load_dependencies
+from osbot_aws.Dependencies import load_dependencies
 from osbot_browser.browser.sites.Web_AWS import Web_AWS
 
 

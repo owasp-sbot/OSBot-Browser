@@ -1,6 +1,6 @@
 from pbx_gs_python_utils.utils.Misc import Misc
 from gw_bot.helpers.Lambda_Helpers import slack_message
-from osbot_browser.browser.Browser_Commands import load_dependencies
+from osbot_aws.Dependencies import load_dependencies
 from time import sleep
 
 def run(event, context):

@@ -115,39 +115,39 @@ class Browser_Commands:
 
 
 
-    @staticmethod
-    def risks(team_id=None, channel=None, params=None):
-        load_dependency('syncer') ;
-        load_dependency('requests')
-
-        from osbot_browser.view_helpers.Risk_Dashboard import Risk_Dashboard
-
-        jira_key = params.pop(0)
-
-        return ( Risk_Dashboard().create_dashboard_for_jira_key(jira_key)
-                                 .send_graph_name_to_slack(team_id, channel)
-                                 .send_screenshot_to_slack(team_id, channel))
-
-        # graph_name = 'graph_DGK'
-        # root_node = 'GSSP-6'
-        #
-        # return Risk_Dashboard().create_dashboard_for_graph(graph_name,root_node).send_screenshot_to_slack(team_id, channel)
-
-
-    @staticmethod
-    def risks_test_data(team_id=None, channel=None, params=None):
-        load_dependency('syncer') ;
-        load_dependency('requests')
-
-        from osbot_browser.view_helpers.Risk_Dashboard import Risk_Dashboard
-
-        return Risk_Dashboard().create_dashboard_with_test_data().send_screenshot_to_slack(team_id, channel)
-
-        #browser = Risk_Dashboard().create_dashboard_with_test_data().browser()
-
-        #clip = {'x': 1, 'y': 1, 'width': 915, 'height': 435}
-        #png_file =  browser.sync__screenshot(clip = clip)
-        #return Browser_Lamdba_Helper().send_png_file_to_slack(team_id, channel, 'markdown', png_file)
+    # @staticmethod
+    # def risks(team_id=None, channel=None, params=None):
+    #     load_dependency('syncer') ;
+    #     load_dependency('requests')
+    #
+    #     from osbot_browser.view_helpers.Risk_Dashboard import Risk_Dashboard
+    #
+    #     jira_key = params.pop(0)
+    #
+    #     return ( Risk_Dashboard().create_dashboard_for_jira_key(jira_key)
+    #                              .send_graph_name_to_slack(team_id, channel)
+    #                              .send_screenshot_to_slack(team_id, channel))
+    #
+    #     # graph_name = 'graph_DGK'
+    #     # root_node = 'GSSP-6'
+    #     #
+    #     # return Risk_Dashboard().create_dashboard_for_graph(graph_name,root_node).send_screenshot_to_slack(team_id, channel)
+    #
+    #
+    # @staticmethod
+    # def risks_test_data(team_id=None, channel=None, params=None):
+    #     load_dependency('syncer') ;
+    #     load_dependency('requests')
+    #
+    #     from osbot_browser.view_helpers.Risk_Dashboard import Risk_Dashboard
+    #
+    #     return Risk_Dashboard().create_dashboard_with_test_data().send_screenshot_to_slack(team_id, channel)
+    #
+    #     #browser = Risk_Dashboard().create_dashboard_with_test_data().browser()
+    #
+    #     #clip = {'x': 1, 'y': 1, 'width': 915, 'height': 435}
+    #     #png_file =  browser.sync__screenshot(clip = clip)
+    #     #return Browser_Lamdba_Helper().send_png_file_to_slack(team_id, channel, 'markdown', png_file)
 
 
     @staticmethod

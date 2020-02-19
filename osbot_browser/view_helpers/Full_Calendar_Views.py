@@ -1,4 +1,4 @@
-from gw_bot.lambdas.png_to_slack import load_dependencies
+from osbot_aws.Dependencies import load_dependencies
 from osbot_gsuite.apis.GCalendar import GCalendar
 
 from pbx_gs_python_utils.utils.Dev import Dev

@@ -4,7 +4,7 @@ from time import sleep
 from pbx_gs_python_utils.utils.Dev import Dev
 from pbx_gs_python_utils.utils.Misc import Misc
 
-from gw_bot.lambdas.png_to_slack import load_dependencies
+from osbot_aws.Dependencies import load_dependencies
 
 
 class Am_Charts_Views:

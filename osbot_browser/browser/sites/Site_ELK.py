@@ -5,9 +5,7 @@ from osbot_aws.apis.Secrets import Secrets
 from syncer import sync
 
 from osbot_browser.browser.API_Browser import API_Browser
-from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
-from pbx_gs_python_utils.utils.Dev import Dev
-from pbx_gs_python_utils.utils.Lambdas_Helpers import slack_message
+from gw_bot.helpers.Lambda_Helpers import slack_message
 
 # todo: Rename to Web_ELK
 class Site_ELK:

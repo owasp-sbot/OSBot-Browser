@@ -1,8 +1,6 @@
 import json
 
-from gw_bot.lambdas.png_to_slack import load_dependencies
-
-from pbx_gs_python_utils.utils.Dev import Dev
+from osbot_aws.Dependencies import load_dependencies
 from pbx_gs_python_utils.utils.Misc import Misc
 
 

@@ -6,7 +6,7 @@ from pbx_gs_python_utils.utils.Dev import Dev
 from pbx_gs_python_utils.utils.Misc import Misc
 
 from gw_bot.helpers.Lambda_Helpers import slack_message
-from gw_bot.lambdas.png_to_slack import load_dependencies
+from osbot_aws.Dependencies import load_dependencies
 
 
 class Go_Js_Views:
