@@ -96,7 +96,7 @@ class Go_Js_Views:
         log_message('Step 1: Generating graph for issue {0} using direction `all` and depth `{1}`'.format(direction, depth))
 
         payload     = {"params": ['links', start, direction, depth, view]}
-        result      = Lambda('osbot_jira.lambdas.elastic_jira').invoke(payload)
+        result      = Lambda('osbot_jira.lambdas.jira').invoke(payload)
         graph       = json.loads(result.get('text'))
         graph_name  = graph.get('graph_name')
         sleep(0.5)

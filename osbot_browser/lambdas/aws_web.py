@@ -9,11 +9,10 @@ def run(event, context):
 
 
     channel = event.get('channel')
+
     try:
         wait = 3
-        headless = False
-        aws      = Web_AWS(headless=headless).setup()
-
+        aws      = Web_AWS().setup()
         slack_message(':one: Logging in to AWS',[], channel)
         aws.login()
 

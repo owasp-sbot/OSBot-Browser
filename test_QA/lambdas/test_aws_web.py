@@ -24,5 +24,5 @@ class test_google_charts(Test_Helper):
 
     def test_update_and_invoke(self):
         self.test_update_lambda()
-        #self.result = self._lambda.invoke({})
-        self.png_data = self._lambda.invoke({'channel': 'DRE51D4EM'})
+        self.result = self._lambda.invoke({})
+        #self.png_data = self._lambda.invoke({'channel': 'DRE51D4EM'})
