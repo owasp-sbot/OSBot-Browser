@@ -7,16 +7,17 @@ from osbot_browser.browser.API_Browser import API_Browser
 from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 from osbot_browser.browser.Render_Page import Render_Page
 from osbot_browser.browser.Web_Server import Web_Server
-from pbx_gs_python_utils.utils.Files import Files
-from pbx_gs_python_utils.utils.Json import Json
-from pbx_gs_python_utils.utils.Misc import Misc
-
+from osbot_jira.api.jira_server.API_Jira_Rest import API_Jira_Rest
+from osbot_utils.utils.Files import path_combine, Files, save_string_as_file, save_bytes_as_file
+from osbot_utils.utils.Json import Json
+from osbot_utils.utils.Misc import json_dumps
 
 
 class VivaGraph_Js:
     def __init__(self, headless=True):
         self.web_page    = '/vivagraph/simple.html'
-        self.web_root    = Files.path_combine(Files.parent_folder(__file__), '../web_root')
+        self.jira_icons  = '/vivagraph/icons'
+        self.web_root    = path_combine(Files.parent_folder(__file__), '../web_root')
         self.api_browser = API_Browser(headless=headless).sync__setup_browser()
         self.web_server  = Web_Server(self.web_root)
         self.render_page = Render_Page(api_browser=self.api_browser, web_server=self.web_server)
@@ -78,9 +79,6 @@ class VivaGraph_Js:
             elif        len(nodes) > 200: self.browser().sync__browser_width(3000) ; sleep(10)
 
             return self.send_screenshot_to_slack(team_id, channel)
-            #self.create_graph(nodes, edges,options,graph_name)
-            #return self.send_screenshot_to_slack(t§eam_id, channel)
-
 
     # main methods
 
@@ -107,7 +105,7 @@ class VivaGraph_Js:
             img_url   = node.get('img_url' ) or 'icons/project.svg'
             img_size  = node.get('img_size') or 50
             params = { "label" : label, "img_url": img_url, 'img_size':img_size}
-            js_code += 'graph.addNode("{0}",{1});\n'.format(key,Misc.json_dumps(params))
+            js_code += 'graph.addNode("{0}",{1});\n'.format(key, json_dumps(params))
         for edge in edges:
             js_code += 'graph.addLink("{0}","{1}");\n'.format(edge[0],edge[2])
         js_code += "run_graph()"
@@ -118,43 +116,67 @@ class VivaGraph_Js:
     def resolve_icon_from_issue_type(self, issue,key):
         label    = key
         img_size = 20
-        none_icon = 'icons/none.jpg'
-        mappings = {
-            'Risk'           : 'icons/risk_theme.svg',
-            'Risk Theme'     : 'icons/risk_theme.svg',
-            'Vulnerability'  : 'icons/vuln.png',
-            'GS-Project'     : 'icons/gs_project.svg',
-            'Business entity': 'icons/business_entity.svg',
-            'GS Service '    : 'icons/gs_service.svg',
-            'IT Asset'       : 'icons/it_asset.svg',
-            'IT System'      : 'icons/it_asset.svg',
-            'People'         : 'icons/people.svg',
-            'Programme'      : 'icons/programme.svg',
-            'Threat Model'   : 'icons/threat_model.svg',
-            'Key Result'     : 'icons/key-result.svg',
-            'Objective'      : 'icons/objective.svg',
-            'Task'           : 'icons/task.svg',
-            'Epic'           : 'icons/epic.svg',
-            'Data Journey'   : 'icons/data_journey.svg',
-            'Project'        : 'icons/project.svg',
-            'Fact'           : 'icons/fact.svg',
-            'Incident'       : 'icons/incident.png',
-            'Incident Task'  : 'icons/incident_task.png',
-            'User Access'    : 'icons/user_access.svg',
-            'Security Event' : 'icons/security_event.svg',
-        }
 
-        if issue and issue.get("Issue Type"):
-            issue_type = issue.get("Issue Type")
-            icon = mappings.get(issue_type, none_icon)
-
-            #if icon == none_icon:
-            #    Dev.pprint(key + ' ' + issue_type)
-
+        if issue:
+            project_key = issue.get('Key').split('-')[0]
+            icon = f'icons/{project_key}.png'
         else:
             icon = 'icons/none.jpg'
-            #icon = 'https://dummyimage.com/100x40/2c2f87/FFFFFF&text={0}'.format(key)
-            #img_size = 10
 
         return label,img_size,icon
 
+
+
+        # none_icon = 'icons/none.jpg'
+        # mappings = {
+        #     'Risk'           : 'icons/risk_theme.svg',
+        #     'Risk Theme'     : 'icons/risk_theme.svg',
+        #     'Vulnerability'  : 'icons/vuln.png',
+        #     'GS-Project'     : 'icons/gs_project.svg',
+        #     'Business entity': 'icons/business_entity.svg',
+        #     'GS Service '    : 'icons/gs_service.svg',
+        #     'IT Asset'       : 'icons/it_asset.svg',
+        #     'IT System'      : 'icons/it_asset.svg',
+        #     'People'         : 'icons/people.svg',
+        #     'Programme'      : 'icons/programme.svg',
+        #     'Threat Model'   : 'icons/threat_model.svg',
+        #     'Key Result'     : 'icons/key-result.svg',
+        #     'Objective'      : 'icons/objective.svg',
+        #     'Task'           : 'icons/task.svg',
+        #     'Epic'           : 'icons/epic.svg',
+        #     'Data Journey'   : 'icons/data_journey.svg',
+        #     'Project'        : 'icons/project.svg',
+        #     'Fact'           : 'icons/fact.svg',
+        #     'Incident'       : 'icons/incident.png',
+        #     'Incident Task'  : 'icons/incident_task.png',
+        #     'User Access'    : 'icons/user_access.svg',
+        #     'Security Event' : 'icons/security_event.svg',
+        # }
+        #
+        # if issue and issue.get("Issue Type"):
+        #     issue_type = issue.get("Issue Type")
+        #     icon = mappings.get(issue_type, none_icon)
+        #
+        #     #if icon == none_icon:
+        #     #    Dev.pprint(key + ' ' + issue_type)
+        #
+        # else:
+        #     icon = 'icons/none.jpg'
+        #     #icon = 'https://dummyimage.com/100x40/2c2f87/FFFFFF&text={0}'.format(key)
+        #     #img_size = 10
+        #
+        # return label,img_size,icon
+
+
+
+    def save_jira_icons_locally(self):
+        jira_rest_api = API_Jira_Rest()
+        icons = jira_rest_api.projects_icons()
+        for key, url in icons.items():
+            icon_path  = f'{self.web_root}{self.jira_icons}/{key}.png'
+            icon_bytes = jira_rest_api.request_get(url)
+            save_bytes_as_file(icon_bytes,icon_path)
+
+        #self.png_data = self.api.request_get(
+        #    'https://glasswall.atlassian.net/secure/projectavatar?pid=10045&avatarId=10615')
+        return icons

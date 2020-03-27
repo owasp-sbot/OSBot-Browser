@@ -5,7 +5,7 @@ from osbot_aws.Dependencies import load_dependencies
 class VivaGraph_Js_Views:
 
     @staticmethod
-    def default(team_id=None, channel=None, params=None, no_render=False,headless=True):        
+    def default(team_id=None, channel=None, params=None, screenshot=True,no_render=False,headless=True):
         load_dependencies('syncer,requests,pyppeteer');
         from osbot_browser.view_helpers.VivaGraph_Js import VivaGraph_Js
 
@@ -19,8 +19,8 @@ class VivaGraph_Js_Views:
             edges = graph_data.get('edges')
             nodes = []
             for key,issue in graph_data.get('nodes').items():
-                if issue and issue.get("Image Url") :
-                    (label, img_size, img_url) = (key,20,issue.get("Image Url"))
+                if issue and issue.get("Image") :
+                    (label, img_size, img_url) = (key,20,issue.get("Image"))
                 else:
                     (label,img_size,img_url) = vivagraph_js.resolve_icon_from_issue_type(issue, key)
                 node = {
@@ -41,28 +41,32 @@ class VivaGraph_Js_Views:
                 return graph_name, nodes, edges, graph_data, vivagraph_js
 
             options = {}
-            return vivagraph_js.create_graph_and_send_screenshot_to_slack(nodes, edges, options, team_id, channel)
+            if screenshot:
+                return vivagraph_js.create_graph_and_send_screenshot_to_slack(nodes, edges, options, team_id, channel)
+            else:
+                vivagraph_js.create_graph(nodes, edges, options)
 
 
+
+    # @staticmethod
+    # def by_issue_type(team_id=None, channel=None, params=None):
+    #     params.append('Issue Type')
+    #     return VivaGraph_Js_Views.by_field(team_id, channel, params)
+    #
+    # @staticmethod
+    # def by_rating(team_id=None, channel=None, params=None):
+    #     params.append('Rating')
+    #     return VivaGraph_Js_Views.by_field(team_id, channel, params)
 
     @staticmethod
-    def by_issue_type(team_id=None, channel=None, params=None):
-        params.append('Issue Type')
-        return VivaGraph_Js_Views.by_field(team_id, channel, params)
-
-    @staticmethod
-    def by_rating(team_id=None, channel=None, params=None):
-        params.append('Rating')
-        return VivaGraph_Js_Views.by_field(team_id, channel, params)
-
-    @staticmethod
-    def by_field(team_id=None, channel=None, params=None):
+    def node_value(team_id=None, channel=None, params=None,headless=True):
 
         if len(params) < 2:
-            text = ':red_circle: Hi, for the `by_field` command, you need to provide a field name, for example: `Summary`, `Issue Type`,`Rating`, `Status`  '
+            text = ':red_circle: Hi, for the `node_value` command, you need to provide a field name, for example: `Summary`, `Issue Type`,`Rating`, `Status`  '
             return text
 
-        (graph_name, nodes, edges, graph_data, vivagraph_js) = VivaGraph_Js_Views.default(team_id, channel, params,no_render=True)
+        (graph_name, nodes, edges, graph_data, vivagraph_js) = VivaGraph_Js_Views.default(team_id, channel, params,no_render=True,headless=headless)
+
         field = ' '.join(params)
         for node in nodes:
             key   = node.get('key')

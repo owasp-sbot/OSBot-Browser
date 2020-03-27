@@ -8,9 +8,16 @@ class Test_VivaGraph_Js(TestCase):
 
     def setUp(self):
         self.vivagraph = VivaGraph_Js()
+        self.result    = None
+
+    def tearDown(self):
+        if self.result is not None:
+            Dev.pprint(self.result)
 
     def test_create_graph(self):
         (nodes, edges, graph_data, graph_name) = (0,0,0,None)
-        Dev.pprint(self.vivagraph.create_graph(nodes, edges, graph_data, graph_name))
+        Dev.pprint(self.vivagraph.create_graph(nodes, edges))
 
+    def test_save_jira_icons_locally(self):
+        self.result = self.vivagraph.save_jira_icons_locally()
 
