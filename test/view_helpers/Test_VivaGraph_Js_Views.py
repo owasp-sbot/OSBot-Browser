@@ -23,22 +23,23 @@ class Test_VivaGraph_Js_Views(Test_Helper):
     def test_default(self):
         #graph_name = 'graph_I3H' #'graph_UUZ'
         graph_name = 'graph_24O'
-        graph_name = 'graph_U5J'
+        #graph_name = 'graph_041'  # large one
         headless   = False
-        screenshot = False
+        screenshot = True
+        width      = '2600'
         self.png_data = VivaGraph_Js_Views.default(params=[graph_name], screenshot=screenshot, headless=headless)
         #self.png_data = False
 
-        #return
+
     def test_default__with_non_issue_nodes(self):
         graph_name = 'graph_THV'                    # create by an group_by filter
         self.png_data = VivaGraph_Js_Views.default(params=[graph_name])
 
 
-    # def test_by_issue_type(self):
-    #     graph_name = 'graph_UUZ'    # ( 20 nodes,  27 edges)
-    #
-    #     self.png_data = VivaGraph_Js_Views.by_issue_type(params=[graph_name])
+    def test_by_no_key(self):
+        graph_name = 'graph_24O'    # ( 20 nodes,  27 edges)
+        graph_name = 'graph_041'
+        self.png_data = VivaGraph_Js_Views.no_key(params=[graph_name],headless=False)
 
     def test_by_node_value(self):
         graph_name = 'graph_UUZ'

@@ -7,7 +7,6 @@ from osbot_browser.browser.API_Browser import API_Browser
 from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 from osbot_browser.browser.Render_Page import Render_Page
 from osbot_browser.browser.Web_Server import Web_Server
-from osbot_jira.api.jira_server.API_Jira_Rest import API_Jira_Rest
 from osbot_utils.utils.Files import path_combine, Files, save_string_as_file, save_bytes_as_file
 from osbot_utils.utils.Json import Json
 from osbot_utils.utils.Misc import json_dumps
@@ -74,9 +73,9 @@ class VivaGraph_Js:
         if len(nodes) >0:
             self.create_graph(nodes, edges,options)
             if          len(nodes) < 20 :                                            sleep(1)
-            elif  20 <  len(nodes) < 100: self.browser().sync__browser_width(1500) ; sleep(2)
-            elif 100 <  len(nodes) < 200: self.browser().sync__browser_width(2000) ; sleep(5)
-            elif        len(nodes) > 200: self.browser().sync__browser_width(3000) ; sleep(10)
+            elif  20 <  len(nodes) < 100: self.browser().sync__browser_width(800) ; sleep(2)
+            elif 100 <  len(nodes) < 200: self.browser().sync__browser_width(1400) ; sleep(4)
+            elif        len(nodes) > 200: self.browser().sync__browser_width(2000) ; sleep(6)
 
             return self.send_screenshot_to_slack(team_id, channel)
 
@@ -169,7 +168,9 @@ class VivaGraph_Js:
 
 
 
+    # todo: refactor this out of this class (since this is the class that is called from the lambda function)
     def save_jira_icons_locally(self):
+        from osbot_jira.api.jira_server.API_Jira_Rest import API_Jira_Rest
         jira_rest_api = API_Jira_Rest()
         icons = jira_rest_api.projects_icons()
         for key, url in icons.items():

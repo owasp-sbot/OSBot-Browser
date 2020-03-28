@@ -59,6 +59,18 @@ class VivaGraph_Js_Views:
     #     return VivaGraph_Js_Views.by_field(team_id, channel, params)
 
     @staticmethod
+    def no_key(team_id=None, channel=None, params=None, headless=True):
+
+        (graph_name, nodes, edges, graph_data, vivagraph_js) = VivaGraph_Js_Views.default(team_id, channel, params, no_render=True, headless=headless)
+        issues = graph_data.get('nodes')
+        for node in nodes:
+            key = node.get('key')
+            if issues.get(key):             # if it is an Issue Id, remove the keys (if not Leave it there)
+                node['label'] = ''
+
+        return vivagraph_js.create_graph_and_send_screenshot_to_slack(nodes, edges, {}, team_id, channel)
+
+    @staticmethod
     def node_value(team_id=None, channel=None, params=None,headless=True):
 
         if len(params) < 2:

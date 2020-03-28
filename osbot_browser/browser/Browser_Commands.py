@@ -236,11 +236,15 @@ class Browser_Commands:
 
     @staticmethod
     def viva_graph(team_id=None, channel=None, params=None):
+        if len(params) == 1:
+            params.append('default')   # default to 'default' view
+
         if len(params) < 2:
             text = ':red_circle: Hi, for the `viva_graph` command, you need to provide 2 parameters: '
             attachment_text = '*graph name* - the nodes and edges you want to view\n' \
                               '*view name* - the view to render'
             return text, [{'text': attachment_text}]
+
 
         from osbot_browser.view_helpers.VivaGraph_Js_Views import VivaGraph_Js_Views
 
