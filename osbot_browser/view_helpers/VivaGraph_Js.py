@@ -121,7 +121,7 @@ class VivaGraph_Js:
             project_key = issue.get('Key').split('-')[0]
             icon = f'icons/{project_key}.png'
         else:
-            icon = 'icons/none.jpg'
+            icon = 'icons/dot.png'
 
         return label,img_size,icon
 

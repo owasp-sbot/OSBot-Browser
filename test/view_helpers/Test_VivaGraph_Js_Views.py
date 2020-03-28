@@ -23,6 +23,7 @@ class Test_VivaGraph_Js_Views(Test_Helper):
     def test_default(self):
         #graph_name = 'graph_I3H' #'graph_UUZ'
         graph_name = 'graph_24O'
+        graph_name = 'graph_U5J'
         headless   = False
         screenshot = False
         self.png_data = VivaGraph_Js_Views.default(params=[graph_name], screenshot=screenshot, headless=headless)
