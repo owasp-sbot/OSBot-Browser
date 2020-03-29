@@ -3,6 +3,7 @@ import json
 import unittest
 from   unittest import TestCase
 
+from gw_bot.helpers.Test_Helper import Test_Helper
 from osbot_browser.browser.Browser_Commands import Browser_Commands
 from pbx_gs_python_utils.utils.Dev import Dev
 from pbx_gs_python_utils.utils.Files import Files
@@ -10,24 +11,14 @@ from pbx_gs_python_utils.utils.Files import Files
 from gw_bot.Deploy import Deploy
 
 
-class Test_Browser_Commands(TestCase):
+class Test_Browser_Commands(Test_Helper):
 
     def setUp(self):
+        super().setUp()
         self.browser_commands = Browser_Commands()
-        self.png_file         = '/tmp/lambda_png_file.png'
-        self.team_id          = 'T7F3AUXGV'
-        self.channel          = 'DDKUZTK6X' #''GDL2EC3EE'
-        self.result           = None
+        self.team_id          = None #'T7F3AUXGV'
+        self.channel          = None #'DDKUZTK6X' #''GDL2EC3EE'
 
-    def tearDown(self):
-        if self.result is not None:
-            Dev.pprint(self.result)
-
-    def _save_png_data(self, png_data):
-        png_file = '/tmp/lambda_png_file.png'
-        if png_data:
-            with open(png_file, "wb") as fh:
-                fh.write(base64.decodebytes(png_data.encode()))
 
     def test_list(self):
         result = self.browser_commands.list(None, None, None)
@@ -153,6 +144,9 @@ class Test_Browser_Commands(TestCase):
         channel = 'DJ8UA0RFT'
         self.browser_commands.google_charts(None, channel,['default'])
         #self.browser_commands.oss_today(None, channel)
+
+    def test_vis_js(self):
+        self.result = self.browser_commands.vis_js(params =[])
 
     def test_sow(self):
         result = self.browser_commands.sow(None, None,['view', 'SOW-135'])

@@ -114,20 +114,6 @@ class Test_Lambda_lambda_browser(Test_Helper):
         Dev.pprint(png_data)
         self._save_png_file(png_data)
 
-    @unittest.skip('needs fixing (api has moved since this test)')
-    def test_vis_js(self):
-        nodes = [{'id': '123', 'label': 'vis js\n via lambda'},
-                 {'id': 'aaa', 'label': 'another node'}]
-        edges = [{'from': '123', 'to': 'aaa'}]
-
-        options = {'nodes': {'shape': 'box'}}
-        data = {'nodes': nodes, 'edges': edges, 'options': options }
-
-        payload = { "params" : ['vis_js', json.dumps(data)]}
-        png_data = self.lambda_browser.invoke(payload)
-        Dev.pprint(png_data)
-        self._save_png_file(png_data)
-
     def test_go_js(self):
         #self.test_update_lambda()
         payload = {"params": ['go_js', 'graph_J2O', 'default']}

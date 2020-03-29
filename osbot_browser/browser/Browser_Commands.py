@@ -150,30 +150,30 @@ class Browser_Commands:
     #     #return Browser_Lamdba_Helper().send_png_file_to_slack(team_id, channel, 'markdown', png_file)
 
 
-    @staticmethod
-    def vis_js(team_id=None, channel=None, params=None):
-        path = 'examples/vis-js.html'
-
-        params = ' '.join(params).replace('“','"').replace('”','"')
-        data = json.loads(params)
-
-        load_dependency('syncer')
-        load_dependency('requests')
-
-        nodes   = data.get('nodes'  )
-        edges   = data.get('edges'  )
-        options = data.get('options')
-        from osbot_browser.view_helpers.Vis_Js import Vis_Js
-        vis_js = Vis_Js()
-        vis_js.create_graph(nodes, edges, options)
-        #vis_js.show_jira_graph(graph_name)
-        return vis_js.send_screenshot_to_slack(team_id,channel)
-
-        # browser = Browser_Lamdba_Helper().setup()
-        #
-        # return browser.open_local_page_and_get_html(path,js_code=js_code)
-
-        #return browser.render_file(team_id, channel,path, js_code=js_code)
+    # @staticmethod
+    # def vis_js(team_id=None, channel=None, params=None):
+    #     path = 'examples/vis-js.html'
+    #
+    #     params = ' '.join(params).replace('“','"').replace('”','"')
+    #     data = json.loads(params)
+    #
+    #     load_dependency('syncer')
+    #     load_dependency('requests')
+    #
+    #     nodes   = data.get('nodes'  )
+    #     edges   = data.get('edges'  )
+    #     options = data.get('options')
+    #     from osbot_browser.view_helpers.Vis_Js import Vis_Js
+    #     vis_js = Vis_Js()
+    #     vis_js.create_graph(nodes, edges, options)
+    #     #vis_js.show_jira_graph(graph_name)
+    #     return vis_js.send_screenshot_to_slack(team_id,channel)
+    #
+    #     # browser = Browser_Lamdba_Helper().setup()
+    #     #
+    #     # return browser.open_local_page_and_get_html(path,js_code=js_code)
+    #
+    #     #return browser.render_file(team_id, channel,path, js_code=js_code)
 
 
     @staticmethod

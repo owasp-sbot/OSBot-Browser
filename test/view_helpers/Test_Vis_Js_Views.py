@@ -13,7 +13,7 @@ class Test_Vis_Js_Views(Test_Helper):
 
     def setUp(self):
         super().setUp()
-        self.graph_name = 'graph_XKW'
+        self.graph_name = 'graph_BMM'
         self.png_data   = None
 
     def tearDown(self):
@@ -23,7 +23,7 @@ class Test_Vis_Js_Views(Test_Helper):
 
 
     def test_default(self):
-        graph_name = 'graph_IQB'
+        graph_name = 'graph_BMM'
         self.result = Vis_Js_Views.default(params=[graph_name],headless=False)
         return
 

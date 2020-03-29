@@ -80,9 +80,11 @@ class Browser_Lamdba_Helper:
     #     return
 
     def web_root(self):
-        if os.getenv('AWS_REGION') is not None:         # if we are in AWS
+        if os.getenv('AWS_REGION') is not None:            # if we are in AWS
             return Files.path_combine('.','./osbot_browser/web_root')
-        if 'test/browser' in Files.current_folder():    # if we are in an unit test
+        if 'test/browser' in Files.current_folder():       # if we are in an unit test
+            return  Files.path_combine('.','../../osbot_browser/web_root')
+        if 'test_QA/browser' in Files.current_folder():    # todo: find a better way to handle the path when executing from UnitTests
             return  Files.path_combine('.','../../osbot_browser/web_root')
         parent_folder = Files.folder_name(__file__)
         if 'serverless-render/osbot_browser/browser' in parent_folder:
