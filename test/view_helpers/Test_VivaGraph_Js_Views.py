@@ -13,9 +13,12 @@ class Test_VivaGraph_Js_Views(Test_Helper):
         self.graph_name = 'graph_XKW'
         self.png_data   = None
 
-    def tearDown(self):
-        if self.png_data:
-            Browser_Lamdba_Helper().save_png_data(self.png_data)
+    # def tearDown(self):
+    #     super().defau
+    #     if self.png_data:
+    #         Browser_Lamdba_Helper().save_png_data(self.png_data)
+
+
 
     def test_deploy_lambda_function(self):
         self.result = Deploy().deploy_lambda__browser()
@@ -23,12 +26,21 @@ class Test_VivaGraph_Js_Views(Test_Helper):
     def test_default(self):
         #graph_name = 'graph_I3H' #'graph_UUZ'
         graph_name = 'graph_24O'
-        #graph_name = 'graph_041'  # large one
-        headless   = False
+        #graph_name = 'graph_041'  # large one  (doesn't work headless)
+        channel    = None #'CSK9RADE2'
+        headless   = True
         screenshot = True
-        width      = '2600'
-        self.png_data = VivaGraph_Js_Views.default(params=[graph_name], screenshot=screenshot, headless=headless)
+        self.png_data = VivaGraph_Js_Views.default(params=[graph_name], screenshot=screenshot, headless=headless, channel=channel)
         #self.png_data = False
+
+    def test_default__check_width(self):
+        graph_name    = 'graph_03K'
+        browser_width = 200
+        render_wait   = 0
+        screenshot    = False
+        vivagraph_js = VivaGraph_Js_Views.default(params=[graph_name,browser_width, render_wait], screenshot=screenshot)
+        assert vivagraph_js.browser_width == browser_width
+        assert  vivagraph_js.render_wait == render_wait
 
 
     def test_default__with_non_issue_nodes(self):
@@ -38,8 +50,8 @@ class Test_VivaGraph_Js_Views(Test_Helper):
 
     def test_by_no_key(self):
         graph_name = 'graph_24O'    # ( 20 nodes,  27 edges)
-        graph_name = 'graph_041'
-        self.png_data = VivaGraph_Js_Views.no_key(params=[graph_name],headless=False)
+        #graph_name = 'graph_041'
+        self.png_data = VivaGraph_Js_Views.no_key(params=[graph_name],headless=True)
 
     def test_by_node_value(self):
         graph_name = 'graph_UUZ'

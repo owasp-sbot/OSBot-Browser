@@ -248,7 +248,7 @@ class Browser_Commands:
 
         from osbot_browser.view_helpers.VivaGraph_Js_Views import VivaGraph_Js_Views
 
-        params[0], params[1] = params[1], params[0]
+        params[0], params[1] = params[1], params[0]    # swap params so that the view name goes first (since that is the method name
 
         (text, attachments) = Slack_Commands_Helper(VivaGraph_Js_Views).show_duration(True).invoke(team_id, channel, params)
 
