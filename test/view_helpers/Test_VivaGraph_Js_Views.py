@@ -24,11 +24,13 @@ class Test_VivaGraph_Js_Views(Test_Helper):
         self.result = Deploy().deploy_lambda__browser()
 
     def test_default(self):
+        graph_name = 'graph_J1Z'
         #graph_name = 'graph_I3H' #'graph_UUZ'
-        graph_name = 'graph_24O'
+        #graph_name = 'graph_24O'
         #graph_name = 'graph_041'  # large one  (doesn't work headless)
+        #graph_name = 'graph_DR8'
         channel    = None #'CSK9RADE2'
-        headless   = True
+        headless   = False
         screenshot = True
         self.png_data = VivaGraph_Js_Views.default(params=[graph_name], screenshot=screenshot, headless=headless, channel=channel)
         #self.png_data = False
@@ -55,8 +57,9 @@ class Test_VivaGraph_Js_Views(Test_Helper):
 
     def test_by_node_value(self):
         graph_name = 'graph_UUZ'
-        field      = 'Status'
-        self.png_data = VivaGraph_Js_Views.node_value(params=[graph_name,field],headless=False)
+        field      = 'Summary'
+        width      = 100
+        self.png_data = VivaGraph_Js_Views.node_value(params=[graph_name,field,width],headless=False)
         #self.png_data = False
 
     # def test_people(self):

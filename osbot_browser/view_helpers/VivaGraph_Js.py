@@ -81,7 +81,7 @@ class VivaGraph_Js:
     def calculate_browser_width_and_wait(self, nodes):
         if self.browser_width is None:
             if         len(nodes) <  20 : self.browser_width = 400
-            elif 20  < len(nodes) < 100 : self.browser_width = 800
+            elif 20  < len(nodes) < 100 : self.browser_width = 1100
             elif 100 < len(nodes) < 300 : self.browser_width = 1500
             else                        : self.browser_width = 3000
         if self.render_wait is None:

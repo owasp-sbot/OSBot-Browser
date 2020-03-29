@@ -50,12 +50,13 @@ class VivaGraph_Js_Views:
     def node_value(team_id=None, channel=None, params=None,headless=True,screenshot=True):
 
         if len(params) < 2:
-            text = ':red_circle: Hi, for the `node_value` command, you need to provide a field name, for example: `Summary`, `Issue Type`,`Rating`, `Status`  '
+            text = ':red_circle: Hi, for the `node_value` command, you need to provide a field name, for example: `Summary`, `Issue_Type`,`Rating`, `Status`  '
             return text
 
+        field = params[1].replace('_', ' ')   #  Add support for fields with a space
+        del params[1]                         #  We need to remove it so that it doesn't affect the other params like width or delay.
         (graph_name, nodes, edges, graph_data, vivagraph_js) = VivaGraph_Js_Views.default(team_id, channel, params,no_render=True,headless=headless)
 
-        field = ' '.join(params)
         for node in nodes:
             key   = node.get('key')
             issue = graph_data.get('nodes').get(key)
