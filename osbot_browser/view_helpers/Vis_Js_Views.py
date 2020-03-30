@@ -23,7 +23,6 @@ class Vis_Js_Views:
             graph_name = graph_data.get('graph_name')
             for key, issue in graph_data.get('nodes').items():
                 nodes.append({'id': key, 'label': key})
-                # Dev.pprint(issue)
 
             for edge in graph_data.get('edges'):
                 from_node = edge[0]

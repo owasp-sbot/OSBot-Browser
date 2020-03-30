@@ -53,7 +53,7 @@ class VivaGraph_Js:
         clip = None
         return self.browser().sync__screenshot(clip=clip)
 
-    def send_screenshot_to_slack(self, team_id, channel):
+    def send_screenshot_to_slack(self, team_id, channel):           # todo: refactor screenshot creation from this method
         if self.browser_width:
             self.browser().sync__browser_width(self.browser_width)
         if self.render_wait:
@@ -124,7 +124,7 @@ class VivaGraph_Js:
 
         self.exec_js(js_code)
 
-    def create_graph_and_send_screenshot_to_slack(self, nodes, edges, graph_name, screenshot, team_id, channel):
+    def create_graph_and_send_screenshot_to_slack(self, nodes, edges, graph_name=None, screenshot=True, team_id=None, channel=None):
         with Web_Server(self.web_root) as web_server:               # handle server start and stop
             self.web_server = web_server
 
@@ -146,7 +146,7 @@ class VivaGraph_Js:
             if issue and issue.get("Image"):
                 (label, img_size, img_url) = (key, 20, issue.get("Image"))
             else:
-                (label, img_size, img_url) = self.resolve_icon_from_issue_type(issue, key)
+                (label, img_size, img_url) = self.resolve_icon_from_key(key)
             node = {
                 'key': key,
                 'label': label,
@@ -156,12 +156,18 @@ class VivaGraph_Js:
             nodes.append(node)
         return nodes,edges
 
-    def resolve_icon_from_issue_type(self, issue,key):
+    def render_gs_graph(self, gs_graph):
+        graph_data = gs_graph.get_graph_data()
+        (nodes, edges) = self.get_nodes_edges_from_graph_data(graph_data)
+        png_data = self.create_graph_and_send_screenshot_to_slack(nodes, edges)
+        return png_data
+
+    def resolve_icon_from_key(self, key):
         label    = key
         img_size = 20
 
-        if issue:
-            project_key = issue.get('Key').split('-')[0]
+        if '-' in key:                          # todo: find better solution to do this
+            project_key = key.split('-')[0]
             icon = f'icons/{project_key}.png'
         else:
             icon = 'icons/dot.png'
