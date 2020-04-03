@@ -1,6 +1,7 @@
 from gw_bot.helpers.Lambda_Helpers import slack_message
 from osbot_aws.Dependencies import load_dependencies
 from osbot_utils.utils import Misc
+from osbot_utils.utils.Misc import to_int
 
 
 class VivaGraph_Js_Views:
@@ -15,9 +16,9 @@ class VivaGraph_Js_Views:
         vivagraph_js = VivaGraph_Js(headless=headless)
 
         if len(params) > 1:
-            vivagraph_js.browser_width = Misc.to_int(params[1])
+            vivagraph_js.browser_width = to_int(params[1], None)
         if len(params) > 2:
-            vivagraph_js.render_wait = Misc.to_int(params[2])
+            vivagraph_js.render_wait = to_int(params[2], None)
 
         graph_data = vivagraph_js.get_graph_data(graph_name)
 
