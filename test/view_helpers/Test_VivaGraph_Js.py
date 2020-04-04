@@ -14,7 +14,6 @@ class Test_VivaGraph_Js(Test_Helper):
     def setUp(self):
         super().setUp()
         self.vivagraph_js = VivaGraph_Js(headless=False)
-        #self.result    = None
 
     #def tearDown(self):
     #    if self.result is not None:

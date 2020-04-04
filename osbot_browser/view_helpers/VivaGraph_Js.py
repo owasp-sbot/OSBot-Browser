@@ -162,7 +162,7 @@ class VivaGraph_Js:
         png_data = self.create_graph_and_send_screenshot_to_slack(nodes, edges)
         return png_data
 
-    def resolve_icon_from_key(self, key):
+    def resolve_icon_from_key(self, key):       # todo: refactor to use Jira_Icons method
         label    = key
         img_size = 20
 
@@ -176,6 +176,7 @@ class VivaGraph_Js:
 
 
     # todo: refactor this out of this class (since this is the class that is called from the lambda function)
+    # see class Jira_Icons
     def save_jira_icons_locally(self):
         from osbot_jira.api.jira_server.API_Jira_Rest import API_Jira_Rest
         jira_rest_api = API_Jira_Rest()
