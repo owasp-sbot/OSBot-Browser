@@ -19,28 +19,23 @@ class test_Web_Jira(Test_Helper):
         self.close_wait = 0
 
     def tearDown(self):
-        if self.result is not None:
-            Dev.pprint(self.result)
-
-        if self.png_data:
-            png_file = '/tmp/tmp-jira-screenshot.png'
-            with open(png_file, "wb") as fh:
-                fh.write(base64.decodebytes(self.png_data.encode()))
-            Dev.pprint("Png data with size {0} saved to {1}".format(len(self.png_data), png_file))
+        super().tearDown()
 
         if self.new_page:
             sleep(self.close_wait)
             self.web_jira.page.close()
 
     def test_issue(self):
-        #self.web_jira.logout()
-        #self.web_jira.login()
-        #self.web_jira.fix_set_list_view()
-        #self.png_data = self.web_jira.issue('PERSON-1').fix_issue_remove_ui_elements().screenshot()
-        self.web_jira.issue('PERSON-1')
+        self.web_jira.issue('VP-1')
+
+        self.web_jira.logout()
+        self.web_jira.login()
+        self.web_jira.fix_set_list_view()
+        self.png_data = self.web_jira.issue('PERSON-1').fix_issue_remove_ui_elements().screenshot()
+
 
     def test_fix_issue_remove_ui_elements(self):
-        #self.web_jira.issue('PERSON-42')
+        self.web_jira.issue('VP-1')
         self.result = self.web_jira.fix_issue_remove_ui_elements()
 
     def test_login(self):
@@ -55,10 +50,9 @@ class test_Web_Jira(Test_Helper):
     def test_open(self):
         path ='/'
         self.result = self.web_jira.open(path)
+        #self.png_data = self.web_jira.screenshot()
+
+    def test_screenshot(self):
         self.png_data = self.web_jira.screenshot()
-
-    def test_just_chromium(self):
-        self.result='done'
-
 
 

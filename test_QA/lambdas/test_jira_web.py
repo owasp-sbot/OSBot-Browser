@@ -20,7 +20,7 @@ class test_jira_web(Test_Helper):
 
     def test_invoke_directly(self):
         issue_id = 'VP-2'
-        payload = { 'issue_id' : issue_id , 'channel': 'DRE51D4EM' , 'delay': 0}
+        payload = { 'issue_id' : issue_id  ,'headless':False} #'channel': 'DRE51D4EM' , 'delay': 0}
         self.result = run(payload,{})
 
     def test_invoke_lambda(self):

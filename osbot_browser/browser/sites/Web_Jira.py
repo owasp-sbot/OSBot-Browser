@@ -130,12 +130,12 @@ class Web_Jira:
                         remove = function(selector,text,index) {
                                                                    target = contains(selector,text)[index]
                                                                    if (target) {target.remove()} }
-                            
+
                         remove('div' , 'updating the issue view', 11)
                         remove('span','Activity' ,0)                            
                         document.querySelector('[data-testid="Navigation"]').remove()
                         document.querySelector('#jira-issue-header').children[0].children[0].children[0].children[0].children[0].children[1].remove()
-                        
+
                         //external share
                         contains('div', 'External Share').pop().parentElement.parentElement.parentElement.remove()
                         """

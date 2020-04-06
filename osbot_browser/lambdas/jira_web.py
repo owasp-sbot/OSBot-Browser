@@ -11,6 +11,7 @@ def run(event, context):
     width    = event.get('width')
     height   = event.get('height')
     delay    = Misc.to_int(event.get('delay'))
+    headless = event.get('headless', True)
 
     if issue_id is None:
         return { 'error': 'No issue ID provided' }
@@ -18,7 +19,7 @@ def run(event, context):
     load_dependencies('syncer,requests,pyppeteer')
     try:
         from osbot_browser.browser.sites.Web_Jira import Web_Jira
-        web_jira = Web_Jira().setup()
+        web_jira = Web_Jira(headless=headless).setup()
 
 
         slack_message(':one: Logging in...', [] ,channel)
