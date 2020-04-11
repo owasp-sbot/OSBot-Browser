@@ -1,4 +1,4 @@
-from osbot_aws.apis.Secrets import Secrets
+from osbot_aws.apis.Secrets             import Secrets
 from osbot_browser.browser.Browser_Page import Browser_Page
 
 

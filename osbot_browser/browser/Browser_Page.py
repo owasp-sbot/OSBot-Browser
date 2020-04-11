@@ -1,6 +1,6 @@
 from time import sleep
 
-from osbot_aws.Dependencies import load_dependency
+from osbot_aws.Dependencies                      import load_dependency
 from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 
 

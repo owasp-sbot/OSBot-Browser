@@ -3,9 +3,9 @@ from time import sleep
 
 import requests
 
-from pbx_gs_python_utils.utils.Files import Files
-from pbx_gs_python_utils.utils.Misc  import Misc
-from pbx_gs_python_utils.utils.Http  import port_is_open
+from osbot_utils.utils import Misc
+from osbot_utils.utils.Files import Files
+from osbot_utils.utils.Http import port_is_open
 
 
 class Web_Server:

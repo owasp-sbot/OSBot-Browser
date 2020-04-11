@@ -29,9 +29,10 @@ class Test_VivaGraph_Js_Views(Test_Helper):
         #graph_name = 'graph_24O'
         #graph_name = 'graph_041'  # large one  (doesn't work headless)
         #graph_name = 'graph_DR8'
+        #graph_name = 'graph_39B'   # large (all links from all tasks)
         channel    = None #'CSK9RADE2'
         headless   = False
-        screenshot = True
+        screenshot = False
         self.png_data = VivaGraph_Js_Views.default(params=[graph_name], screenshot=screenshot, headless=headless, channel=channel)
         #self.png_data = False
 
