@@ -58,7 +58,6 @@ class Vis_Js:
             self.create_graph(nodes, edges,options,graph_name)
             return self.send_screenshot_to_slack(team_id, channel)
 
-    # @use_local_cache_if_available
     def get_graph_data(self, graph_name):
         params = {'params': ['raw_data', graph_name, 'details'], 'data': {}}
         data = Lambda('osbot_jira.lambdas.graph').invoke(params)

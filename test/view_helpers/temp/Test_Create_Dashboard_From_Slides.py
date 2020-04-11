@@ -19,7 +19,6 @@ class Create_Dashboard_From_Slides:
             self._gsheets = GSheets(gsuite_secret_id=self.gsuite_secret_id)
         return self._gsheets
 
-    #@use_local_cache_if_available
     def get_r1_r2_r3_issues(self):
         params = ['search', 'label', 'R1,R2,R3']
         return Lambda('osbot_jira.lambdas.elk_to_slack').invoke({"params": params})
