@@ -1,5 +1,6 @@
 from osbot_aws.Dependencies            import load_dependencies
-from osbot_aws.apis.shell.Shell_Server import lambda_shell
+from osbot_aws.apis.shell.Lambda_Shell import lambda_shell
+
 from osbot_utils.utils.Process         import Process
 
 

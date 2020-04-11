@@ -4,6 +4,7 @@ from time import sleep
 from gw_bot.Deploy import Deploy
 from gw_bot.helpers.Test_Helper import Test_Helper
 from osbot_aws.apis.Lambda import Lambda
+from osbot_aws.apis.shell.Lambda_Shell import Lambda_Shell
 from osbot_aws.helpers.Lambda_Package import Lambda_Package
 from osbot_utils.decorators.Lists import group_by
 from osbot_utils.utils import Misc
@@ -103,17 +104,20 @@ from osbot_browser.browser.API_Browser import API_Browser
 api_browser = API_Browser()
 """
 
+    def auth_key(self):
+        return Lambda_Shell().get_lambda_shell_auth()
+
     def _invoke_shell_command(self, command, kwargs=None):
-        params = {'shell': {'method_name': command , 'method_kwargs': kwargs}}
+        params = {'shell': {'method_name': command , 'method_kwargs': kwargs , 'auth_key': self.auth_key()}}
         return self._lambda.invoke(params)
 
     def _invoke_python_code(self, code):
         code = self.api_browser_code + code
-        return self._lambda.shell_python_exec(code)
+        return self._lambda.shell_python_exec(code, self.auth_key())
 
     def _invoke_python_line(self, line_of_code):
         code = self.api_browser_code + "result = " + line_of_code
-        return self._lambda.shell_python_exec(code)
+        return self._lambda.shell_python_exec(code, self.auth_key())
 
     def _reset_lambda(self):
         Lambda_Package(self.lambda_name).reset()
@@ -156,7 +160,7 @@ api_browser = API_Browser()
     def test_ctor(self):
         assert self._invoke_python_line('api_browser.file_tmp_last_chrome_session')== '/tmp/browser-last_chrome_session.json'
         assert self._invoke_python_line('api_browser.headless'                    ) == True
-        assert self._invoke_python_line('api_browser.auto_close'                  ) == False
+        assert self._invoke_python_line('api_browser.new_browser'                 ) == False
         assert self._invoke_python_line('api_browser.log_js_errors_to_console'    ) == True
 
 
@@ -213,7 +217,7 @@ load_dependencies('requests,pyppeteer,websocket-client')
 
 api_browser.sync__setup_browser()
 #api_browser.sync__open('https://www.google.com/')
-api_browser.sync__open('http://localhost:41529')
+api_browser.sync__open('https://www.whatismybrowser.com/')
 
 result = api_browser.sync__screenshot_base64()
 """
