@@ -4,22 +4,23 @@ import os
 from time import sleep
 from syncer import sync
 
-from pbx_gs_python_utils.utils.Dev          import Dev
-from pbx_gs_python_utils.utils.Files        import Files
-from pbx_gs_python_utils.utils.Http         import WS_is_open
-from pbx_gs_python_utils.utils.Json         import Json
-from pbx_gs_python_utils.utils.Process      import Process
+from osbot_utils.utils.Dev import Dev
+from osbot_utils.utils.Files import Files
+from osbot_utils.utils.Http import WS_is_open
+from osbot_utils.utils.Json import Json
+from osbot_utils.utils.Process import Process
 
 
 class API_Browser:
 
-    def __init__(self, headless = True, url_chrome = None):
+    def __init__(self, headless = True, new_browser=False, url_chrome = None):
         self.file_tmp_last_chrome_session = '/tmp/browser-last_chrome_session.json'
         #self.file_tmp_screenshot          = '/tmp/browser-page-screenshot.png'
         self.file_tmp_screenshot          = Files.temp_file('.png')
         self._browser                     = None
         self.headless                     = headless
-        self.auto_close                   = headless                       # don't auto close when not running headless
+        #self.auto_close                   = auto_close
+        self.new_browser                  = new_browser
         self.url_chrome                   = url_chrome
         self.log_js_errors_to_console     = True
 
@@ -28,21 +29,75 @@ class API_Browser:
             self._browser = await self.browser_connect()
         return self._browser
 
-    async def browser_connect(self):
+    # connect or open browser functions
+    async def browser_connect(self):                                                        # currently used when connecting locally (not on AWS)
         from pyppeteer import connect, launch                                               # we can only import this here or we will have a conflict with the AWS headless version
         url_chrome = None
         if not self.url_chrome:
-            url_chrome = self.get_last_chrome_session().get('url_chrome')
+            url_chrome = self.get_last_chrome_session()
         if url_chrome and WS_is_open(url_chrome):                                           # needs pip install websocket-client
             self._browser = await connect({'browserWSEndpoint': url_chrome})
         else:
             self._browser = await launch(headless=self.headless,
-                                         autoClose = self.auto_close,
+                                         #autoClose= self.auto_close,
                                          args=['--no-sandbox',
                                                #'--single-process',   # this option crashed chrome when logging in to Jira
                                                '--disable-dev-shm-usage'])
             self.set_last_chrome_session({'url_chrome': self._browser.wsEndpoint})
         return self._browser
+
+    #  binary downloaded from https://github.com/alixaxel/chrome-aws-lambda/releases (which was the most recent compilation of chrome for AWS that I could find
+    #  file created using: brotli -d chromium.br
+    #  refefences: https://medium.com/@marco.luethy/running-headless-chrome-on-aws-lambda-fa82ad33a9eb#a2fb
+    def load_latest_version_of_chrome(self):
+        source_file = '/tmp/lambdas-dependencies_chromium-2_1_1'            # todo: compile this ourselves
+        target_file = '/tmp/lambdas-dependencies/pyppeteer/headless_shell'  #
+        if Files.not_exists(source_file):
+            s3_bucket = 'gw-bot-lambdas'
+            s3_key = 'lambdas-dependencies/chromium-2_1_1'
+            from osbot_aws.apis.S3 import S3
+            S3().file_download(s3_bucket, s3_key)
+            Files.copy(source_file, target_file)
+
+    #todo: transform into async method
+    def sync__setup_browser(self):                                                          # weirdly this works but the version below (using @sync) doesn't (we get an 'Read-only file system' error)
+        import asyncio
+        if os.getenv('AWS_REGION') is None:                                                 # we not in AWS so run the normal browser connect using pyppeteer normal method
+            asyncio.get_event_loop().run_until_complete(self.browser_connect())
+            return self
+
+        self.load_latest_version_of_chrome()
+        path_headless_shell          = '/tmp/lambdas-dependencies/pyppeteer/headless_shell'     # path to headless_shell AWS Linux executable
+        os.environ['PYPPETEER_HOME'] = '/tmp'                                                   # tell pyppeteer to use this read-write path in Lambda aws
+
+        async def set_up_browser():  # todo: refactor this code into separate methods
+            from pyppeteer import connect, launch                                               # import pyppeteer dependency
+            if self.new_browser:
+                Process.run("chmod", ['+x', path_headless_shell])                                   # set the privs of path_headless_shell to execute
+                self._browser = await launch(executablePath=path_headless_shell,                    # lauch chrome (i.e. headless_shell)
+                                             args=['--no-sandbox'              ,
+                                                   '--single-process'          ,
+                                                   '--disable-dev-shm-usage'                        # one use case where this made the difference is when taking large Slack screenshots
+                                                   ])                                               # two key settings or the requests will not work
+            else:
+                url_chrome = self.get_last_chrome_session()                                         # get url of last chrome session
+                if url_chrome and WS_is_open(url_chrome):  # needs pip install websocket-client     # if it is still open
+                    self._browser = await connect({'browserWSEndpoint': url_chrome})                # connect to it
+                else:
+                    Process.run("chmod", ['+x', path_headless_shell])                                   # set the privs of path_headless_shell to execute
+                    self._browser = await launch(executablePath=path_headless_shell,                    # lauch chrome (i.e. headless_shell)
+                                                 args=['--no-sandbox'              ,
+                                                       '--single-process'          ,
+                                                       '--disable-dev-shm-usage'                        # one use case where this made the difference is when taking large Slack screenshots
+                                                       ])                                               # two key settings or the requests will not work
+                self.set_last_chrome_session({'url_chrome': self._browser.wsEndpoint})              # save current endpoint (so that we can connect to it next time
+
+        asyncio.get_event_loop().run_until_complete(set_up_browser())
+        return self
+
+    def set_new_browser(self,value):
+        self.new_browser = value
+    # other browser helper methods
 
     async def browser_close(self):          # bug: this is not working 100% since there are still tons of "headless_shell <defunct>" proccess left (one per execution)
         browser = await self.browser()
@@ -141,18 +196,23 @@ class API_Browser:
         page = pages.pop()
         return page
 
+    async def pages(self):
+        browser = await self.browser()
+        return await browser.pages()
+
     async def sleep(self, mseconds):
         page = await self.page()
         await page.waitFor(mseconds)
         return self
 
     async def html(self):
-        try:
-            from pyquery import PyQuery         # add it here since there was some import issues with running it in lambda (etree). Also this method should not be that useful inside an lambda
-            content = await self.html_raw()
-            return PyQuery(content)
-        except:
-            return await self.html_raw()
+        return await self.html_raw()
+        # try:
+        #     from pyquery import PyQuery         # add it here since there was some import issues with running it in lambda (etree). Also this method should not be that useful inside an lambda
+        #     content = await self.html_raw()
+        #     return PyQuery(content)
+        # except:
+        #     return await self.html_raw()
 
     async def html_raw(self):
         page = await self.page()
@@ -176,8 +236,8 @@ class API_Browser:
         if clip:
             full_page = False
         await page.screenshot({'path': file_screenshot,'fullPage': full_page, 'clip' : clip})
-        if self.auto_close:
-            await self.browser_close()
+        #if self.auto_close:
+        #    await self.browser_close()
         return file_screenshot
 
 
@@ -197,7 +257,7 @@ class API_Browser:
 
     def get_last_chrome_session(self):
         if Files.exists(self.file_tmp_last_chrome_session):
-            return Json.load_json(self.file_tmp_last_chrome_session)
+            return Json.load_json(self.file_tmp_last_chrome_session).get('url_chrome')
         return {}
 
     def set_last_chrome_session(self, data):
@@ -205,41 +265,6 @@ class API_Browser:
         return self
 
     # helper sync functions
-
-    #todo: this is a hack to get the latest version, not only we should be compiling this ourselves, at the moment this is replacing the version installed from the pyppeteer.zip (which means that the first time takes a couple more seconds)
-    #  binary downloaded from https://github.com/alixaxel/chrome-aws-lambda/releases (which was the most recent compilation of chrome for AWS that I could find
-    #  file created using: brotli -d chromium.br
-    # refefences: https://medium.com/@marco.luethy/running-headless-chrome-on-aws-lambda-fa82ad33a9eb#a2fb
-    def load_latest_version_of_chrome(self):
-        source_file = '/tmp/lambdas-dependencies_chromium-2_0_2'            # 134994840
-        target_file = '/tmp/lambdas-dependencies/pyppeteer/headless_shell'  # 104854024
-        if Files.not_exists(source_file):
-            s3_bucket = 'gw-bot-lambdas'
-            s3_key = 'lambdas-dependencies/chromium-2_0_2'
-            from osbot_aws.apis.S3 import S3
-            S3().file_download(s3_bucket, s3_key)
-            Files.copy(source_file, target_file)
-
-    def sync__setup_browser(self):                                                          # weirdly this works but the version below (using @sync) doesn't (we get an 'Read-only file system' error)
-        import asyncio
-        if os.getenv('AWS_REGION') is None:                                                 # we not in AWS so run the normal browser connect using pyppeteer normal method
-            asyncio.get_event_loop().run_until_complete(self.browser_connect())
-            return self
-
-        self.load_latest_version_of_chrome()
-        path_headless_shell          = '/tmp/lambdas-dependencies/pyppeteer/headless_shell'     # path to headless_shell AWS Linux executable
-        os.environ['PYPPETEER_HOME'] = '/tmp'                                                   # tell pyppeteer to use this read-write path in Lambda aws
-
-        async def set_up_browser():
-            from pyppeteer import launch                                                        # import pyppeteer dependency
-            Process.run("chmod", ['+x', path_headless_shell])                                   # set the privs of path_headless_shell to execute
-            self._browser = await launch(executablePath=path_headless_shell,                    # lauch chrome (i.e. headless_shell)
-                                         args=['--no-sandbox'              ,
-                                               '--single-process'          ,
-                                               '--disable-dev-shm-usage'                        # one use case where this made the difference is when taking large Slack screenshots
-                                               ])                             # two key settings or the requests will not work
-        asyncio.get_event_loop().run_until_complete(set_up_browser())
-        return self
 
     # @sync
     # async def sync__setup_aws_browser(self):
@@ -314,6 +339,10 @@ class API_Browser:
     @sync
     async def sync__page(self):
         return await self.page()
+
+    @sync
+    async def sync__pages(self):
+        return await self.pages()
 
     @sync
     async def sync__page_close(self,page):

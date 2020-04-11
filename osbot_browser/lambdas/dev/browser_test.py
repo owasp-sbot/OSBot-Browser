@@ -1,28 +1,31 @@
-from osbot_utils.utils.Process import Process
+from osbot_aws.Dependencies            import load_dependencies
+from osbot_aws.apis.shell.Shell_Server import lambda_shell
+from osbot_utils.utils.Process         import Process
 
 
-class Lambda_Shell:
+# class Lambda_Shell:
+#
+#     def run_command(self,shell_command):
+#         if shell_command:
+#             executable = shell_command.get('executable')
+#             params     = shell_command.get('params')
+#             cwd        = shell_command.get('cwd')
+#             return Process.run(executable, params=params, cwd=cwd)
 
-    def run_command(self,shell_command):
-        if shell_command:
-            executable = shell_command.get('executable')
-            params     = shell_command.get('params')
-            cwd        = shell_command.get('cwd')
-            return Process.run(executable, params=params, cwd=cwd)
 
+@lambda_shell
+def run(event, context=None):
 
+    #shell_command = event.get('shell_command')
+    #if shell_command:
+    #    return Lambda_Shell().run_command(shell_command)
 
-def run(event, context):
-
-    shell_command = event.get('shell_command')
-    if shell_command:
-        return Lambda_Shell().run_command(shell_command)
-
+    return 'here'
     code = event.get('code')
     if code:
         return exec(code)
 
-    from osbot_aws.Dependencies import load_dependencies
+
     load_dependencies('syncer,requests,pyppeteer,websocket-client')
 
     url = event.get('url')
