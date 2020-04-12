@@ -17,6 +17,7 @@ class Browser_Page:
         load_dependency('syncer')
         load_dependency('requests')
         load_dependency('pyppeteer')
+        load_dependency('websocket-client')
         return self.setup()
 
     def setup(self):

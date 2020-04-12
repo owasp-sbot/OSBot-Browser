@@ -2,7 +2,7 @@ from osbot_aws.apis.Lambda import Lambda
 
 def setup(event):
     from osbot_aws.Dependencies import load_dependencies
-    load_dependencies('syncer , requests , pyppeteer , jira')
+    load_dependencies('syncer,requests,pyppeteer,websocket-client,jira')
 
     from osbot_browser.view_helpers.Sow_Views import Sow
     headless = event.get('headless') is None

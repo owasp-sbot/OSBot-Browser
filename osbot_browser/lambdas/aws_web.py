@@ -4,7 +4,7 @@ from osbot_browser.browser.sites.Web_AWS import Web_AWS
 
 
 def run(event, context):
-    load_dependencies('syncer,requests,pyppeteer')
+    load_dependencies('syncer,requests,pyppeteer,websocket-client')
     from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 
 

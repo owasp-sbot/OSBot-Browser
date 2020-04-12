@@ -16,7 +16,7 @@ def run(event, context):
     if issue_id is None:
         return { 'error': 'No issue ID provided' }
 
-    load_dependencies('syncer,requests,pyppeteer')
+    load_dependencies('syncer,requests,pyppeteer,websocket-client')
     try:
         from osbot_browser.browser.sites.Web_Jira import Web_Jira
         web_jira = Web_Jira(headless=headless).setup()

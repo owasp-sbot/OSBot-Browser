@@ -13,7 +13,7 @@ class Go_Js_Views:
 
     @staticmethod
     def _get_graph_data(params,layout=None, headless=True):
-        load_dependencies('syncer,requests,pyppeteer')
+        load_dependencies('syncer,requests,pyppeteer,websocket-client')
         from osbot_browser.view_helpers.Go_Js import Go_Js
 
         graph_name = params.pop(0)

@@ -10,6 +10,8 @@ from pbx_gs_python_utils.utils.Files                        import Files
 from pbx_gs_python_utils.utils.Misc                         import Misc
 from pbx_gs_python_utils.utils.Process                      import Process
 
+from osbot_utils.utils.Misc import to_int
+
 
 class Browser_Commands:
 
@@ -17,8 +19,6 @@ class Browser_Commands:
 
     @staticmethod
     def slack(team_id=None, channel=None, params=None):
-
-
         target    = Misc.array_pop(params,0)
         height    = Misc.to_int(Misc.array_pop(params, 0))
         width     = Misc.to_int(Misc.array_pop(params, 0))
@@ -47,26 +47,39 @@ class Browser_Commands:
 
 
     @staticmethod
-    def screenshot(team_id=None, channel=None, params=[]):
-        load_dependencies('syncer,requests,pyppeteer');
+    def screenshot(team_id=None, channel=None, params=None):
+        params = params or []
         try:
-            url            = params.pop(0).replace('<', '').replace('>', '')  # fix extra chars added by Slack
-            width          = Misc.to_int(Misc.array_pop(params, 0))
-            height         = Misc.to_int(Misc.array_pop(params, 0))
-            delay          = Misc.to_int(Misc.array_pop(params, 0))
-            message = ":point_right: taking screenshot of url: {0}".format(url)
+            url = None
+            if len(params) > 0:
+                url = params.pop(0).replace('<', '') \
+                                   .replace('>', '')                # fix extra chars added by Slack and the u00a0 unicode char.
+                if url == '_':                                      # special mode to not render
+                    url = None
+                else:
+                    message = ":point_right: taking screenshot of url: {0}".format(url)
+            if url is None:
+                message = ':point_right: no url provided, so showing what is currently on the browser'
+
+            width          = to_int(Misc.array_pop(params, 0))
+            height         = to_int(Misc.array_pop(params, 0))
+            delay          = to_int(Misc.array_pop(params, 0))
+
             if width : message += ", with width `{0}`".format(width)
             if height: message += ", with height `{0}` (min height)".format(height)
             if delay : message += ", with delay of  `{0}` seconds".format(delay)
-            slack_message(message,[], channel,team_id)
+            slack_message(message,[], channel)
 
             browser_helper = Browser_Lamdba_Helper().setup()
             if width:
                 browser_helper.api_browser.sync__browser_width(width,height)
             png_data       = browser_helper.get_screenshot_png(url,full_page=True,delay=delay)
+            slack_message(f':point_right: got screenshot of size {len(png_data)}, sending it to Slack...', [], channel)
             return browser_helper.send_png_data_to_slack(team_id,channel,url, png_data)
         except Exception as error:
-            message = f':red_circle: Browser Error: {error}'
+            import traceback
+            message = f':red_circle: Browser Error: {error} \n {traceback.format_exc()}'
+            #message = f':red_circle: Browser Error: {error}'
             return slack_message(message,[], channel,team_id)
 
     @staticmethod
@@ -99,7 +112,7 @@ class Browser_Commands:
 
     @staticmethod
     def render(team_id, channel, params):
-        load_dependencies('syncer,requests,pyppeteer');
+        load_dependencies('syncer,requests,pyppeteer,websocket-client');
         if params:
             target = params.pop(0)
             delay  = Misc.to_int(Misc.array_pop(params,0))
@@ -201,7 +214,7 @@ class Browser_Commands:
 
     @staticmethod
     def go_js(team_id=None, channel=None, params=None):
-        load_dependencies('syncer,requests,pyppeteer')
+        load_dependencies('syncer,requests,pyppeteer,websocket-client')
         if len(params) < 2:
             text = ':red_circle: Hi, for the `go_js` command, you need to provide 2 parameters: '
             attachment_text = '*graph name* - the nodes and edges you want to view\n' \
@@ -218,7 +231,7 @@ class Browser_Commands:
 
     @staticmethod
     def graph(team_id=None, channel=None, params=None):
-        load_dependencies('syncer,requests,pyppeteer')
+        load_dependencies('syncer,requests,pyppeteer,websocket-client') # todo: remove this from here (should already not be needed)
         if len(params) < 2:
             text = ':red_circle: Hi, for the `graph` command, you need to provide 2 parameters: '
             attachment_text = '*graph name* - the nodes and edges you want to view\n' \
@@ -307,6 +320,7 @@ class Browser_Commands:
         load_dependency('syncer')
         load_dependency('requests')
         load_dependency('pyppeteer')
+        load_dependency('websocket-client')
         from osbot_browser.view_helpers.Maps_Views import Maps_Views
         (text,attachments) = Slack_Commands_Helper(Maps_Views).invoke('not-used', channel, params)
         if team_id is None:
@@ -317,6 +331,7 @@ class Browser_Commands:
         load_dependency('syncer')
         load_dependency('requests')
         load_dependency('pyppeteer')
+        load_dependency('websocket-client')
         try:
             from osbot_browser.view_helpers.Sow_Views import Sow_Views
             (text, attachments) = Slack_Commands_Helper(Sow_Views).invoke('not-used', channel, params)
@@ -324,8 +339,6 @@ class Browser_Commands:
                 return text
         except Exception as error:
             return f'[sow error] {error}'
-
-
 
     @staticmethod
     def version(team_id=None, channel=None, params=None):

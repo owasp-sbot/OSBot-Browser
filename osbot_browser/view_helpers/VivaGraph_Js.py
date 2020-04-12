@@ -127,17 +127,21 @@ class VivaGraph_Js:
     def create_graph_and_send_screenshot_to_slack(self, nodes, edges, graph_name=None, screenshot=True, team_id=None, channel=None):
         with Web_Server(self.web_root) as web_server:               # handle server start and stop
             self.web_server = web_server
-
-            self.create_graph(nodes, edges)
-
-            if screenshot:
-                self.calculate_browser_width_and_wait(nodes)
-                message = f":point_right: Rendering `{graph_name}` using VivaGraph JS engine with: *nodes* `{len(nodes)}` *edges* `{len(edges)}` *width* `{self.browser_width}` and *render_wait* `{self.render_wait}`"
+            try:
+                message = f":point_right: Creating `{graph_name}` using VivaGraph JS engine with: *nodes* `{len(nodes)}` *edges* `{len(edges)}` *width* `{self.browser_width}` and *render_wait* `{self.render_wait}`\n"
                 slack_message(message,[], channel, team_id)
-                png_data = self.send_screenshot_to_slack(team_id, channel)
-                return png_data
-            else:
-                return self
+                #slack_message(f':point_right: Creating graph in viva_graph with {len(nodes)} nodes', [], channel)
+                self.create_graph(nodes, edges)
+                #slack_message(f':point_right: Created graph in viva_graph with {len(nodes)} nodes', [], channel)
+                if screenshot:
+                    self.calculate_browser_width_and_wait(nodes)
+                    png_data = self.send_screenshot_to_slack(team_id, channel)
+                    return png_data
+                else:
+                    return self
+            except Exception as error:
+                message = f':red_circle: error in create_graph_and_send_screenshot_to_slack :{error}'
+                return slack_message(message, [], channel)
 
     def get_nodes_edges_from_graph_data(self, graph_data):
         edges = graph_data.get('edges')

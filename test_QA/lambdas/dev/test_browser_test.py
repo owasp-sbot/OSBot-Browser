@@ -2,10 +2,12 @@ from gw_bot.Deploy import Deploy
 from osbot_aws.apis.Lambda import Lambda
 
 from gw_bot.helpers.Test_Helper import Test_Helper
+from osbot_aws.apis.shell.Lambda_Shell import Lambda_Shell
 from osbot_browser.lambdas.dev.browser_test import run
+from osbot_utils.decorators.trace import trace
 
 
-class test_broweser_test(Test_Helper):
+class test_browser_test(Test_Helper):
 
     def setUp(self):
         super().setUp()
@@ -14,7 +16,12 @@ class test_broweser_test(Test_Helper):
         self._lambda     = Lambda(self.lambda_name)
 
     def test_invoke_directly(self):
-        self.result = run({'shell': {'method_name':'ping'}})
+        # confirm 'lambda_sheel is working ok
+        assert run({'lambda_shell': {'method_name':'ping', 'auth_key': Lambda_Shell().get_lambda_shell_auth()}}) == 'pong'
+
+    def test_lambda_invoke(self):
+        params = {'lambda_shell': {'method_name': 'ping', 'auth_key': Lambda_Shell().get_lambda_shell_auth()}}
+        self.result = self._lambda.invoke(params)
 
     def test_update_lambda(self):
         # note this lambda needs python 3.7 , with 3.8 it fails with error: "while loading shared libraries: libnss3.so"
@@ -22,57 +29,30 @@ class test_broweser_test(Test_Helper):
 
     def test_update_and_invoke(self):
         self.test_update_lambda()
-        self.png_data = self._lambda.invoke({'url': 'https://www.google.com/'})
+        self.result = self._lambda.invoke({'url': 'https://www.google.com/'})
         #self.png_data = self._lambda.invoke({})
 
     def test_just_invoke(self):
         payload = {'url': 'http://localhost:42195'}
         payload = {'url': 'https://www.google.com/asd'}
-        payload = {'url': 'https://news.bbc.co.uk'}
+        #payload = {'url': 'https://news.bbc.co.uk'}
         #payload = {}
         self.png_data = self._lambda.invoke(payload)
+        #self.png_data = self._lambda.invoke(payload)
 
-    def test_update_and_invoke_shell_command(self):
-        #self.test_update_lambda()
-        payload = {'shell_command': {'executable': 'bash', 'params': ['-c','ls /tmp'], 'cwd':'.'}}
-        #payload = {'shell_command': {'executable': 'bash', 'params': ['-c', 'pwd'], 'cwd': '.'}}
-        #payload = {'shell_command': {'executable': 'whoami', 'params': [], 'cwd': '.'}}
-        payload = {'shell_command': {'executable': 'cat', 'params': ['/tmp/browser-last_chrome_session.json'], 'cwd': '.'}}
-        #payload = {'shell_command': {'executable': 'ps', 'params': ['-aux'], 'cwd': '.'}}
-        payload = {'shell_command': {'executable': 'ps', 'params': ['-o','pid,user,%mem,command','ax'], 'cwd': '.'}}
-        self.result = self._lambda.invoke(payload)
+    def test_invoke_shell_get_event_logs(self):
+        print()
+        print(self._lambda.shell().ls('/tmp/event_log'))
+        print(self._lambda.shell().file_contents('/tmp/event_log/2020-04-12__00-20-34__258152.json'))
 
-    def test_exec(self):
-        code = """
-def a():
-    return
-raise Exception('123')    
-result = 123    
-"""
-        the_code = compile(code, 'test', 'exec')
-        exec(code)
-        self.result = locals().get('result')
+    def test_invoke_shell_list_processes(self):
+        print(self._lambda.shell().list_processes())
 
-    def test_invoke_eval(self):
-        #self.test_update_lambda()
-        code = """
-from osbot_aws.Dependencies import load_dependencies
-load_dependencies('syncer,requests,pyppeteer,websocket-client')    
-from osbot_browser.browser.API_Browser import API_Browser        
-api_browser = API_Browser().sync__setup_browser()
-#api_browser.sync__open('https://httpbin.org')
-a = api_browser.auto_close
-result =api_browser.sync__url()
-#result =api_browser.sync__screenshout()
-#a = len(api_browser.sync__pages())
-        """
-        payload = {'shell': {'method_name':'python_exec', 'method_kwargs':{'code':code}}}
-        self.result = self._lambda.invoke(payload)
+
 
     #    for this to work run this command on the tests folder
     #         pip3 install -t _lambda_dependencies/websocket websocket
     #    GW-Bot/modules/OSBot-browser/_lambda_dependencies
-
     def test_upload_dependency(self):
         import websockets
         from osbot_aws.Dependencies import upload_dependency

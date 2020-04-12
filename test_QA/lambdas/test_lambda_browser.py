@@ -22,8 +22,6 @@ class Test_Lambda_lambda_browser(Test_Helper):
 
     def tearDown(self):
         super().tearDown()
-        if self.png_data:
-            self._save_png_file(self.png_data)
 
     def _save_png_file(self, png_data):
         try:
@@ -59,14 +57,53 @@ class Test_Lambda_lambda_browser(Test_Helper):
         self._save_png_file(png_data)
 
     def test_screenshot(self):
-        #Deploy().setup().deploy_lambda__browser()
-        channel = 'DRE51D4EM'
-        url = 'https://www.google.co.uk/aaa'
+        self.test_update_lambda()
+        channel = None #'DRE51D4EM'
+        url = 'https://www.google.co.uk'
         #url = 'https://news.bbc.co.uk/aaa'
-        #url = 'http://visjs.org/'
-        payload = {"params": ['screenshot', url,], 'data': {'channel':channel}}
-        result = self.lambda_browser.invoke(payload)
-        Dev.pprint(result)
+        #url = 'https://www.whatismybrowser.com/'
+        payload = {"params": ['screenshot','_'], 'data': {'channel':channel}}
+        self.result = self.lambda_browser.invoke(payload)
+        #print(self.lambda_browser.shell().reset())
+        print(self.lambda_browser.shell().list_processes())
+        #Dev.pprint(result)
+
+    def test_invoke_shell_get_processes(self):
+        shell = self.lambda_browser.shell()
+        print()
+        print(shell.list_processes())
+
+    def test_invoke_shell_get_event_logs(self):
+        log_folder= '/tmp/event_logs'
+        log_file = '2020-04-12__02-41-15__142417.json'
+        shell = self.lambda_browser.shell()
+        print()
+        print(shell.ls(log_folder))
+        for log_file in shell.ls(log_folder).split('\n'):
+            print()
+            print(f'*****{log_file}*****')
+            print(shell.file_contents(f'{log_folder}/{log_file}'))
+            print()
+        #print(shell.ls('/tmp/lambdas-dependencies'))
+        #print(shell.ls('/tmp/lambdas-dependencies'))
+        #"browser screenshot <https://www.google.com>",
+
+    def test_invoke_shell_code(self):
+        #self.test_update_lambda()
+        code = """
+from osbot_browser.browser.Browser_Lamdba_Helper   import Browser_Lamdba_Helper
+from osbot_aws.Dependencies import load_dependencies
+from osbot_utils.utils.Files import Files        
+
+browser_helper = Browser_Lamdba_Helper().setup()
+browser_helper.api_browser.sync__browser_width(1500)
+result =  browser_helper.get_screenshot_png()
+              """
+        shell = self.lambda_browser.shell()
+        self.png_data = shell.python_exec(code)
+        #print(shell.ls('/tmp'))
+        #print(shell.file_contents('/tmp/browser-last_chrome_session.json'))
+        #print(shell.list_processes())
 
     def test_list(self):
         payload = {"params": ['list']}
@@ -214,6 +251,10 @@ class Test_Lambda_lambda_browser(Test_Helper):
         payload = {"params": ['screenshot', url,], 'data': {}}
         self.png_data = self.lambda_browser.invoke(payload)
 
+    def test_viva_graph(self):
+        self.test_update_lambda()
+        payload = {"params": ['viva_graph','graph_5QQ', 'default']}
+        self.result = self.lambda_browser.invoke(payload)
 
     def test_invoke_directly__screenshot___settings_help(self):
 
@@ -224,34 +265,37 @@ class Test_Lambda_lambda_browser(Test_Helper):
 
 
 
+#def use_upgraded_chromium_version(self):
+    # updating this programatically didn't work, using the code below
+    # # original version is 575458
+    # new_revision = '664010'
+    # new_revision = '77812'
+    # import pyppeteer
+    # import pyppeteer.chromium_downloader
+    # import os
+    # original_version = pyppeteer.__chromium_revision__
+    #
+    # os.environ['PYPPETEER_CHROMIUM_REVISION']  = new_revision
+    # pyppeteer.__chromium_revision__            = new_revision
+    # pyppeteer.chromium_downloader.REVISION     = new_revision
+    # #pyppeteer.chromium_downloader.downloadURLs = {
+    # #                                                'linux': f'{downloads_folder}/{new_revision}/chrome-linux/chrome',
+    # #                                                'mac'  : f'{downloads_folder}/{new_revision}/chrome-mac/Chromium.app/Contents/MacOS/Chromium',
+    # #                                                'win32': f'{downloads_folder}/{new_revision}/chrome-win32/chrome.exe',
+    # #                                                'win64': f'{downloads_folder}/{new_revision}/chrome-win32/chrome.exe',
+    # #                                            }
+    # from pathlib import Path
+    # pyppeteer.chromium_downloader.chromiumExecutable["mac"] = Path(str(pyppeteer.chromium_downloader.chromiumExecutable["mac"]).replace(original_version, new_revision))
+    # pyppeteer.chromium_downloader.downloadURLs["mac"]       = Path(str(pyppeteer.chromium_downloader.downloadURLs["mac"]).replace(original_version, new_revision))
+    #
+    # so ended up changing these values directly on the source code
+    # __chromium_revision__ = '575458'       # v69 original one
+    # __chromium_revision__ = '628590'       # v74
+    # __chromium_revision__ = '664010'       # v76
+    # __chromium_revision__ = '701274'       # 79.0.3929
+    #__chromium_revision__ = '737645'  # v82  latest
 
-
-def use_upgraded_chromium_version(self):
-        # updating this programatically didn't work, using the code below
-        # # original version is 575458
-        # new_revision = '664010'
-        # new_revision = '77812'
-        # import pyppeteer
-        # import pyppeteer.chromium_downloader
-        # import os
-        # original_version = pyppeteer.__chromium_revision__
-        #
-        # os.environ['PYPPETEER_CHROMIUM_REVISION']  = new_revision
-        # pyppeteer.__chromium_revision__            = new_revision
-        # pyppeteer.chromium_downloader.REVISION     = new_revision
-        # #pyppeteer.chromium_downloader.downloadURLs = {
-        # #                                                'linux': f'{downloads_folder}/{new_revision}/chrome-linux/chrome',
-        # #                                                'mac'  : f'{downloads_folder}/{new_revision}/chrome-mac/Chromium.app/Contents/MacOS/Chromium',
-        # #                                                'win32': f'{downloads_folder}/{new_revision}/chrome-win32/chrome.exe',
-        # #                                                'win64': f'{downloads_folder}/{new_revision}/chrome-win32/chrome.exe',
-        # #                                            }
-        # from pathlib import Path
-        # pyppeteer.chromium_downloader.chromiumExecutable["mac"] = Path(str(pyppeteer.chromium_downloader.chromiumExecutable["mac"]).replace(original_version, new_revision))
-        # pyppeteer.chromium_downloader.downloadURLs["mac"]       = Path(str(pyppeteer.chromium_downloader.downloadURLs["mac"]).replace(original_version, new_revision))
-        #
-        # so ended up changing these values directly on the source code
-        # __chromium_revision__ = '575458'       # v69 original one
-        # __chromium_revision__ = '628590'       # v74
-        # __chromium_revision__ = '664010'       # v76
-        # __chromium_revision__ = '701274'       # 79.0.3929
-        __chromium_revision__ = '737645'  # v82  latest
+    def test_update_dependency(self):
+        from osbot_aws.Dependencies import upload_dependency, pip_install_dependency
+        #pip_install_dependency('pyppeteer2')
+        upload_dependency('pyppeteer2')

@@ -11,7 +11,7 @@ class Am_Charts_Views:
 
     @staticmethod
     def _get_graph_data(params,layout=None, headless=True):
-        load_dependencies('syncer,requests,pyppeteer');
+        load_dependencies('syncer,requests,pyppeteer,websocket-client');
         from osbot_browser.view_helpers.Am_Charts import Am_Charts
 
         am_charts  = Am_Charts(headless=headless,layout=layout)
@@ -32,7 +32,7 @@ class Am_Charts_Views:
 
     @staticmethod
     def chord(team_id=None, channel=None, params=None, headless=True):
-        load_dependencies('syncer,requests,pyppeteer');
+        load_dependencies('syncer,requests,pyppeteer,websocket-client');
         (am_charts, graph_data) = Am_Charts_Views._get_graph_data(params, headless=headless)
         Dev.pprint(graph_data)
         am_charts.load_page(True)
@@ -106,7 +106,7 @@ chart.___data = ""
     #todo: rewrite this to make it only usable from Jupyter (for this to work from slack, we need to get the timeline from a graph)
     @staticmethod
     def timeline(team_id=None, channel=None, params=None, headless=True):
-        load_dependencies('syncer,requests,pyppeteer');
+        load_dependencies('syncer,requests,pyppeteer,websocket-client');
         from osbot_browser.view_helpers.Am_Charts import Am_Charts
 
         am_charts = Am_Charts(headless=headless)

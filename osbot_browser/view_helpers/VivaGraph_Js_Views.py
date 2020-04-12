@@ -1,5 +1,6 @@
 from gw_bot.helpers.Lambda_Helpers import slack_message
 from osbot_aws.Dependencies import load_dependencies
+from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 from osbot_utils.utils import Misc
 from osbot_utils.utils.Misc import to_int
 
@@ -8,7 +9,8 @@ class VivaGraph_Js_Views:
 
     @staticmethod
     def default(team_id=None, channel=None, params=None, screenshot=True,no_render=False,headless=True):
-        load_dependencies('syncer,requests,pyppeteer');
+        Browser_Lamdba_Helper().load_browser_dependencies()
+        #load_dependencies('syncer,requests,pyppeteer,websocket-client');
         from osbot_browser.view_helpers.VivaGraph_Js import VivaGraph_Js
 
         graph_name = params[0]

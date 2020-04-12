@@ -4,6 +4,7 @@ import unittest
 from   unittest import TestCase
 
 from gw_bot.helpers.Test_Helper import Test_Helper
+from osbot_aws.apis.Lambda import Lambda
 from osbot_browser.browser.Browser_Commands import Browser_Commands
 from pbx_gs_python_utils.utils.Dev import Dev
 from pbx_gs_python_utils.utils.Files import Files
@@ -31,6 +32,19 @@ class Test_Browser_Commands(Test_Helper):
         #os.environ['OSX_CHROME'] = 'True'
         url = 'https://www.google.co.uk'
         self.browser_commands.screenshot(self.team_id, self.channel, [url])
+
+    def test_screenshot_via_lambda(self):
+        #Deploy().deploy_lambda__browser()
+        url          = 'https://www.google.com/asd'
+        lambda_name  = 'osbot_browser.lambdas.lambda_browser'
+        lambda_browser = Lambda(lambda_name)
+        payload = {"params": ['screenshot', url]}
+        self.png_data = lambda_browser.invoke(payload)
+        from osbot_aws.apis.shell.Lambda_Shell import Lambda_Shell
+        auth_key = Lambda_Shell().get_lambda_shell_auth()
+        payload = {'lambda_shell': {'method_name': 'list_processes', 'method_kwargs': None, 'auth_key': auth_key}}
+
+        print(lambda_browser.invoke(payload))
 
     def test_slack(self):
         #os.environ['OSX_CHROME'] = 'True'

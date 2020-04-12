@@ -4,7 +4,7 @@
 def run(event, context):
     try:
         from osbot_aws.Dependencies import load_dependencies
-        load_dependencies('syncer,requests,pyppeteer')
+        load_dependencies('syncer,requests,pyppeteer,websocket-client')
         from osbot_browser.view_helpers.gw.Xml_Report import Xml_Report
 
         headless  = event.get('headless')

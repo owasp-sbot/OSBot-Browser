@@ -1,6 +1,7 @@
 import base64
 import os
 
+from osbot_aws.Dependencies import load_dependencies
 from osbot_aws.apis.Lambda import Lambda
 from osbot_aws.apis.S3 import S3
 from osbot_utils.utils.Files import Files
@@ -51,12 +52,15 @@ class Browser_Lamdba_Helper:
             fh.write(base64.decodebytes(png_data.encode()))
         return self.send_png_file_to_slack(team_id, channel,target, png_file)
 
+    def load_browser_dependencies(self):
+        load_dependencies('syncer,requests,pyppeteer2,websocket-client')
+
     def setup(self):
+        self.load_browser_dependencies()
         from osbot_browser.browser.API_Browser import API_Browser
         from osbot_browser.browser.Render_Page import Render_Page
         self.api_browser = API_Browser(headless=self.headless).sync__setup_browser()
         self.render_page = Render_Page(api_browser=self.api_browser, web_root=self.web_root())
-
         return self
 
     @staticmethod

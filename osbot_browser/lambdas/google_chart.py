@@ -1,7 +1,7 @@
 from osbot_aws.Dependencies import load_dependencies
 
 def run(event, context):
-    load_dependencies('syncer,requests,pyppeteer')
+    load_dependencies('syncer,requests,pyppeteer,websocket-client')
     from osbot_browser.view_helpers.Google_Charts_Js import Google_Charts_Js
     google_charts = Google_Charts_Js()
     google_charts.load_page(True)

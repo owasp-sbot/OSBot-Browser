@@ -108,7 +108,7 @@ api_browser = API_Browser()
         return Lambda_Shell().get_lambda_shell_auth()
 
     def _invoke_shell_command(self, command, kwargs=None):
-        params = {'shell': {'method_name': command , 'method_kwargs': kwargs , 'auth_key': self.auth_key()}}
+        params = {'lambda_shell': {'method_name': command , 'method_kwargs': kwargs , 'auth_key': self.auth_key()}}
         return self._lambda.invoke(params)
 
     def _invoke_python_code(self, code):
