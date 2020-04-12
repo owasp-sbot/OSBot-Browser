@@ -6,19 +6,19 @@ from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 
 class Browser_Page:
 
-    def __init__(self,headless=True, new_page=True):
-        self.headless        = headless
+    def __init__(self,headless=True, new_page=False):
+        self.headless       = headless
         self.browser        = None
         self.browser_helper = None
         self.new_page       = new_page
         self.page           = None
 
-    def setup_with_dependencies(self):
-        load_dependency('syncer')
-        load_dependency('requests')
-        load_dependency('pyppeteer')
-        load_dependency('websocket-client')
-        return self.setup()
+    # def setup_with_dependencies(self):
+    #     load_dependency('syncer')
+    #     load_dependency('requests')
+    #     load_dependency('pyppeteer')
+    #     load_dependency('websocket-client')
+    #     return self.setup()
 
     def setup(self):
         self.browser_helper = Browser_Lamdba_Helper(headless=self.headless).setup()

@@ -3,7 +3,7 @@ from osbot_browser.browser.Browser_Page import Browser_Page
 
 
 class Web_Jira:
-    def __init__(self,headless=True, new_page=True):
+    def __init__(self,headless=True, new_page=False):
         self._browser               = None
         self._browser_helper        = None
         self.server_details         = None
@@ -14,6 +14,7 @@ class Web_Jira:
         self.page : Browser_Page    = None
 
     def setup(self):
+
         self.page           = Browser_Page(headless = self.headless, new_page=self.new_page).setup()
         self.server_details = Secrets(self.secrets_id).value_from_json_string()
         self.server_url     = self.server_details.get('server')

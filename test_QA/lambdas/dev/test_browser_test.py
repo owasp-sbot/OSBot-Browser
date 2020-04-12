@@ -34,7 +34,7 @@ class test_browser_test(Test_Helper):
 
     def test_just_invoke(self):
         payload = {'url': 'http://localhost:42195'}
-        payload = {'url': 'https://www.google.com/asd'}
+        payload = {'url': 'https://www.google.com'}
         #payload = {'url': 'https://news.bbc.co.uk'}
         #payload = {}
         self.png_data = self._lambda.invoke(payload)
@@ -47,6 +47,8 @@ class test_browser_test(Test_Helper):
 
     def test_invoke_shell_list_processes(self):
         print(self._lambda.shell().list_processes())
+        print(self._lambda.shell().disk_space())
+        print(self._lambda.shell().ls('/tmp -la'))
 
 
 
