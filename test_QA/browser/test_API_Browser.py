@@ -1,6 +1,4 @@
 import sys ;
-from time import sleep
-
 from gw_bot.Deploy import Deploy
 from gw_bot.helpers.Test_Helper import Test_Helper
 from osbot_aws.apis.Lambda import Lambda
@@ -8,7 +6,6 @@ from osbot_aws.apis.shell.Lambda_Shell import Lambda_Shell
 from osbot_aws.helpers.Lambda_Package import Lambda_Package
 from osbot_utils.decorators.Lists import group_by
 from osbot_utils.utils import Misc
-from osbot_utils.utils.Dev import Dev
 from osbot_utils.utils.Files import Files, file_exists, file_contents
 from osbot_utils.utils.Http import WS_is_open
 
@@ -26,18 +23,6 @@ class test_API_Browser(TestCase):
 
     def setUp(self):
          self.api = API_Browser(headless = False)
-
-    @sync
-    async def test_browser_connect(self):
-        browser = await self.api.browser_connect()
-        assert WS_is_open(browser.wsEndpoint)
-
-    def test_get_set_last_chrome_session(self):
-        self.api.file_tmp_last_chrome_session = Files.temp_file()
-        data = { 'url_chrome':'ws://127.0.0.1:64979/devtools/browser/75fbaab9-33eb-41ee-afd9-4aed65166791'}
-        self.api.set_last_chrome_session(data)
-        assert self.api.get_last_chrome_session() == data
-        Files.delete(self.api.file_tmp_last_chrome_session)
 
     @unittest.skip("bug: needs to load markdow page first")
     @sync
