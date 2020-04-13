@@ -18,7 +18,6 @@ class API_Browser:
         #self.file_tmp_screenshot          = '/tmp/browser-page-screenshot.png'
         self.file_tmp_screenshot          = Files.temp_file('.png')
         self._browser                     = None
-        self.url_chrome                   = url_chrome
         self.log_js_errors_to_console     = True
 
     async def browser(self):

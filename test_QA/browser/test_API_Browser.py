@@ -24,7 +24,7 @@ class test_API_Browser(TestCase):
     def setUp(self):
          self.api = API_Browser(headless = False)
 
-    @unittest.skip("bug: needs to load markdow page first")
+    #@unittest.skip("bug: needs to load markdow page first")
     @sync
     async def test_js_eval(self):
         markdown = """

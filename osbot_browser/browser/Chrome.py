@@ -1,48 +1,61 @@
 import os
+from typing import Optional
+
+from pyppeteer.browser          import Browser
+from pyppeteer                  import connect, launch
 from osbot_utils.utils.Files    import file_not_exists, file_copy, file_exists
 from osbot_utils.utils.Http     import WS_is_open
-from osbot_utils.utils.Json import json_save, json_load
+from osbot_utils.utils.Json     import json_save, json_load
 from osbot_utils.utils.Process  import run_process
-from pyppeteer                  import connect, launch
+
 
 
 class Chrome():
     def __init__(self):
         self.options= self.default_options()
         self.file_tmp_last_chrome_session = '/tmp/browser-last_chrome_session.json'
-        self.headless = True
-        self._browser = None
+        self._browser: Browser = None
+
+    def default_options(self):
+        options =  {
+                        "headless"   : True,       # run with no UI
+                        "auto_close" : True,       # auto close the chrome process after parent process stops (like in a unit test)
+                        "new_process": True        # start a new chrome process every time
+                   }
+        return options
 
     async def browser(self):
         if self._browser is None:
             self._browser = await self.browser_connect()
+            pass
         return self._browser
 
-    def default_options(self):
-        options =  {
-                        "headless"   : True ,
-                        "new_browser": False        # think of better name
-                   }
-        return options
 
 
+    async def browser_launch(self):
+        args = ['--no-sandbox',
+                #'--single-process',   # this option crashed chrome when logging in to Jira
+                '--disable-dev-shm-usage'
+                #'--enable-ui-devtools',
+                '--remote-debugging-port=9222'
+                ]
+        self._browser  = await launch(headless  = self.options['headless']  ,   # show UI
+                                      autoClose = self.options['auto_close'],   # with False Chromium will not close when Unit Tests end
+                                      args      = args)
 
-    # connect or open browser functions
+        return self._browser
+
     async def browser_connect(self):                                                        # currently used when connecting locally (not on AWS)
-
-        url_chrome = None
-        if not self.url_chrome:
-            url_chrome = self.get_last_chrome_session()
-        if url_chrome and WS_is_open(url_chrome):                                           # needs pip install websocket-client
-            self._browser = await connect({'browserWSEndpoint': url_chrome})
+        if self.options['new_process']:
+            return await self.browser_launch()
         else:
-            self._browser = await launch(headless=self.headless,
-                                         #autoClose= self.auto_close,
-                                         args=['--no-sandbox',
-                                               #'--single-process',   # this option crashed chrome when logging in to Jira
-                                               '--disable-dev-shm-usage'])
-            self.set_last_chrome_session(self._browser.wsEndpoint)
-        return self._browser
+            url_chrome = self.get_last_chrome_session()
+            if url_chrome and WS_is_open(url_chrome):                                           # needs pip install websocket-client
+                self._browser = await connect({'browserWSEndpoint': url_chrome})
+            else:
+                self._browser = await self.browser_launch()
+                self.set_last_chrome_session(self._browser.wsEndpoint)
+            return self._browser
 
     #  binary downloaded from https://github.com/alixaxel/chrome-aws-lambda/releases (which was the most recent compilation of chrome for AWS that I could find
     #  file created using: brotli -d chromium.br
@@ -69,7 +82,7 @@ class Chrome():
         os.environ['PYPPETEER_HOME'] = '/tmp'                                                   # tell pyppeteer to use this read-write path in Lambda aws
 
         async def set_up_browser():  # todo: refactor this code into separate methods
-            if self.new_browser:
+            if self.options['new_browser']:
                 run_process("chmod", ['+x', path_headless_shell])                                   # set the privs of path_headless_shell to execute
                 self._browser = await launch(executablePath=path_headless_shell,                    # lauch chrome (i.e. headless_shell)
                                              args=['--no-sandbox'              ,
@@ -101,3 +114,23 @@ class Chrome():
         data = {'url_chrome': url_chrome}
         json_save(self.file_tmp_last_chrome_session, data)
         return self
+
+    # utils methods
+    async def connection(self):
+        return (await self.browser())._connection.connection
+
+    async def port(self):
+         return (await self.connection()).remote_address[1]
+
+    async def ws_endpoint(self):
+        return (await self.browser()).wsEndpoint
+        #return browser._connection.connection.port
+        #return self.sync_browser().
+
+    async def version(self):
+        return await (await self.browser()).version()
+
+    # # sync methods
+    # @sync
+    # async def sync_browser(self):
+    #     return await self.browser()
