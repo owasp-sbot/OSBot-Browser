@@ -1,6 +1,8 @@
 import os
 from typing import Optional
 
+import pyppeteer
+import pyppeteer.chromium_downloader
 from pyppeteer.browser          import Browser
 from pyppeteer                  import connect, launch
 from osbot_utils.utils.Files    import file_not_exists, file_copy, file_exists
@@ -15,6 +17,11 @@ class Chrome():
         self.options= self.default_options()
         self.file_tmp_last_chrome_session = '/tmp/browser-last_chrome_session.json'
         self._browser: Browser = None
+        # add check for AWS execution
+        self.osx_config()
+
+    def osx_config(self):
+        self.osx_set_chrome_version('722234')
 
     def default_options(self):
         options =  {
@@ -37,7 +44,7 @@ class Chrome():
                 #'--single-process',   # this option crashed chrome when logging in to Jira
                 '--disable-dev-shm-usage'
                 #'--enable-ui-devtools',
-                '--remote-debugging-port=9222'
+                #'--remote-debugging-port=9222'
                 ]
         self._browser  = await launch(headless  = self.options['headless']  ,   # show UI
                                       autoClose = self.options['auto_close'],   # with False Chromium will not close when Unit Tests end
@@ -130,6 +137,23 @@ class Chrome():
     async def version(self):
         return await (await self.browser()).version()
 
+    # sync methods
+
+    def headless(self, value=True):
+        self.options['headless'   ] = value
+        self.options['auto_close' ] = value
+        self.options['new_process'] = value
+        return self
+    # see https://awesomeopensource.com/project/alixaxel/chrome-aws-lambda for a good list of value chrome_version values
+    def osx_set_chrome_version(self, chrome_version):
+        from pathlib import Path
+        original_version = pyppeteer.__chromium_revision__
+        os.environ['PYPPETEER_CHROMIUM_REVISION']               = chrome_version
+        pyppeteer.__chromium_revision__                         = chrome_version
+        pyppeteer.chromium_downloader.REVISION                  = chrome_version
+        pyppeteer.chromium_downloader.chromiumExecutable["mac"] = Path(str(pyppeteer.chromium_downloader.chromiumExecutable["mac"]).replace(original_version, chrome_version))
+        pyppeteer.chromium_downloader.downloadURLs["mac"]       = str(pyppeteer.chromium_downloader.downloadURLs["mac"]).replace(original_version, chrome_version)
+        return self
     # # sync methods
     # @sync
     # async def sync_browser(self):

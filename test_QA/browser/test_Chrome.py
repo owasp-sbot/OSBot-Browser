@@ -31,11 +31,15 @@ class test_Chrome(Unit_Test):
         url = 'https://www.google.com/404'
         #url = 'https://news.bbc.co.uk'
         #url = 'https://file-drop.co.uk/aaaa'
+        # url = 'https://www.whatismybrowser.com/'
         page     = await browser.newPage()
         response = await page.goto(url)
-        self.result = page.url == url
-        png_data = await page.screenshot()
-        self.png_data = png_data #(await page.screenshot())
+        assert response.url == url
+        assert response.status == 404
+
+
+        # png_data = await page.screenshot()
+        # self.png_data = png_data #(await page.screenshot())
 
 
 
@@ -75,11 +79,23 @@ class test_Chrome(Unit_Test):
 
     @sync
     async def test_version(self):
-        assert await self.chrome.version() == 'HeadlessChrome/71.0.3542.0'
+        assert await self.chrome.version() == 'HeadlessChrome/80.0.3987.0'
 
     @sync
     async def test_ws_endpoint(self):
         assert WS_is_open(await self.chrome.ws_endpoint())
+
+    @sync
+    async def test_osx_set_chrome_version(self):
+        # the first time this test executes, it will download these versions of Chromium
+        # path will be something like: /Users/diniscruz/Library/Application\ Support/pyppeteer/local-chromium/722234
+        assert await Chrome()                                 .version() == 'HeadlessChrome/80.0.3987.0' # set to 722234
+        assert await Chrome().osx_set_chrome_version('588429').version() == 'HeadlessChrome/71.0.3542.0' # current pyppeteer default (see value hardcoded at pyppeteer.__chromium_revision__ )
+        assert await Chrome().osx_set_chrome_version('575458').version() == 'HeadlessChrome/69.0.3494.0'
+        assert await Chrome().osx_set_chrome_version('664010').version() == 'HeadlessChrome/76.0.3807.0'
+        #assert await Chrome().osx_set_chrome_version('722234').version() == 'HeadlessChrome/80.0.3987.0' # current
+        assert await Chrome().osx_set_chrome_version('737173').version() == 'HeadlessChrome/81.0.4044.0'  # latest stable (as of 13/April) - see https://chromium.woolyss.com/ for list
+
 
     # Use case tests
 
@@ -89,3 +105,30 @@ class test_Chrome(Unit_Test):
         pid_2 = (await Chrome().browser()).process.pid
         assert pid_1 > 10
         assert pid_1 != pid_2
+
+
+    @sync
+    async def test_open_chromium(self):
+        chrome = Chrome().osx_set_chrome_version('737173').headless(False)
+        chrome.options['headless'] = False
+        chrome.options['auto_close'] = False
+        browser = await chrome.browser()
+        page = await browser.newPage()
+        await page.goto('https://www.whatismybrowser.com/')
+
+    @sync
+    async def test_re_use_chromium(self):
+        chrome = Chrome().headless(False)
+        browser = await chrome.browser()
+        self.result = browser.wsEndpoint
+
+        #81.0.4044
+
+    @sync
+    async def test_screenshot(self):
+
+        chrome = Chrome().headless(False)
+        browser = await chrome.browser()
+        page = (await browser.pages()).pop()
+
+        self.png_data = await page.screenshot()
