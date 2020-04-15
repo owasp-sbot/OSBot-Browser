@@ -1,10 +1,10 @@
 from unittest import TestCase
 
-from osbot_browser.browser.Chrome import Chrome
+from osbot_browser.chrome.Chrome import Chrome
 from osbot_utils.decorators.Sync import sync
 from osbot_utils.testing.Unit_Test import Unit_Test
 from osbot_utils.utils.Dev import Dev
-from osbot_utils.utils.Files import temp_file, file_delete, file_contents
+from osbot_utils.utils.Files import temp_file, file_delete, file_contents, temp_folder, path_combine, file_exists
 from osbot_utils.utils.Http import WS_is_open, port_is_open
 
 
@@ -89,6 +89,7 @@ class test_Chrome(Unit_Test):
     async def test_osx_set_chrome_version(self):
         # the first time this test executes, it will download these versions of Chromium
         # path will be something like: /Users/diniscruz/Library/Application\ Support/pyppeteer/local-chromium/722234
+        # see ids from https://github.com/alixaxel/chrome-aws-lambda ('Versioning' section)
         assert await Chrome()                                 .version() == 'HeadlessChrome/80.0.3987.0' # set to 722234
         assert await Chrome().osx_set_chrome_version('588429').version() == 'HeadlessChrome/71.0.3542.0' # current pyppeteer default (see value hardcoded at pyppeteer.__chromium_revision__ )
         assert await Chrome().osx_set_chrome_version('575458').version() == 'HeadlessChrome/69.0.3494.0'
@@ -107,28 +108,51 @@ class test_Chrome(Unit_Test):
         assert pid_1 != pid_2
 
 
-    @sync
-    async def test_open_chromium(self):
-        chrome = Chrome().osx_set_chrome_version('737173').headless(False)
-        chrome.options['headless'] = False
-        chrome.options['auto_close'] = False
-        browser = await chrome.browser()
-        page = await browser.newPage()
-        await page.goto('https://www.whatismybrowser.com/')
-
-    @sync
-    async def test_re_use_chromium(self):
-        chrome = Chrome().headless(False)
-        browser = await chrome.browser()
-        self.result = browser.wsEndpoint
+    # @sync
+    # async def test_open_chromium(self):
+    #     chrome = Chrome().osx_set_chrome_version('737173').headless(False)
+    #     browser = await chrome.browser()
+    #     page = await browser.newPage()
+    #     await page.goto('https://www.whatismybrowser.com/')
+    #
+    # @sync
+    # async def test_re_use_chromium(self):
+    #     chrome = Chrome().headless(False)
+    #     browser = await chrome.browser()
+    #     self.result = browser.wsEndpoint
 
         #81.0.4044
 
     @sync
-    async def test_screenshot(self):
+    async def test_args_set_user_data_dir__enable_logging(self):
+        user_data = temp_folder()
+        chrome = (Chrome().headless(True)
+                          .args_set_user_data_dir(user_data)
+                          .enable_logging())
+        await chrome.browser()
+        log_file = path_combine(user_data, 'Default/chrome_debug.log')
+        assert file_exists(log_file)
 
-        chrome = Chrome().headless(False)
+    @sync
+    async def test_set_chrome_log_file(self):
+        log_file = '/tmp/chrome_logfile.log'
+        file_delete(log_file)
+        chrome = Chrome().headless(True).enable_logging(log_file)
+        await chrome.browser()
+        assert 'Could not get the download directory.' in file_contents(log_file).split('\n').pop(0)
+
+    @sync
+    async def test_screenshot_jira(self):
+
+
+        chrome = ( Chrome().headless(True).args_remove_single_process().args_append('--allow-file-access-from-files')
+                 )
+
         browser = await chrome.browser()
         page = (await browser.pages()).pop()
+        #await page.goto('https://glasswall.atlassian.net/')
+        #await page.goto('https://glasswall.atlassian.net/')
+        await page.goto('chrome://version')
 
-        self.png_data = await page.screenshot()
+        await browser.close()
+

@@ -54,9 +54,6 @@ class API_Browser:
             if name and params:
                 return await self.js_invoke_function(name, params,page=page) # execute them as a js method
 
-            #from time import sleep                                          # we might need to add some kind of timeout or callback (to handle cases when actions need a bit more time to stabilize after the js execution)
-            #sleep(0.250)                                                    # but I think this is better done outside this function
-
     async def js_eval(self, code,page=None):
         if page is None:
             page = await self.page()
