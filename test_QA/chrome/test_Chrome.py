@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from osbot_browser.browser.Web_Server import Web_Server
 from osbot_browser.chrome.Chrome import Chrome
 from osbot_utils.decorators.Sync import sync
 from osbot_utils.testing.Unit_Test import Unit_Test
@@ -143,16 +144,16 @@ class test_Chrome(Unit_Test):
 
     @sync
     async def test_screenshot_jira(self):
-
-
-        chrome = ( Chrome().headless(True).args_remove_single_process().args_append('--allow-file-access-from-files')
-                 )
-
+        chrome  = Chrome().headless(True)
         browser = await chrome.browser()
-        page = (await browser.pages()).pop()
+        page    = (await browser.pages()).pop()
+        with Web_Server() as web_server:
+            await page.goto(web_server.url())
+            self.png_data = await page.screenshot()
+        return
         #await page.goto('https://glasswall.atlassian.net/')
         #await page.goto('https://glasswall.atlassian.net/')
-        await page.goto('chrome://version')
 
-        await browser.close()
+
+        #await browser.close()
 
