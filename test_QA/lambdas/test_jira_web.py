@@ -16,8 +16,8 @@ class test_jira_web(Test_Helper):
         Deploy().setup().deploy_lambda__browser('osbot_browser.lambdas.jira_web')
 
     # def test_update_lambda_code(self):
-    #     from gw_bot.setup.OSS_Setup import OSS_Setup
-    #     OSS_Setup().lambda_package('osbot_browser.lambdas.jira_web').aws_lambda.reset()
+    #     from gw_bot.setup.OSBot_Setup import OSBot_Setup
+    #     OSBot_Setup().lambda_package('osbot_browser.lambdas.jira_web').aws_lambda.reset()
 
     def test_invoke_directly(self):
         issue_id = 'VP-2'
