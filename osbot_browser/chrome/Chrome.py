@@ -142,6 +142,10 @@ class Chrome():
     async def connection(self):
         return (await self.browser())._connection.connection
 
+    async def page(self):
+        browser = await self.browser()
+        return (await browser.pages()).pop()
+
     async def port(self):
          return (await self.connection()).remote_address[1]
 
@@ -283,3 +287,16 @@ class Chrome():
     @sync
     async def sync_browser(self):
         return await self.browser()
+
+    @sync
+    async def sync_open(self, url):
+        await (await self.page()).goto(url)
+        return self
+
+    @sync
+    async def sync_url(self):
+        return (await self.page()).url
+
+    @sync
+    async def sync_screenshot(self):
+        return await (await self.page()).screenshot()

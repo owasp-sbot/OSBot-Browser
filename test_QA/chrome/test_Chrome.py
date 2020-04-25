@@ -199,5 +199,25 @@ class test_Chrome(Unit_Test):
             self.png_data = await page.screenshot()
 
     # sync versions of async methods
+
     def test_sync_browser(self):
         assert type(self.chrome.sync_browser().process.pid) is int
+
+    def test_sync_open(self):
+        url = 'https://www.google.com/404'
+        assert self.chrome.sync_open(url).sync_url() == url
+
+    def test_sync_screenshot(self):
+        url = 'https://www.google.com/404'
+        self.png_data = self.chrome.sync_open(url).sync_screenshot()
+
+
+    # test sites
+
+    @sync
+    async def test_site__news_google_com(self):
+        chrome = Chrome()#.headless(False)
+        browser = await chrome.browser()
+        page    = (await browser.pages()).pop()
+        await page.goto('https://www.google.com')
+        self.png_data = await page.screenshot()
