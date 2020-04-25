@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from typing import Optional
 
 import pyppeteer
@@ -8,13 +9,17 @@ from pyppeteer                  import connect, launch
 from osbot_utils.utils.Files    import file_not_exists, file_copy, file_exists
 from osbot_utils.utils.Http     import WS_is_open
 from osbot_utils.utils.Json     import json_save, json_load
+from osbot_utils.utils.Misc import date_now
 from osbot_utils.utils.Process  import run_process
 
 
+CONNECT_METHOD_NO_BROWSER       = 'No browser open or connected'
+CONNECT_METHOD_STARTED_CHROME   = 'Started chrome process'
+CONNECT_METHOD_CONNECTED_CHROME = 'Connected to running chrome process'
 
 class Chrome():
     def __init__(self):
-        self.options= self.default_options()
+        self.options = self.default_options()
         self.file_tmp_last_chrome_session = '/tmp/browser-last_chrome_session.json'
         self._browser      : Browser = None
         self._chrome_args : list    = self.get_default_chrome_args()
@@ -41,12 +46,6 @@ class Chrome():
 
 
     async def browser_launch(self):
-        # args = ['--no-sandbox',
-        #         #'--single-process',   # this option crashed chrome when logging in to Jira
-        #
-        #         #'--enable-ui-devtools',
-        #         #'--remote-debugging-port=9222'
-        #         ]
         self._browser  = await launch(headless  = self.options['headless'  ],   # show UI
                                       autoClose = self.options['auto_close'],   # with False Chromium will not close when Unit Tests end
                                       args      = self._chrome_args         )
@@ -58,17 +57,23 @@ class Chrome():
         if self.options['new_process']:
             return await self.browser_launch()
         else:
-            url_chrome = self.get_last_chrome_session()
+            url_chrome = self.get_last_chrome_session().get('url_chrome')
             if url_chrome and WS_is_open(url_chrome):                                           # needs pip install websocket-client
                 self._browser = await connect({'browserWSEndpoint': url_chrome})
             else:
                 self._browser = await self.browser_launch()
-                self.set_last_chrome_session(self._browser.wsEndpoint)
+                self.set_last_chrome_session()
             return self._browser
 
+    async def close(self):
+        browser = await self.browser()
+        if browser:
+            await browser.close()
+        return self
     #  binary downloaded from https://github.com/alixaxel/chrome-aws-lambda/releases (which was the most recent compilation of chrome for AWS that I could find
     #  file created using: brotli -d chromium.br
     #  refefences: https://medium.com/@marco.luethy/running-headless-chrome-on-aws-lambda-fa82ad33a9eb#a2fb
+
     def load_latest_version_of_chrome(self):
         source_file = '/tmp/lambdas-dependencies_chromium-2_1_1'            # todo: compile this ourselves
         target_file = '/tmp/lambdas-dependencies/pyppeteer/headless_shell'  #
@@ -99,7 +104,7 @@ class Chrome():
                                                    '--disable-dev-shm-usage'                        # one use case where this made the difference is when taking large Slack screenshots
                                                    ])                                               # two key settings or the requests will not work
             else:
-                url_chrome = self.get_last_chrome_session()                                         # get url of last chrome session
+                url_chrome = self.get_last_chrome_session().get('url_chrome')                                         # get url of last chrome session
                 if url_chrome and WS_is_open(url_chrome):  # needs pip install websocket-client     # if it is still open
                     self._browser = await connect({'browserWSEndpoint': url_chrome})                # connect to it
                 else:
@@ -109,18 +114,23 @@ class Chrome():
                                                        '--single-process'          ,
                                                        '--disable-dev-shm-usage'                        # one use case where this made the difference is when taking large Slack screenshots
                                                        ])                                               # two key settings or the requests will not work
-                self.set_last_chrome_session({'url_chrome': self._browser.wsEndpoint})              # save current endpoint (so that we can connect to it next time
+                self.set_last_chrome_session()              # save current endpoint (so that we can connect to it next time
 
         asyncio.get_event_loop().run_until_complete(set_up_browser())
         return self
 
     def get_last_chrome_session(self):
         if file_exists(self.file_tmp_last_chrome_session):
-            return json_load(self.file_tmp_last_chrome_session).get('url_chrome')
+            return json_load(self.file_tmp_last_chrome_session)
         return {}
 
-    def set_last_chrome_session(self, url_chrome):
-        data = {'url_chrome': url_chrome}
+    def set_last_chrome_session(self):
+        data = {
+                 'process_args': self.process_args()     ,
+                 'process_id'  : self.process_id()       ,
+                 'url_chrome'  : self._browser.wsEndpoint,
+                 'when'        : date_now()
+                }
         json_save(self.file_tmp_last_chrome_session, data)
         return self
 
@@ -208,11 +218,40 @@ class Chrome():
                   #'--use-mock-keychain',                       # already added by puppeteer
                 ]
 
+    def connect_method(self):
+        if self._browser is None:
+            return CONNECT_METHOD_NO_BROWSER
+        if self.process_id():
+            return CONNECT_METHOD_STARTED_CHROME
+        return CONNECT_METHOD_CONNECTED_CHROME
+
+    def keep_open(self):
+        #self.options['headless'] = False
+        self.options['auto_close' ] = False
+        self.options['new_process'] = False
+        return self
+
     def headless(self, value=True):
         self.options['headless'   ] = value
         self.options['auto_close' ] = value
         self.options['new_process'] = value
         return self
+
+    def chrome_executable(self):
+        if self.connect_method() == CONNECT_METHOD_NO_BROWSER:
+            return None
+        if self.connect_method() == CONNECT_METHOD_STARTED_CHROME:
+            return self._browser.process.args[0]
+        if self.connect_method() == CONNECT_METHOD_CONNECTED_CHROME:
+            return self.get_last_chrome_session().get('process_args',[''])[0]
+
+    def process_args(self):
+        if self._browser.process:
+            return self._browser.process.args
+
+    def process_id(self):
+        if self._browser.process:
+            return self._browser.process.pid
 
     def set_chrome_log_file(self, path):
         os.putenv('CHROME_LOG_FILE', path)

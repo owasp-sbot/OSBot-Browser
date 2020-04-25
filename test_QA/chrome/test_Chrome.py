@@ -7,6 +7,7 @@ from osbot_utils.testing.Unit_Test import Unit_Test
 from osbot_utils.utils.Dev import Dev
 from osbot_utils.utils.Files import temp_file, file_delete, file_contents, temp_folder, path_combine, file_exists
 from osbot_utils.utils.Http import WS_is_open, port_is_open
+from osbot_utils.utils.Json import json_load
 
 
 class test_Chrome(Unit_Test):
@@ -14,10 +15,10 @@ class test_Chrome(Unit_Test):
     def setUp(self):
         super().setUp()
         self.chrome = Chrome()
-        self.chrome.headless    = True
-        self.chrome.auto_close  = self.chrome.headless is True
-        self.chrome.new_browser = True
-        self.result             = None
+        #self.chrome.headless    = False
+        #self.chrome.auto_close  = self.chrome.headless is True
+        #self.chrome.new_browser = True
+        #self.result             = None
 
     @sync
     async def test_browser_connect(self):
@@ -25,7 +26,21 @@ class test_Chrome(Unit_Test):
         assert type(browser).__name__ == 'Browser'
         assert WS_is_open(browser.wsEndpoint)
 
-    # move to separate methods
+    @sync
+    async def test_chrome_executable(self):
+        assert self.chrome.chrome_executable() is None
+        chrome_1 = Chrome().keep_open()
+        await chrome_1.browser()
+        assert 'Support/pyppeteer/local-chromium' in chrome_1.chrome_executable()
+
+        chrome_2 = Chrome().keep_open()
+        await chrome_2.browser()
+        assert 'Support/pyppeteer/local-chromium' in chrome_2.chrome_executable()
+        print()
+        print(chrome_2.chrome_executable())
+        await chrome_2.close()
+
+
     @sync
     async def test_open(self):
         browser = await self.chrome.browser()
@@ -38,24 +53,46 @@ class test_Chrome(Unit_Test):
         assert response.url == url
         assert response.status == 404
 
-
         # png_data = await page.screenshot()
-        # self.png_data = png_data #(await page.screenshot())
+        #self.png_data = (await page.screenshot())
 
+    @sync
+    async def test_get_last_chrome_session(self):
+        self.chrome.keep_open()
+        browser = await self.chrome.browser()
+        assert set(json_load(self.chrome.file_tmp_last_chrome_session)) == {'process_args', 'process_id', 'url_chrome', 'when'}
+        await browser.close()
 
+    @sync
+    async def test_keep_open(self):
+        url_1 = 'https://www.google.com/404'
+        url_2 = 'https://www.google.com/ABC'
+        chrome_1  = Chrome().keep_open()                            # 1st chrome object (with keep_open setting)
+        browser_1 = await chrome_1.browser()                        # open process and get browser object
+        page_1    = (await browser_1.pages()).pop()                 # get first page
+        await page_1.goto(url_1)                                    # open 404 in google
+        assert page_1.url == url_1                                  # confirm url
 
-    def test_get_set_last_chrome_session(self):
-        self.chrome.file_tmp_last_chrome_session = temp_file()
-        url_chrome = 'ws://127.0.0.1:64979/devtools/browser/75fbaab9-33eb-41ee-afd9-4aed65166791'
-        raw_file   = f"""{{
-  "url_chrome": "{url_chrome}"
-}}"""
-        self.chrome.set_last_chrome_session(url_chrome)
-        assert self.chrome.get_last_chrome_session()                   == url_chrome
-        assert file_contents(self.chrome.file_tmp_last_chrome_session) == raw_file
-        file_delete(self.chrome.file_tmp_last_chrome_session)
+        chrome_2 = Chrome().keep_open()                             # create 2nd chrome object
+        browser_2 = await chrome_2.browser()                        # connect to chrome and get browser object
+        page_2    = (await browser_2.pages()).pop()                 # get page object
+        assert page_2.url == url_1                                  # confirm url
 
+        await page_2.goto(url_2)                                    # open another page in browser_2
+        assert page_1.url == url_2                                  # confirm it was opened in browser 1
+        assert page_2.url == url_2                                  # and in browser_2
 
+        chrome_3 = Chrome().keep_open()                             # create 3rd chrome object
+        browser_3 = await chrome_3.browser()                        # connect to chrome and get browser object
+        page_3    = (await browser_3.pages()).pop()                 # get page object
+        assert page_3.url == url_2                                  # confirm url
+
+        assert self.chrome.connect_method() == 'No browser open or connected'
+        assert chrome_1.connect_method()    == 'Started chrome process'
+        assert chrome_2.connect_method()    == 'Connected to running chrome process'
+        assert chrome_3.connect_method()    == 'Connected to running chrome process'
+        #await browser_1.close()
+        await browser_3.close()                                    # close browser
 
     # utils methods
     @sync
@@ -77,6 +114,7 @@ class test_Chrome(Unit_Test):
     async def test_port(self):
         assert port_is_open(await self.chrome.port())
         browser = await self.chrome.browser()
+        assert (await browser.pages()).pop().url == 'about:blank'
 
     @sync
     async def test_version(self):
@@ -108,21 +146,18 @@ class test_Chrome(Unit_Test):
         assert pid_1 > 10
         assert pid_1 != pid_2
 
-
+    # this one will cause https://github.com/puppeteer/puppeteer/issues/4752
+    # to solve use a variation of: sudo codesign --force --deep --sign - "/Users/diniscruz/Library/Application Support/pyppeteer/local-chromium/722234/chrome-mac/Chromium.app"
     # @sync
-    # async def test_open_chromium(self):
-    #     chrome = Chrome().osx_set_chrome_version('737173').headless(False)
-    #     browser = await chrome.browser()
-    #     page = await browser.newPage()
-    #     await page.goto('https://www.whatismybrowser.com/')
-    #
-    # @sync
-    # async def test_re_use_chromium(self):
+    # async def test_headless(self):
     #     chrome = Chrome().headless(False)
     #     browser = await chrome.browser()
-    #     self.result = browser.wsEndpoint
-
-        #81.0.4044
+    #     url = 'https://www.whatismybrowser.com/'
+    #     page    = await browser.newPage()
+    #     await page.goto(url)
+    #     assert page.url == url
+    #     await page.close()
+    #     await browser.close()
 
     @sync
     async def test_args_set_user_data_dir__enable_logging(self):
@@ -144,16 +179,9 @@ class test_Chrome(Unit_Test):
 
     @sync
     async def test_screenshot_jira(self):
-        chrome  = Chrome().headless(True)
+        chrome  = Chrome()
         browser = await chrome.browser()
         page    = (await browser.pages()).pop()
         with Web_Server() as web_server:
             await page.goto(web_server.url())
             self.png_data = await page.screenshot()
-        return
-        #await page.goto('https://glasswall.atlassian.net/')
-        #await page.goto('https://glasswall.atlassian.net/')
-
-
-        #await browser.close()
-
