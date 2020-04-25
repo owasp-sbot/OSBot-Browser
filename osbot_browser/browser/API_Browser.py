@@ -4,7 +4,7 @@ import os
 from time import sleep
 from syncer import sync
 
-from osbot_browser.browser.Chrome import Chrome
+from osbot_browser.chrome.Chrome import Chrome
 from osbot_utils.utils.Dev import Dev
 from osbot_utils.utils.Files import Files
 from osbot_utils.utils.Http import WS_is_open
