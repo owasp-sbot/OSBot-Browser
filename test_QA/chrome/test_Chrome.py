@@ -117,6 +117,18 @@ class test_Chrome(Unit_Test):
         assert (await browser.pages()).pop().url == 'about:blank'
 
     @sync
+    async def test_process_args(self):
+        await self.chrome.browser()
+        assert '--no-sandbox' in self.chrome.process_args()
+
+    @sync
+    async def test_user_data_dir(self):
+        user_data_dir = temp_folder()
+        self.chrome.args_set_user_data_dir(user_data_dir)
+        await self.chrome.browser()
+        assert self.chrome.user_data_dir() == user_data_dir
+
+    @sync
     async def test_version(self):
         assert await self.chrome.version() == 'HeadlessChrome/80.0.3987.0'
 
@@ -185,3 +197,7 @@ class test_Chrome(Unit_Test):
         with Web_Server() as web_server:
             await page.goto(web_server.url())
             self.png_data = await page.screenshot()
+
+    # sync versions of async methods
+    def test_sync_browser(self):
+        assert type(self.chrome.sync_browser().process.pid) is int

@@ -1,15 +1,14 @@
 import os
-from datetime import datetime
-from typing import Optional
-
 import pyppeteer
 import pyppeteer.chromium_downloader
 from pyppeteer.browser          import Browser
 from pyppeteer                  import connect, launch
-from osbot_utils.utils.Files    import file_not_exists, file_copy, file_exists
+
+from osbot_utils.decorators.Sync import sync
+from osbot_utils.utils.Files import file_not_exists, file_copy, file_exists, temp_folder
 from osbot_utils.utils.Http     import WS_is_open
 from osbot_utils.utils.Json     import json_save, json_load
-from osbot_utils.utils.Misc import date_now
+from osbot_utils.utils.Misc     import date_now
 from osbot_utils.utils.Process  import run_process
 
 
@@ -95,14 +94,19 @@ class Chrome():
         path_headless_shell          = '/tmp/lambdas-dependencies/pyppeteer/headless_shell'     # path to headless_shell AWS Linux executable
         os.environ['PYPPETEER_HOME'] = '/tmp'                                                   # tell pyppeteer to use this read-write path in Lambda aws
 
+        user_data_dir = temp_folder()
+        self.args_set_user_data_dir(user_data_dir)
+        #return user_data_dir
+
         async def set_up_browser():  # todo: refactor this code into separate methods
-            if self.options['new_browser']:
+            if self.options['new_process']:
                 run_process("chmod", ['+x', path_headless_shell])                                   # set the privs of path_headless_shell to execute
                 self._browser = await launch(executablePath=path_headless_shell,                    # lauch chrome (i.e. headless_shell)
-                                             args=['--no-sandbox'              ,
-                                                   '--single-process'          ,
-                                                   '--disable-dev-shm-usage'                        # one use case where this made the difference is when taking large Slack screenshots
-                                                   ])                                               # two key settings or the requests will not work
+                                             args=self._chrome_args )
+                                             # args=['--no-sandbox'              ,
+                                             #       '--single-process'          ,
+                                             #       '--disable-dev-shm-usage'                        # one use case where this made the difference is when taking large Slack screenshots
+                                             #       ])                                               # two key settings or the requests will not work
             else:
                 url_chrome = self.get_last_chrome_session().get('url_chrome')                                         # get url of last chrome session
                 if url_chrome and WS_is_open(url_chrome):  # needs pip install websocket-client     # if it is still open
@@ -248,10 +252,16 @@ class Chrome():
     def process_args(self):
         if self._browser.process:
             return self._browser.process.args
+        return []
 
     def process_id(self):
         if self._browser.process:
             return self._browser.process.pid
+
+    def user_data_dir(self):
+        for arg in self.process_args():
+            if arg.startswith('--user-data-dir='):
+                return arg.split('--user-data-dir=').pop()
 
     def set_chrome_log_file(self, path):
         os.putenv('CHROME_LOG_FILE', path)
@@ -267,3 +277,9 @@ class Chrome():
         pyppeteer.chromium_downloader.chromiumExecutable["mac"] = Path(str(pyppeteer.chromium_downloader.chromiumExecutable["mac"]).replace(original_version, chrome_version))
         pyppeteer.chromium_downloader.downloadURLs["mac"]       = str(pyppeteer.chromium_downloader.downloadURLs["mac"]).replace(original_version, chrome_version)
         return self
+
+    # sync versions of async methods
+
+    @sync
+    async def sync_browser(self):
+        return await self.browser()
