@@ -8,6 +8,7 @@ from osbot_utils.utils.Dev import Dev
 from osbot_utils.utils.Files import temp_file, file_delete, file_contents, temp_folder, path_combine, file_exists
 from osbot_utils.utils.Http import WS_is_open, port_is_open
 from osbot_utils.utils.Json import json_load
+from osbot_utils.utils.Misc import bytes_to_base64
 
 
 class test_Chrome(Unit_Test):
@@ -15,22 +16,26 @@ class test_Chrome(Unit_Test):
     def setUp(self):
         super().setUp()
         self.chrome = Chrome()
-        #self.chrome.headless    = False
-        #self.chrome.auto_close  = self.chrome.headless is True
-        #self.chrome.new_browser = True
-        #self.result             = None
 
     @sync
-    async def test_browser_connect(self):
-        browser = await self.chrome.browser_connect()
+    async def test_browser(self):
+        browser = await self.chrome.browser()
         assert type(browser).__name__ == 'Browser'
         assert WS_is_open(browser.wsEndpoint)
+        assert (await browser.pages()).pop().url == 'about:blank'
+
+    async def test_browser_connect(self):
+        browser = await self.chrome.browser_launch_or_connect()
+        assert type(browser).__name__ == 'Browser'
+        assert WS_is_open(browser.wsEndpoint)
+
 
     @sync
     async def test_chrome_executable(self):
         assert self.chrome.chrome_executable() is None
         chrome_1 = Chrome().keep_open()
-        await chrome_1.browser()
+        self.result = await chrome_1.browser()
+        return
         assert 'Support/pyppeteer/local-chromium' in chrome_1.chrome_executable()
 
         chrome_2 = Chrome().keep_open()
@@ -94,14 +99,6 @@ class test_Chrome(Unit_Test):
         #await browser_1.close()
         await browser_3.close()                                    # close browser
 
-    # utils methods
-    @sync
-    async def test_browser(self):
-        browser = await self.chrome.browser()
-        assert type(browser).__name__ == 'Browser'
-
-        # '/Users/diniscruz/Library/Application Support/pyppeteer/local-chromium/588429/chrome-mac/Chromium.app/Contents/MacOS/Chromium'
-
     @sync
     async def test_connection(self):
         connection = await self.chrome.connection()
@@ -138,6 +135,7 @@ class test_Chrome(Unit_Test):
 
     @sync
     async def test_osx_set_chrome_version(self):
+
         # the first time this test executes, it will download these versions of Chromium
         # path will be something like: /Users/diniscruz/Library/Application\ Support/pyppeteer/local-chromium/722234
         # see ids from https://github.com/alixaxel/chrome-aws-lambda ('Versioning' section)
@@ -212,7 +210,17 @@ class test_Chrome(Unit_Test):
         self.png_data = self.chrome.sync_open(url).sync_screenshot()
 
 
+
     # test sites
+
+    def test_run_chrome_locally(self):
+        path_headless_shell = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+        chrome = Chrome().keep_open()
+        chrome.options['path_headless_shell'] = path_headless_shell
+        chrome.sync_browser()
+        chrome.sync_open('https://www.google.com')
+        self.png_data = bytes_to_base64(chrome.sync_screenshot())
+        chrome.sync_close()
 
     @sync
     async def test_site__news_google_com(self):
