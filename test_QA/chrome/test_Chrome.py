@@ -8,7 +8,7 @@ from osbot_utils.utils.Json import json_load
 from osbot_utils.utils.Misc import bytes_to_base64
 
 
-class test_Chrome(Unit_Test):       # todo: move some of the tests to the Chrome_Setup class 
+class test_Chrome(Unit_Test):       # todo: move some of the tests to the Chrome_Setup class
 
     def setUp(self):
         super().setUp()
@@ -114,7 +114,7 @@ class test_Chrome(Unit_Test):       # todo: move some of the tests to the Chrome
     @sync
     async def test_user_data_dir(self):
         user_data_dir = temp_folder()
-        self.chrome.args_set_user_data_dir(user_data_dir)
+        self.chrome.chrome_args.args_set_user_data_dir(user_data_dir)
         await self.chrome.browser()
         assert self.chrome.chrome_setup.user_data_dir() == user_data_dir
 
@@ -165,9 +165,9 @@ class test_Chrome(Unit_Test):       # todo: move some of the tests to the Chrome
     @sync
     async def test_args_set_user_data_dir__enable_logging(self):
         user_data = temp_folder()
-        chrome = (Chrome().headless(True)
-                          .args_set_user_data_dir(user_data)
-                          .enable_logging())
+        chrome = Chrome().headless(True)
+        (chrome.chrome_args.args_set_user_data_dir(user_data)
+                           .enable_logging())
         await chrome.browser()
         log_file = path_combine(user_data, 'Default/chrome_debug.log')
         assert file_exists(log_file)
@@ -176,7 +176,8 @@ class test_Chrome(Unit_Test):       # todo: move some of the tests to the Chrome
     async def test_set_chrome_log_file(self):
         log_file = '/tmp/chrome_logfile.log'
         file_delete(log_file)
-        chrome = Chrome().headless(True).enable_logging(log_file)
+        chrome = Chrome().headless(True)
+        chrome.chrome_args.enable_logging(log_file)
         await chrome.browser()
         assert 'Could not get the download directory.' in file_contents(log_file).split('\n').pop(0)
 

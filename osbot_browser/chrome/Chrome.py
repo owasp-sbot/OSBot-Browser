@@ -3,15 +3,16 @@ import pyppeteer
 import pyppeteer.chromium_downloader
 from pyppeteer.browser              import Browser
 
+from osbot_browser.chrome.Chrome_Args import Chrome_Args
 from osbot_browser.chrome.Chrome_Setup import Chrome_Setup
 from osbot_utils.decorators.Sync    import sync
 
 class Chrome():
     def __init__(self):
-        self.options            : dict    = self.default_options()
-        self._browser           : Browser = None
-        self._chrome_args       : list    = self.get_default_chrome_args()
-        self.chrome_setup                 = Chrome_Setup(chrome_args=self._chrome_args,options=self.options)
+        self.options        : dict         = self.default_options()
+        self._browser       : Browser      = None
+        self.chrome_args    : Chrome_Args  = Chrome_Args()
+        self.chrome_setup   : Chrome_Setup = Chrome_Setup(chrome_args=self.chrome_args,options=self.options)
 
         self.osx_set_chrome_version('722234')  # 'HeadlessChrome/80.0.3987.0'
 
@@ -56,76 +57,7 @@ class Chrome():
 
     # sync methods
 
-    def args_remove(self, item):
-        if item in self._chrome_args:
-            self._chrome_args.remove(item)
-        return self
-
-    def args_append(self,item):
-        if item not in self._chrome_args:
-            self._chrome_args.append(item)
-        return self
-
-    def args_remove_single_process(self      ): return self.args_remove('--single-process')
-    def args_set_user_data_dir    (self, path): return self.args_append('--user-data-dir='+path)
-
-
-    def enable_logging(self, log_file=None):
-        self.args_append('--enable-logging')
-        self.args_append('--v=1')
-        if log_file:
-            self.set_chrome_log_file(log_file)
-        return self
-
-    def get_default_chrome_args(self):
-        return [                                # list from https://github.com/alixaxel/chrome-aws-lambda/blob/master/source/index.js#L72
-                  '--no-sandbox'            ,   # most important ones
-                  #'--disable-dev-shm-usage' ,   # most important ones
-                  '--single-process'        ,   # most important ones (this has a nasty side effect when opening up Jira, the redirect crashes chrome)
-                  #'--disable-background-timer-throttling',     # already added by puppeteer
-                  #'--disable-breakpad',                        # already added by puppeteer
-                  #'--disable-client-side-phishing-detection',  # already added by puppeteer
-                  '--disable-cloud-import',
-                  #'--disable-default-apps',                    # already added by puppeteer
-                  #'--disable-extensions',                      # already added by puppeteer
-                  '--disable-gesture-typing',
-                  #'--disable-hang-monitor',                    # already added by puppeteer
-                  '--disable-infobars',
-                  '--disable-notifications',
-                  '--disable-offer-store-unmasked-wallet-cards',
-                  '--disable-offer-upload-credit-cards',
-                  #'--disable-popup-blocking',                  # already added by puppeteer
-                  '--disable-print-preview',
-                  #'--disable-prompt-on-repost',                # already added by puppeteer
-                  '--disable-setuid-sandbox',
-                  '--disable-speech-api',
-                  #'--disable-sync',                            # already added by puppeteer
-                  '--disable-tab-for-desktop-share',
-                  #'--disable-translate',                       # already added by puppeteer
-                  '--disable-voice-input',
-                  '--disable-wake-on-wifi',
-                  '--disk-cache-size=33554432',
-                  '--enable-async-dns',
-                  '--enable-simple-cache-backend',
-                  '--enable-tcp-fast-open',
-                  '--enable-webgl',
-                  '--hide-scrollbars',
-                  '--ignore-gpu-blacklist',
-                  '--media-cache-size=33554432',
-                  #'--metrics-recording-only',                  # already added by puppeteer
-                  '--mute-audio',
-                  '--no-default-browser-check',
-                  #'--no-first-run',                            # already added by puppeteer
-                  '--no-pings',
-                  '--no-zygote',
-                  #'--password-store=basic',                    # already added by puppeteer
-                  '--prerender-from-omnibox=disabled',
-                  '--use-gl=swiftshader',
-                  #'--use-mock-keychain',                       # already added by puppeteer
-                ]
-
     def keep_open(self):
-        #self.options['headless'] = False
         self.options['auto_close' ] = False
         self.options['new_process'] = False
         return self
@@ -134,10 +66,6 @@ class Chrome():
         self.options['headless'   ] = value
         self.options['auto_close' ] = value
         self.options['new_process'] = value
-        return self
-
-    def set_chrome_log_file(self, path):
-        os.putenv('CHROME_LOG_FILE', path)
         return self
 
 
@@ -151,27 +79,3 @@ class Chrome():
         pyppeteer.chromium_downloader.chromiumExecutable["mac"] = Path(str(pyppeteer.chromium_downloader.chromiumExecutable["mac"]).replace(original_version, chrome_version))
         pyppeteer.chromium_downloader.downloadURLs["mac"]       = str(pyppeteer.chromium_downloader.downloadURLs["mac"]).replace(original_version, chrome_version)
         return self
-
-    # sync versions of async methods
-
-    @sync
-    async def sync_browser(self):
-        return await self.browser()
-
-    @sync
-    async def sync_close(self):
-        return await self.close()
-
-
-    @sync
-    async def sync_open(self, url):
-        await (await self.page()).goto(url)
-        return self
-
-    @sync
-    async def sync_url(self):
-        return (await self.page()).url
-
-    @sync
-    async def sync_screenshot(self):
-        return await (await self.page()).screenshot()

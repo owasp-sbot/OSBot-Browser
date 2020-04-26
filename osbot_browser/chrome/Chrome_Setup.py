@@ -3,6 +3,7 @@ import os
 from pyppeteer.browser import Browser
 
 from osbot_aws.apis.S3              import s3_file_download
+from osbot_browser.chrome.Chrome_Args import Chrome_Args
 from osbot_utils.utils.Files import temp_folder, file_exists
 from osbot_utils.utils.Http         import WS_is_open
 from osbot_utils.utils.Json import json_load, json_save
@@ -17,11 +18,11 @@ CONNECT_METHOD_CONNECTED_CHROME = 'Connected to running chrome process'
 class Chrome_Setup:
 
     def __init__(self, chrome_args, options):
-        self._browser         : Browser   = None
-        self.chrome_args      : list      = chrome_args
-        self.options          : dict      = options
-        self.s3_chrome_binary : tuple     = ('gw-bot-lambdas','lambdas-dependencies/chromium-2_1_1')
-        self.file_tmp_last_chrome_session = '/tmp/browser-last_chrome_session.json'
+        self._browser         : Browser     = None
+        self.chrome_args      : Chrome_Args = chrome_args
+        self.options          : dict        = options
+        self.s3_chrome_binary : tuple       = ('gw-bot-lambdas','lambdas-dependencies/chromium-2_1_1')
+        self.file_tmp_last_chrome_session   = '/tmp/browser-last_chrome_session.json'
 
     async def browser_setup(self):
         if self.running_on_aws():
@@ -32,7 +33,7 @@ class Chrome_Setup:
     async def browser_setup_for_aws_execution(self):
         self.aws_download_headless_chrome_from_s3()
         os.environ['PYPPETEER_HOME']    = '/tmp'    # tell pyppeteer to use this read-write path in Lambda aws
-        self.args_set_user_data_dir(temp_folder())  # set userdata to folder inside /tmp (since that is writable)
+        self.chrome_args.args_set_user_data_dir(temp_folder())  # set userdata to folder inside /tmp (since that is writable)
         return await self.browser_launch_or_connect()
 
     async def browser_setup_for_local_execution(self):
@@ -58,7 +59,7 @@ class Chrome_Setup:
         kwargs = {
                     "headless" : self.options['headless'  ],    # show UI
                     "autoClose": self.options['auto_close'],    # with False Chromium will not close when Unit Tests end
-                    "args"     : self.chrome_args
+                    "args"     : self.chrome_args.args()
                  }
         path_headless_shell = self.options.get('path_headless_shell')
         if path_headless_shell:                                 # if path if provided

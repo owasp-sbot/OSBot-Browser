@@ -2,7 +2,7 @@ from gw_bot.Deploy import Deploy
 from gw_bot.helpers.Test_Helper import Test_Helper
 from osbot_aws.apis.Lambda import Lambda
 from osbot_utils.decorators.trace import trace
-from osbot_utils.utils.Misc import bytes_to_base64
+
 
 
 class test_Chrome_in_Lambda(Test_Helper):
@@ -23,16 +23,22 @@ class test_Chrome_in_Lambda(Test_Helper):
         code = """
 from osbot_aws.Dependencies import load_dependencies
 load_dependencies('pyppeteer2,websocket-client')
-from osbot_browser.chrome.Chrome import Chrome
+from osbot_browser.chrome.Chrome_Sync import Chrome_Sync
 
-chrome = Chrome().keep_open()
-chrome.sync_browser()
-result = chrome.connect_method()      
+chrome = Chrome_Sync().keep_open()
+chrome.browser()
+#result = chrome.open('https://news.google.com').url()
+
+from osbot_utils.utils.Misc import bytes_to_base64
+result = bytes_to_base64(chrome.screenshot()) 
+
+#result = chrome_sync.chrome.chrome_setup.connect_method()      
 """
+
         #self.test_update_lambda()
         #self.test_reset_lambda()
 
-        self.result = self._lambda.shell().python_exec(code)
+        self.png_data = self._lambda.shell().python_exec(code)
 
     def test_update_and_invoke__test(self):
 
