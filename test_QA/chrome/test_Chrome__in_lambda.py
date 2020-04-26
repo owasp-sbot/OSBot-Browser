@@ -1,6 +1,7 @@
 from gw_bot.Deploy import Deploy
 from gw_bot.helpers.Test_Helper import Test_Helper
 from osbot_aws.apis.Lambda import Lambda
+from osbot_utils.decorators.trace import trace
 from osbot_utils.utils.Misc import bytes_to_base64
 
 
@@ -14,7 +15,26 @@ class test_Chrome_in_Lambda(Test_Helper):
     def test_update_lambda(self):
         self.result = Deploy().deploy_lambda__browser_dev(self.lambda_name)
 
+    #@trace(include=['osbot*', 'boto*'])
+    def test_reset_lambda(self):
+        self.result = self._lambda.shell().reset()
+
     def test_update_and_invoke(self):
+        code = """
+from osbot_aws.Dependencies import load_dependencies
+load_dependencies('pyppeteer2,websocket-client')
+from osbot_browser.chrome.Chrome import Chrome
+
+chrome = Chrome().keep_open()
+chrome.sync_browser()
+result = chrome.connect_method()      
+"""
+        #self.test_update_lambda()
+        #self.test_reset_lambda()
+
+        self.result = self._lambda.shell().python_exec(code)
+
+    def test_update_and_invoke__test(self):
 
         code = """
 from osbot_aws.Dependencies import load_dependencies
@@ -52,7 +72,7 @@ async def local_chrome():
     await chrome.browser_connect()
     return chrome.connect_method() 
 
-chrome = Chrome().keep_open()
+chrome = Chrome()#.keep_open()
 chrome.sync_browser()
 result = chrome.connect_method()
 
