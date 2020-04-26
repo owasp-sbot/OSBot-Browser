@@ -2,14 +2,14 @@ import os
 
 from pyppeteer.browser import Browser
 
-from osbot_aws.apis.S3              import s3_file_download
-from osbot_browser.chrome.Chrome_Args import Chrome_Args
-from osbot_utils.utils.Files import temp_folder, file_exists
-from osbot_utils.utils.Http         import WS_is_open
-from osbot_utils.utils.Json import json_load, json_save
-from osbot_utils.utils.Misc import date_now
-from osbot_utils.utils.Process      import chmod_x
-from pyppeteer                      import connect, launch
+from osbot_aws.apis.S3                  import s3_file_download
+from osbot_browser.chrome.Chrome_Args   import Chrome_Args
+from osbot_utils.utils.Files            import temp_folder, file_exists
+from osbot_utils.utils.Http             import port_is_open
+from osbot_utils.utils.Json             import json_save, json_load
+from osbot_utils.utils.Misc             import date_now
+from osbot_utils.utils.Process          import chmod_x
+from pyppeteer                          import connect, launch
 
 CONNECT_METHOD_NO_BROWSER       = 'No browser open or connected'
 CONNECT_METHOD_STARTED_CHROME   = 'Started chrome process'
@@ -48,8 +48,10 @@ class Chrome_Setup:
             return self._browser
 
     async def browser_connect(self):
-        url_chrome = self.get_last_chrome_session().get('url_chrome')
-        if url_chrome and WS_is_open(url_chrome):                                                       # needs pip install websocket-client
+        last_chrome_session = self.get_last_chrome_session()
+        url_chrome = last_chrome_session.get('url_chrome')
+        port       = last_chrome_session.get('port')
+        if url_chrome and port_is_open(port):                                                       # needs pip install websocket-client
             self._browser = await connect({'browserWSEndpoint': url_chrome})
             return True
         return False
@@ -117,6 +119,7 @@ class Chrome_Setup:
                  'process_args': self.process_args()     ,
                  'process_id'  : self.process_id()       ,
                  'url_chrome'  : self._browser.wsEndpoint,
+                 'port'        : self._browser._connection.connection.remote_address[1],
                  'when'        : date_now()
                 }
         json_save(self.file_tmp_last_chrome_session, data)

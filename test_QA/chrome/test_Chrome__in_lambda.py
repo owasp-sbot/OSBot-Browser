@@ -22,23 +22,23 @@ class test_Chrome_in_Lambda(Test_Helper):
     def test_update_and_invoke(self):
         code = """
 from osbot_aws.Dependencies import load_dependencies
-load_dependencies('pyppeteer2,websocket-client')
+load_dependencies('pyppeteer2')
 from osbot_browser.chrome.Chrome_Sync import Chrome_Sync
 
 chrome = Chrome_Sync().keep_open()
 chrome.browser()
 #result = chrome.open('https://news.google.com').url()
 
-from osbot_utils.utils.Misc import bytes_to_base64
-result = bytes_to_base64(chrome.screenshot()) 
+#from osbot_utils.utils.Misc import bytes_to_base64
+#result = bytes_to_base64(chrome.screenshot()) 
 
-#result = chrome_sync.chrome.chrome_setup.connect_method()      
+result = chrome.chrome.chrome_setup.connect_method()      
 """
 
-        #self.test_update_lambda()
+        self.test_update_lambda()
         #self.test_reset_lambda()
 
-        self.png_data = self._lambda.shell().python_exec(code)
+        self.result = self._lambda.shell().python_exec(code)
 
     def test_update_and_invoke__test(self):
 
@@ -74,7 +74,7 @@ async def local_chrome():
         
     #return GET(url)
     await connect({'browserWSEndpoint': url_chrome})     
-    return WS_is_open(url_chrome)
+    return port_is_open(url_chrome)
     await chrome.browser_connect()
     return chrome.connect_method() 
 

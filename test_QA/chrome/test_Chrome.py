@@ -1,9 +1,11 @@
 from osbot_browser.browser.Web_Server import Web_Server
 from osbot_browser.chrome.Chrome import Chrome
+from osbot_browser.chrome.Chrome_Setup import Chrome_Setup
+from osbot_browser.chrome.Chrome_Sync import Chrome_Sync
 from osbot_utils.decorators.Sync import sync
 from osbot_utils.testing.Unit_Test import Unit_Test
 from osbot_utils.utils.Files import temp_file, file_delete, file_contents, temp_folder, path_combine, file_exists
-from osbot_utils.utils.Http import WS_is_open, port_is_open
+from osbot_utils.utils.Http import port_is_open, GET, port_is_not_open
 from osbot_utils.utils.Json import json_load
 from osbot_utils.utils.Misc import bytes_to_base64
 
@@ -17,14 +19,16 @@ class test_Chrome(Unit_Test):       # todo: move some of the tests to the Chrome
     @sync
     async def test_browser(self):
         browser = await self.chrome.browser()
+        port    = await self.chrome.port()
         assert type(browser).__name__ == 'Browser'
-        assert WS_is_open(browser.wsEndpoint)
+        assert port_is_open(port)
         assert (await browser.pages()).pop().url == 'about:blank'
 
     async def test_browser_connect(self):
         browser = await self.chrome.browser_launch_or_connect()
+        port    = await self.chrome.port()
         assert type(browser).__name__ == 'Browser'
-        assert WS_is_open(browser.wsEndpoint)
+        assert port_is_open(port)
 
 
     @sync
@@ -58,11 +62,12 @@ class test_Chrome(Unit_Test):       # todo: move some of the tests to the Chrome
     async def test_get_last_chrome_session(self):
         self.chrome.keep_open()
         browser = await self.chrome.browser()
-        assert set(json_load(self.chrome.chrome_setup.file_tmp_last_chrome_session)) == {'process_args', 'process_id', 'url_chrome', 'when'}
+        assert set(json_load(self.chrome.chrome_setup.file_tmp_last_chrome_session)) == {'process_args', 'process_id', 'port', 'when','url_chrome'}
         await browser.close()
 
     @sync
     async def test_keep_open(self):
+        file_delete(Chrome_Setup(None,None).file_tmp_last_chrome_session)
         url_1 = 'https://www.google.com/404'
         url_2 = 'https://www.google.com/ABC'
         chrome_1  = Chrome().keep_open()                            # 1st chrome object (with keep_open setting)
@@ -123,8 +128,13 @@ class test_Chrome(Unit_Test):       # todo: move some of the tests to the Chrome
         assert await self.chrome.version() == 'HeadlessChrome/80.0.3987.0'
 
     @sync
-    async def test_ws_endpoint(self):
-        assert WS_is_open(await self.chrome.ws_endpoint())
+    async def test_port(self):
+        ws_endpoint = await self.chrome.ws_endpoint()
+        port        = await self.chrome.port()
+        assert ws_endpoint.startswith(f'ws://127.0.0.1:{port}')
+
+        assert port_is_open    (port  )
+        assert port_is_not_open(port+1)
 
     @sync
     async def test_osx_set_chrome_version(self):
@@ -190,20 +200,6 @@ class test_Chrome(Unit_Test):       # todo: move some of the tests to the Chrome
             await page.goto(web_server.url())
             self.png_data = await page.screenshot()
 
-    # sync versions of async methods
-
-    def test_sync_browser(self):
-        assert type(self.chrome.sync_browser().process.pid) is int
-
-    def test_sync_open(self):
-        url = 'https://www.google.com/404'
-        assert self.chrome.sync_open(url).sync_url() == url
-
-    def test_sync_screenshot(self):
-        url = 'https://www.google.com/404'
-        self.png_data = self.chrome.sync_open(url).sync_screenshot()
-
-
 
     # test sites
 
@@ -211,10 +207,11 @@ class test_Chrome(Unit_Test):       # todo: move some of the tests to the Chrome
         path_headless_shell = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
         chrome = Chrome().keep_open()
         chrome.options['path_headless_shell'] = path_headless_shell
-        chrome.sync_browser()
-        chrome.sync_open('https://www.google.com')
-        self.png_data = bytes_to_base64(chrome.sync_screenshot())
-        chrome.sync_close()
+        chrome_sync = Chrome_Sync(chrome)
+        chrome_sync.browser()
+        chrome_sync.open('https://www.google.com')
+        self.png_data = bytes_to_base64(chrome_sync.screenshot())
+        chrome_sync.close()
 
     @sync
     async def test_site__news_google_com(self):

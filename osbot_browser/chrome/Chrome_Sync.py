@@ -3,8 +3,8 @@ from osbot_utils.decorators.Sync import sync
 
 
 class Chrome_Sync:
-    def __init__(self):
-        self.chrome = Chrome()
+    def __init__(self, chrome: Chrome =None):
+        self.chrome = chrome or Chrome()
 
     @sync
     async def browser(self):
