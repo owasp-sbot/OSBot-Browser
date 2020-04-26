@@ -1,17 +1,14 @@
-from unittest import TestCase
-
 from osbot_browser.browser.Web_Server import Web_Server
 from osbot_browser.chrome.Chrome import Chrome
 from osbot_utils.decorators.Sync import sync
 from osbot_utils.testing.Unit_Test import Unit_Test
-from osbot_utils.utils.Dev import Dev
 from osbot_utils.utils.Files import temp_file, file_delete, file_contents, temp_folder, path_combine, file_exists
 from osbot_utils.utils.Http import WS_is_open, port_is_open
 from osbot_utils.utils.Json import json_load
 from osbot_utils.utils.Misc import bytes_to_base64
 
 
-class test_Chrome(Unit_Test):
+class test_Chrome(Unit_Test):       # todo: move some of the tests to the Chrome_Setup class 
 
     def setUp(self):
         super().setUp()
@@ -32,17 +29,13 @@ class test_Chrome(Unit_Test):
 
     @sync
     async def test_chrome_executable(self):
-        assert self.chrome.chrome_executable() is None
+        assert self.chrome.chrome_setup.chrome_executable() is None
         chrome_1 = Chrome().keep_open()
-        self.result = await chrome_1.browser()
-        return
-        assert 'Support/pyppeteer/local-chromium' in chrome_1.chrome_executable()
-
+        await chrome_1.browser()
+        assert 'Support/pyppeteer/local-chromium' in chrome_1.chrome_setup.chrome_executable()
         chrome_2 = Chrome().keep_open()
         await chrome_2.browser()
-        assert 'Support/pyppeteer/local-chromium' in chrome_2.chrome_executable()
-        print()
-        print(chrome_2.chrome_executable())
+        assert 'Support/pyppeteer/local-chromium' in chrome_2.chrome_setup.chrome_executable()
         await chrome_2.close()
 
 
@@ -65,7 +58,7 @@ class test_Chrome(Unit_Test):
     async def test_get_last_chrome_session(self):
         self.chrome.keep_open()
         browser = await self.chrome.browser()
-        assert set(json_load(self.chrome.file_tmp_last_chrome_session)) == {'process_args', 'process_id', 'url_chrome', 'when'}
+        assert set(json_load(self.chrome.chrome_setup.file_tmp_last_chrome_session)) == {'process_args', 'process_id', 'url_chrome', 'when'}
         await browser.close()
 
     @sync
@@ -92,10 +85,10 @@ class test_Chrome(Unit_Test):
         page_3    = (await browser_3.pages()).pop()                 # get page object
         assert page_3.url == url_2                                  # confirm url
 
-        assert self.chrome.connect_method() == 'No browser open or connected'
-        assert chrome_1.connect_method()    == 'Started chrome process'
-        assert chrome_2.connect_method()    == 'Connected to running chrome process'
-        assert chrome_3.connect_method()    == 'Connected to running chrome process'
+        assert self.chrome.chrome_setup.connect_method() == 'No browser open or connected'
+        assert chrome_1.chrome_setup.connect_method()    == 'Started chrome process'
+        assert chrome_2.chrome_setup.connect_method()    == 'Connected to running chrome process'
+        assert chrome_3.chrome_setup.connect_method()    == 'Connected to running chrome process'
         #await browser_1.close()
         await browser_3.close()                                    # close browser
 
@@ -116,14 +109,14 @@ class test_Chrome(Unit_Test):
     @sync
     async def test_process_args(self):
         await self.chrome.browser()
-        assert '--no-sandbox' in self.chrome.process_args()
+        assert '--no-sandbox' in self.chrome.chrome_setup.process_args()
 
     @sync
     async def test_user_data_dir(self):
         user_data_dir = temp_folder()
         self.chrome.args_set_user_data_dir(user_data_dir)
         await self.chrome.browser()
-        assert self.chrome.user_data_dir() == user_data_dir
+        assert self.chrome.chrome_setup.user_data_dir() == user_data_dir
 
     @sync
     async def test_version(self):
