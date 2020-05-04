@@ -2,7 +2,6 @@ import os
 
 from pyppeteer.browser import Browser
 
-from osbot_aws.apis.S3                  import s3_file_download
 from osbot_browser.chrome.Chrome_Args   import Chrome_Args
 from osbot_utils.utils.Files            import temp_folder, file_exists
 from osbot_utils.utils.Http             import port_is_open
@@ -79,8 +78,9 @@ class Chrome_Setup:
     #  binary downloaded from https://github.com/alixaxel/chrome-aws-lambda/releases (which was the most recent compilation of chrome for AWS that I could find
     #  file created using: brotli -d chromium.br
     #  refefences: https://medium.com/@marco.luethy/running-headless-chrome-on-aws-lambda-fa82ad33a9eb#a2fb
-    #todo: fix target_file location in chrome exec path
+    #todo: put this on an AWS speficic class (since it requires OSBot_AWS)
     def aws_download_headless_chrome_from_s3(self):
+        from osbot_aws.apis.S3 import s3_file_download
         (s3_bucket, s3_key) = self.s3_chrome_binary
         headless_shell = s3_file_download(s3_bucket, s3_key, use_cache=True)
         self.options['path_headless_shell'] = headless_shell

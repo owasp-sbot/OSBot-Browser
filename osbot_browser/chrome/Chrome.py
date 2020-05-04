@@ -68,6 +68,13 @@ class Chrome():
         self.options['new_process'] = value
         return self
 
+    def ignore_cert_errors(self):
+        self.chrome_args.args_append('--ignore-certificate-errors')
+        return self
+
+    def sync(self):
+        from osbot_browser.chrome.Chrome_Sync import Chrome_Sync
+        return Chrome_Sync(self)
 
     # see https://awesomeopensource.com/project/alixaxel/chrome-aws-lambda for a good list of value chrome_version values
     def osx_set_chrome_version(self, chrome_version):

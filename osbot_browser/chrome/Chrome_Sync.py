@@ -6,6 +6,10 @@ class Chrome_Sync:
     def __init__(self, chrome: Chrome =None):
         self.chrome = chrome or Chrome()
 
+    def api_browser(self):      # todo: figure out if this is the best way to expose this object
+        from osbot_browser.browser.API_Browser import API_Browser
+        return API_Browser(self.browser())
+
     @sync
     async def browser(self):
         return await self.chrome.browser()

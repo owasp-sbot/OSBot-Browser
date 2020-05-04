@@ -8,13 +8,13 @@ from osbot_browser.chrome.Chrome import Chrome
 from osbot_utils.utils.Dev import Dev
 from osbot_utils.utils.Files import Files
 
-
+# todo: page should be a top class level object (with cache support)
 class API_Browser:
 
-    def __init__(self, headless = True, new_browser=False, url_chrome = None):
+    def __init__(self, browser=None):  # headless = True, new_browser=False, url_chrome = None):
         #self.file_tmp_screenshot          = '/tmp/browser-page-screenshot.png'
         self.file_tmp_screenshot          = Files.temp_file('.png')
-        self._browser                     = None
+        self._browser                     = browser
         self.log_js_errors_to_console     = True
 
     async def browser(self):
@@ -173,19 +173,6 @@ class API_Browser:
 
     # helper sync functions
 
-    # @sync
-    # async def sync__setup_aws_browser(self):
-    #
-    #     load_dependency('pyppeteer')
-    #     from pyppeteer import launch
-    #     path_headless_shell          = '/tmp/lambdas-dependencies/pyppeteer/headless_shell'
-    #     os.environ['PYPPETEER_HOME'] = '/tmp'
-    #     Process.run("chmod", ['+x', path_headless_shell])
-    #     self._browser = await launch(executablePath=path_headless_shell,
-    #                                  args=['--no-sandbox',
-    #                                        '--single-process'])
-    #     return self
-
     @sync
     async def sync__browser_width(self, width,height=None):
         if height is None: height = width
@@ -257,13 +244,9 @@ class API_Browser:
 
     @sync
     async def sync__page_text(self, page=None):
-        #try:
         if page is None:
             page = await self.page()
         return await page.evaluate('() => document.body.innerText')
-        #except:
-        #    return ""
-        #return await self.page().plainText()
 
     # @sync
     # async def sync__page__with_auto_dialog_accept(self):
@@ -319,4 +302,9 @@ class API_Browser:
         if page is None:
             page = await self.page()
         await page.waitForNavigation()
+        return self
+
+    @sync
+    async def sync_sleep(self, mili_seconds):
+        await self.sleep(mili_seconds)
         return self
