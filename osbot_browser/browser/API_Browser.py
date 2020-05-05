@@ -258,6 +258,10 @@ class API_Browser:
         return {'js_coverage': js_coverage, 'css_coverage': css_coverage}
 
     @sync
+    async def sync__element(self, page, selector):
+        return await self.element(page, selector)
+
+    @sync
     async def sync__element_attribute(self, page, selector, name):
         return await self.element_attribute(page, selector, name)
 
@@ -415,6 +419,12 @@ class API_Browser:
         except Exception as error:
             Dev.print("[Error][sync__await_for_element] {0}".format(error))
             return False
+
+    @sync
+    async def sync__set_upload_file(self, page, selector, file_path):
+        file_element = await self.element(page, selector)
+        return await file_element.uploadFile(file_path)
+
 
     @sync
     async def sync__wait_for_selector(self, page, selector):
