@@ -2,17 +2,19 @@ import base64
 import json
 import os
 from time import sleep
+
+from pyppeteer.element_handle import ElementHandle
 from syncer import sync
 
 from osbot_browser.chrome.Chrome import Chrome
 from osbot_utils.utils.Dev import Dev
 from osbot_utils.utils.Files import Files
 
-# todo: page should be a top class level object (with cache support)
+# see https://github.com/puppeteer/puppeteer/blob/master/docs/api.md for all the functions available
+
 class API_Browser:
 
     def __init__(self, browser=None):  # headless = True, new_browser=False, url_chrome = None):
-        #self.file_tmp_screenshot          = '/tmp/browser-page-screenshot.png'
         self.file_tmp_screenshot          = Files.temp_file('.png')
         self._browser                     = browser
         self.log_js_errors_to_console     = True
@@ -22,11 +24,7 @@ class API_Browser:
             self._browser = await Chrome().browser()
         return self._browser
 
-    #def set_new_browser(self,value):
-    #    self.new_browser = value
-    # other browser helper methods
-
-    async def browser_close(self):          # bug: this is not working 100% since there are still tons of "headless_shell <defunct>" proccess left (one per execution)
+    async def browser_close(self):
         browser = await self.browser()
         if browser is not None:
             pages = await browser.pages()
@@ -35,7 +33,7 @@ class API_Browser:
             await browser.close()
 
     async def element(self, page, selector):
-        if type(selector) is not str:           # for the cases when a selector is already a selector
+        if type(selector) is ElementHandle:      # for the cases when a selector is already a selector
             return selector                     # todo: add better check that it is a selector
         try:
             return await page.querySelector(selector)
@@ -59,16 +57,20 @@ class API_Browser:
             return await page.evaluate(f'(element) => element.{property}', element)
         return None
 
-    async def elements(self, page, selector):
+    async def elements(self, page, target):
+        if type(target) is list:             # cases when target is a list of elements
+            return target
         try:
-            return await page.querySelectorAll(selector)
+            return await page.querySelectorAll(target)
         except:
             return None
 
     async def elements_attribute(self, page, selector, name):
         result = []
-        for element in await self.elements(page, selector):
-            result.append(await self.element_attribute(page, element, name))
+        elements = await self.elements(page, selector)
+        if elements:
+            for element in elements:
+                result.append(await self.element_attribute(page, element, name))
         return result
 
     async def elements_attributes(self, page, selector):
@@ -220,8 +222,15 @@ class API_Browser:
         await page.setViewport(viewport)
         return self
 
-    # helper sync functions
+    async def xpath(self, page, xpath, return_error=False):
+        try:
+            return await page.xpath(xpath)
+        except Exception as error:
+            if return_error:
+                return {'error': error}
+            return None
 
+    # helper sync functions
     @sync
     async def sync__browser_width(self, width,height=None):
         if height is None: height = width
@@ -296,6 +305,11 @@ class API_Browser:
     async def sync__elements_text(self, page, selector):
         return await self.elements_property(page, selector, 'textContent')
 
+    @sync
+    async def sync__elements_xpath(self, page, xpath, return_error=False):
+        return await self.xpath(page, xpath,return_error)
+
+        #return await self.elements_property(page, selector, 'textContent')
     @sync
     async def sync__js_execute(self, js_code,page=None):
         return await self.js_execute(js_code,page=page)
@@ -401,6 +415,12 @@ class API_Browser:
         except Exception as error:
             Dev.print("[Error][sync__await_for_element] {0}".format(error))
             return False
+
+    @sync
+    async def sync__wait_for_selector(self, page, selector):
+        await page.waitForSelector(selector)
+        return self
+
     @sync
     async def sync__wait_for_navigation(self, page=None):
         if page is None:
