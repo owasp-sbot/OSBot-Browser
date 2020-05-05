@@ -34,6 +34,55 @@ class API_Browser:
                await page.close()
             await browser.close()
 
+    async def element(self, page, selector):
+        if type(selector) is not str:           # for the cases when a selector is already a selector
+            return selector                     # todo: add better check that it is a selector
+        try:
+            return await page.querySelector(selector)
+        except:
+            return None
+
+    async def element_attribute(self, page, target, name):
+        element = await self.element(page, target)
+        if element:
+            return await page.evaluate('(element, name) => element.getAttribute(name)', element, name)
+
+    async def element_attributes(self, page, target):
+        element = await self.element(page, target)
+        if element:
+            return await page.evaluate('(element) => element.getAttributeNames().map((name)=>  { return { [name]: element.getAttribute(name) } } )', element)
+
+
+    async def element_property(self, page, target, property):
+        element = await self.element(page, target)
+        if element:
+            return await page.evaluate(f'(element) => element.{property}', element)
+        return None
+
+    async def elements(self, page, selector):
+        try:
+            return await page.querySelectorAll(selector)
+        except:
+            return None
+
+    async def elements_attribute(self, page, selector, name):
+        result = []
+        for element in await self.elements(page, selector):
+            result.append(await self.element_attribute(page, element, name))
+        return result
+
+    async def elements_attributes(self, page, selector):
+        result = []
+        for element in await self.elements(page, selector):
+            result.append(await self.element_attributes(page, element))
+        return result
+
+    async def elements_property(self, page, selector, property):
+        result = []
+        for element in await self.elements(page, selector):
+            result.append(await self.element_property(page, element, property))
+        return result
+
     async def js_execute(self, js_code,page=None):
         if js_code:
             if type(js_code).__name__ == 'str':                              # if it is a string, execute it
@@ -189,6 +238,65 @@ class API_Browser:
         return self
 
     @sync
+    async def coverage_start(self, page):
+        await page.coverage.startJSCoverage()
+        await page.coverage.startCSSCoverage()
+
+    @sync
+    async def coverage_stop(self, page):
+        js_coverage = await page.coverage.stopJSCoverage()
+        css_coverage = await page.coverage.stopCSSCoverage()
+        return {'js_coverage': js_coverage, 'css_coverage': css_coverage}
+
+    @sync
+    async def sync__element_attribute(self, page, selector, name):
+        return await self.element_attribute(page, selector, name)
+
+    @sync
+    async def sync__element_attributes(self, page, selector):
+        return await self.element_attributes(page, selector)
+
+    @sync
+    async def sync__element_html_inner(self, page, selector):
+        return await self.element_property(page, selector, 'innerHTML')
+
+    @sync
+    async def sync__element_html_outer(self, page, selector):
+        return await self.element_property(page, selector, 'outerHTML')
+
+    @sync
+    async def sync__element_property(self, page, selector, property):
+        return await self.element_property(page, selector, property)
+
+    @sync
+    async def sync__element_text(self, page, selector):
+        return await self.element_property(page, selector, 'textContent')
+
+    @sync
+    async def sync__elements_attribute(self, page, selector, name):
+        return await self.elements_attribute(page, selector, name)
+
+    @sync
+    async def sync__elements_attributes(self, page, selector):
+        return await self.elements_attributes(page, selector)
+
+    @sync
+    async def sync__elements_html_inner(self, page, selector):
+        return await self.elements_property(page, selector, 'innerHTML')
+
+    @sync
+    async def sync__elements_html_outer(self, page, selector):
+        return await self.elements_property(page, selector, 'outerHTML')
+
+    @sync
+    async def sync__elements_property(self, page, selector, property):
+        return await self.elements_property(page, selector, property)
+
+    @sync
+    async def sync__elements_text(self, page, selector):
+        return await self.elements_property(page, selector, 'textContent')
+
+    @sync
     async def sync__js_execute(self, js_code,page=None):
         return await self.js_execute(js_code,page=page)
 
@@ -273,10 +381,6 @@ class API_Browser:
     @sync
     async def sync__url(self):
         return await self.url()
-
-    @sync
-    async def sync__query_selector_all(self, page, selector):
-        return await page.querySelectorAll(selector)
 
     @sync
     async def sync__screenshot(self, url=None, page=None, file_screenshot = None,clip=None,full_page=True):
