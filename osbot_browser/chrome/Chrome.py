@@ -21,7 +21,8 @@ class Chrome():
                         "headless"           : True,    # run with no UI
                         "auto_close"         : True,    # auto close the chrome process after parent process stops (like in a unit test)
                         "new_process"        : True,    # start a new chrome process every time
-                        "path_headless_shell": None     # use pyppeteer executable
+                        "path_headless_shell": None,    # use pyppeteer executable
+                        "slowMo"             : 0
                    }
         return options
 
@@ -70,6 +71,10 @@ class Chrome():
 
     def ignore_cert_errors(self):
         self.chrome_args.args_append('--ignore-certificate-errors')
+        return self
+
+    def slow_chrome_by(self, value):
+        self.options['slowMo'] = value
         return self
 
     def sync(self):

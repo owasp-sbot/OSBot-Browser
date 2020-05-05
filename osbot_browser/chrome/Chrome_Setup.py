@@ -22,6 +22,7 @@ class Chrome_Setup:
         self.options          : dict        = options
         self.s3_chrome_binary : tuple       = ('gw-bot-lambdas','lambdas-dependencies/chromium-2_1_1')
         self.file_tmp_last_chrome_session   = '/tmp/browser-last_chrome_session.json'
+        self.slow_motion      : int         = 0
 
     async def browser_setup(self):
         if self.running_on_aws():
@@ -51,7 +52,11 @@ class Chrome_Setup:
         url_chrome = last_chrome_session.get('url_chrome')
         port       = last_chrome_session.get('port')
         if url_chrome and port_is_open(port):                                                       # needs pip install websocket-client
-            self._browser = await connect({'browserWSEndpoint': url_chrome})
+            kwargs = {
+                        'browserWSEndpoint': url_chrome,
+                        'slowMo'           : self.options['slowMo']  # todo: confirm this has no side effects when set to 0 (i.e. slow it down)
+                    }
+            self._browser = await connect(**kwargs)
             return True
         return False
 
@@ -60,13 +65,14 @@ class Chrome_Setup:
         kwargs = {
                     "headless" : self.options['headless'  ],    # show UI
                     "autoClose": self.options['auto_close'],    # with False Chromium will not close when Unit Tests end
+                    'slowMo'   : self.options['slowMo'    ],
                     "args"     : self.chrome_args.args()
+
                  }
         path_headless_shell = self.options.get('path_headless_shell')
         if path_headless_shell:                                 # if path if provided
             chmod_x(path_headless_shell)                        # make sure it is marked as executable
             kwargs['executablePath'] = path_headless_shell      # add it to the launch params
-
         self._browser  = await launch(**kwargs)
 
         self.set_last_chrome_session()
