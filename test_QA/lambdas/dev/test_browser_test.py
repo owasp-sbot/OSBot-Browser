@@ -4,7 +4,6 @@ from osbot_aws.apis.Lambda import Lambda
 from gw_bot.helpers.Test_Helper import Test_Helper
 from osbot_aws.apis.shell.Lambda_Shell import Lambda_Shell
 from osbot_browser.lambdas.dev.browser_test import run
-from osbot_utils.decorators.trace import trace
 
 
 class test_browser_test(Test_Helper):
