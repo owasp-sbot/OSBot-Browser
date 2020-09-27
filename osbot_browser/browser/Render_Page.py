@@ -15,7 +15,7 @@ class Render_Page:
         if api_browser:
             self.api_browser = api_browser
         else:
-            self.api_browser = API_Browser(headless,headless)
+            self.api_browser = API_Browser(headless= headless)
 
     def render_file(self, html_file):
         return self.render_html(Files.contents(html_file))

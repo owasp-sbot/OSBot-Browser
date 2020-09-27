@@ -18,7 +18,9 @@ class Vis_Js:
     def __init__(self, headless=True):
         self.web_page    = '/vis-js/simple.html'
         self.web_root    = Files.path_combine(Files.parent_folder(__file__), '../web_root')
-        self.api_browser = API_Browser(headless=headless).sync__setup_browser()
+        chrome = Chrome().headless(headless)
+
+        self.api_browser = API_Browser(chrome.sync().browser())
         self.render_page = Render_Page(api_browser=self.api_browser, web_root=self.web_root)
         self.bot_name    = 'GS_Bot'
         self.options     = None

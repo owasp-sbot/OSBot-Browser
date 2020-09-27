@@ -14,14 +14,15 @@ from osbot_utils.utils.Files import Files
 
 class API_Browser:
 
-    def __init__(self, browser=None):  # headless = True, new_browser=False, url_chrome = None):
+    def __init__(self, browser=None, headless=True):  # headless = True, new_browser=False, url_chrome = None):
         self.file_tmp_screenshot          = Files.temp_file('.png')
         self._browser                     = browser
+        self.headless                     = headless
         self.log_js_errors_to_console     = True
 
     async def browser(self):
         if self._browser is None:
-            self._browser = await Chrome().browser()
+            self._browser = await Chrome(self.headless).browser()
         return self._browser
 
     async def browser_close(self):
@@ -400,6 +401,10 @@ class API_Browser:
     async def sync__url(self):
         return await self.url()
 
+    @sync
+    async def sync__setup_browser(self):
+        await self.browser()
+        return self
     @sync
     async def sync__screenshot(self, url=None, page=None, file_screenshot = None,clip=None,full_page=True):
         return await self.screenshot(url,page=page, file_screenshot = file_screenshot,clip=clip,full_page=full_page)

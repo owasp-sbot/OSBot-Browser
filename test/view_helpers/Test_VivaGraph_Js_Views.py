@@ -24,7 +24,7 @@ class Test_VivaGraph_Js_Views(Test_Helper):
         self.result = Deploy().deploy_lambda__browser()
 
     def test_default(self):
-        graph_name = 'graph_J1Z'
+        graph_name = 'graph_X3X'
         #graph_name = 'graph_I3H' #'graph_UUZ'
         #graph_name = 'graph_24O'
         #graph_name = 'graph_041'  # large one  (doesn't work headless)

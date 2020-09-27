@@ -27,31 +27,16 @@ class test_API_Browser(TestCase):
     #@unittest.skip("bug: needs to load markdow page first")
     @sync
     async def test_js_eval(self):
-        markdown = """
-# some title "with double quotes"
-some text  and 'single quotes'
-"""
-        encoded_text = base64.b64encode(markdown.encode()).decode()
-        js_script = "convert(atob('{0}'))".format(encoded_text)
-
-        result = await self.api.js_eval(js_script)
-        #Dev.pprint(result)
-
-    @unittest.skip("bug: needs to load markdow page first")
-    @sync
-    async def test_invoke_js_function(self):
-        markdown = """
-# changed title "via js function"
-some text  and 'single quotes'
-"""
-        result = await self.api.js_invoke_function('convert',markdown)
-        #Dev.pprint(result)
+        text = "some_text"
+        text_base64 = base64.b64encode(text.encode()).decode()
+        assert await self.api.js_eval("btoa('{0}')".format(text))        == text_base64
+        assert await self.api.js_eval("atob('{0}')".format(text_base64)) == text
 
     @sync
     async def test_html(self):
         await self.api.open('https://www.google.com')
-        content = await self.api.html()
-        assert len(content.html()) > 100
+        html = await self.api.html()
+        assert len(html) > 100
 
     @sync
     async def test_open(self):
@@ -62,8 +47,10 @@ some text  and 'single quotes'
 
     @sync
     async def test_page(self):
+        url = 'https://www.google.com/404'
+        await self.api.open(url)
         page = await self.api.page()
-        assert "http" in page.url
+        assert page.url == url
 
 
     @sync

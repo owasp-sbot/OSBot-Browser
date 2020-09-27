@@ -8,13 +8,16 @@ from osbot_browser.chrome.Chrome_Setup import Chrome_Setup
 from osbot_utils.decorators.Sync    import sync
 
 class Chrome():
-    def __init__(self):
+    def __init__(self, headless=True):
         self.options        : dict         = self.default_options()
         self._browser       : Browser      = None
         self.chrome_args    : Chrome_Args  = Chrome_Args()
         self.chrome_setup   : Chrome_Setup = Chrome_Setup(chrome_args=self.chrome_args,options=self.options)
 
-        self.osx_set_chrome_version('722234')  # 'HeadlessChrome/80.0.3987.0'
+        #self.osx_set_chrome_version('722234')  # 'HeadlessChrome/80.0.3987.0' (May 2020)
+        self.osx_set_chrome_version('800071')  # 'HeadlessChrome/86.0.4240.0' (Sep 2020)
+        self.headless(headless)
+
 
     def default_options(self):
         options =  {

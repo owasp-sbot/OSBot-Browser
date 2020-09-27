@@ -37,7 +37,15 @@ class Chrome_Setup:
         return await self.browser_launch_or_connect()
 
     async def browser_setup_for_local_execution(self):
-        return await self.browser_launch_or_connect()
+        try:
+            return await self.browser_launch_or_connect()
+        except Exception as error:
+            if "certificate verify failed'" in str(error):
+                raise Exception("Chrome could not be downloaded due to SSL error. Root cause is lack of SSL certs in your system. \n"
+                                "See https://github.com/pyppeteer/pyppeteer/issues/105 \n"
+                                "See https://timonweb.com/python/fixing-certificate_verify_failed-error-when-trying-requests-html-out-on-mac/ \n") from None
+            else:
+                raise error
 
     async def browser_launch_or_connect(self):                                                          # currently used when connecting locally (not on AWS)
         if self.options.get('new_process'):                                                             # if configured to start a new process all the time

@@ -142,12 +142,13 @@ class test_Chrome(Unit_Test):       # todo: move some of the tests to the Chrome
         # the first time this test executes, it will download these versions of Chromium
         # path will be something like: /Users/diniscruz/Library/Application\ Support/pyppeteer/local-chromium/722234
         # see ids from https://github.com/alixaxel/chrome-aws-lambda ('Versioning' section)
-        assert await Chrome()                                 .version() == 'HeadlessChrome/80.0.3987.0' # set to 722234
+        assert await Chrome()                                 .version() == 'HeadlessChrome/86.0.4240.0' # set to 800071
         assert await Chrome().osx_set_chrome_version('588429').version() == 'HeadlessChrome/71.0.3542.0' # current pyppeteer default (see value hardcoded at pyppeteer.__chromium_revision__ )
-        assert await Chrome().osx_set_chrome_version('575458').version() == 'HeadlessChrome/69.0.3494.0'
-        assert await Chrome().osx_set_chrome_version('664010').version() == 'HeadlessChrome/76.0.3807.0'
-        #assert await Chrome().osx_set_chrome_version('722234').version() == 'HeadlessChrome/80.0.3987.0' # current
-        assert await Chrome().osx_set_chrome_version('737173').version() == 'HeadlessChrome/81.0.4044.0'  # latest stable (as of 13/April) - see https://chromium.woolyss.com/ for list
+        #assert await Chrome().osx_set_chrome_version('575458').version() == 'HeadlessChrome/69.0.3494.0'
+        #assert await Chrome().osx_set_chrome_version('664010').version() == 'HeadlessChrome/76.0.3807.0'
+        assert await Chrome().osx_set_chrome_version('722234').version() == 'HeadlessChrome/80.0.3987.0' # previous
+        assert await Chrome().osx_set_chrome_version('800071').version() == 'HeadlessChrome/86.0.4240.0' # current
+        #assert await Chrome().osx_set_chrome_version('737173').version() == 'HeadlessChrome/81.0.4044.0'  # latest stable (as of 13/April) - see https://chromium.woolyss.com/ for list
 
 
     # Use case tests
@@ -161,6 +162,7 @@ class test_Chrome(Unit_Test):       # todo: move some of the tests to the Chrome
 
     # this one will cause https://github.com/puppeteer/puppeteer/issues/4752
     # to solve use a variation of: sudo codesign --force --deep --sign - "/Users/diniscruz/Library/Application Support/pyppeteer/local-chromium/722234/chrome-mac/Chromium.app"
+    # todo: improve this workflow since it is still not stable
     # @sync
     # async def test_headless(self):
     #     chrome = Chrome().headless(False)
@@ -215,8 +217,16 @@ class test_Chrome(Unit_Test):       # todo: move some of the tests to the Chrome
 
     @sync
     async def test_site__news_google_com(self):
-        chrome = Chrome()#.headless(False)
+        chrome = Chrome().headless(False)
         browser = await chrome.browser()
         page    = (await browser.pages()).pop()
-        await page.goto('https://www.google.com')
+        await page.goto('https://www.google.com/asd')
+        self.png_data = await page.screenshot()
+
+    @sync
+    async def test_site__not_headless_what_is_my_browser(self):
+        chrome = Chrome(headless=False)
+        browser = await chrome.browser()
+        page = (await browser.pages()).pop()
+        await page.goto('https://www.whatismybrowser.com/')
         self.png_data = await page.screenshot()
