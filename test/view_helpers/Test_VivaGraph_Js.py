@@ -1,8 +1,3 @@
-from unittest import TestCase
-
-from pbx_gs_python_utils.utils.Dev import Dev
-
-from gw_bot.api.API_Image import API_Image
 from gw_bot.helpers.Test_Helper import Test_Helper
 from osbot_browser.view_helpers.VivaGraph_Js import VivaGraph_Js
 from osbot_jira.api.graph.GS_Graph import GS_Graph
@@ -21,20 +16,21 @@ class Test_VivaGraph_Js(Test_Helper):
 
     def test_create_graph(self):
         (nodes, edges, graph_data, graph_name) = (0,0,0,None)
-        Dev.pprint(self.vivagraph_js.create_graph(nodes, edges))
+        #Dev.pprint(self.vivagraph_js.create_graph(nodes, edges))
 
     def test_create_graph_and_send_screenshot_to_slack(self):
         nodes = [{'key': 'TEAM-23', 'label': 'TEAM-23', 'img_url': 'icons/TEAM.png', 'img_size': 20}]
         edges = []
         png_data = self.vivagraph_js.create_graph_and_send_screenshot_to_slack(nodes, edges)
-        image = (API_Image().load_from_bytes_base64(png_data)
-                            .set_img_file('/tmp/temp_image.png')
-                            .save())
+
+        # image = (API_Image().load_from_bytes_base64(png_data)
+        #                     .set_img_file('/tmp/temp_image.png')
+        #                     .save())
 
         # import base64
         # from PIL import Image
         # import io
-        self.result = image.info()
+        #self.result = image.info()
         # #self.result = 'asd'
 
     def test_vis_js(self):

@@ -1,10 +1,10 @@
 from unittest import TestCase
 
-from pbx_gs_python_utils.utils.Dev import Dev
-from pbx_gs_python_utils.utils.Files import Files
+from osbot_utils.utils.Dev import Dev
 
 from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 from osbot_browser.view_helpers.gw.Xml_Report import Xml_Report
+from osbot_utils.utils.Files import Files
 
 
 class Test_Xml_Report(TestCase):

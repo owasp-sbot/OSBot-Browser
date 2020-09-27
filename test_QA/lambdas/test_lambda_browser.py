@@ -5,12 +5,12 @@ import unittest
 from osbot_aws.apis.Lambda import Lambda
 
 from gw_bot.Deploy import Deploy
-from pbx_gs_python_utils.utils.Misc import Misc
+from osbot_utils.utils import Misc
 
 from gw_bot.helpers.Test_Helper import Test_Helper
 from osbot_browser.browser.Browser_Commands import Browser_Commands
 from osbot_browser.lambdas.lambda_browser   import run
-from pbx_gs_python_utils.utils.Dev          import Dev
+from osbot_utils.utils.Dev                  import Dev
 
 
 class Test_Lambda_lambda_browser(Test_Helper):

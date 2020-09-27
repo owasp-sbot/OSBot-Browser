@@ -9,6 +9,7 @@ from osbot_aws.apis.S3 import S3
 from osbot_browser.browser.API_Browser                    import API_Browser
 from osbot_browser.browser.Browser_Lamdba_Helper          import Browser_Lamdba_Helper
 from osbot_browser.browser.Render_Page                    import Render_Page
+from osbot_browser.chrome.Chrome import Chrome
 from osbot_utils.utils.Files import Files
 from osbot_utils.utils.Json import Json
 

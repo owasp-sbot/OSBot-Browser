@@ -4,7 +4,7 @@ from osbot_aws.apis.Lambda import Lambda
 
 from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 from osbot_browser.view_helpers.Go_Js_Views import Go_Js_Views
-from pbx_gs_python_utils.utils.Dev import Dev
+from osbot_utils.utils.Dev import Dev
 from osbot_browser.view_helpers.View_Examples import View_Examples
 
 

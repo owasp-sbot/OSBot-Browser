@@ -1,12 +1,15 @@
-import sys ; sys.path.append('../osbot_browser')
+import sys ;
+
+from osbot_utils.utils.Files import Files
+from osbot_utils.utils.Temp_File import Temp_File
+
+sys.path.append('../osbot_browser')
 
 from unittest import TestCase
 
 from osbot_browser.browser.Render_Page import Render_Page
-from pbx_gs_python_utils.utils.Dev import Dev
-from pbx_gs_python_utils.utils.Files import Files
-from pbx_gs_python_utils.utils.Misc import Misc
-from pbx_gs_python_utils.utils.Temp_File import Temp_File
+from osbot_utils.utils.Dev import Dev
+from osbot_utils.utils import Misc
 
 
 class test_Render_Page(TestCase):

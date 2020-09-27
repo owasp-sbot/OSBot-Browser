@@ -6,11 +6,10 @@ from osbot_aws.apis.Lambda  import Lambda
 from gw_bot.api.Slack_Commands_Helper import Slack_Commands_Helper
 from gw_bot.helpers.Lambda_Helpers                          import slack_message
 from osbot_browser.browser.Browser_Lamdba_Helper            import Browser_Lamdba_Helper
-from pbx_gs_python_utils.utils.Files                        import Files
-from pbx_gs_python_utils.utils.Misc                         import Misc
-from pbx_gs_python_utils.utils.Process                      import Process
-
+from osbot_utils.utils import Misc
+from osbot_utils.utils.Files import Files
 from osbot_utils.utils.Misc import to_int
+from osbot_utils.utils.Process import Process
 
 
 class Browser_Commands:

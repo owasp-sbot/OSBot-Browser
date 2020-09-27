@@ -1,7 +1,7 @@
 import json
 
 from osbot_aws.Dependencies import load_dependencies
-from pbx_gs_python_utils.utils.Misc import Misc
+from osbot_utils.utils import Misc
 
 
 class DataTable_Js_Views:

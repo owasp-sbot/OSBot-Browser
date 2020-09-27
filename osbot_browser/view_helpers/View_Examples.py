@@ -1,8 +1,7 @@
-from pbx_gs_python_utils.utils.Files import Files
-from pbx_gs_python_utils.utils.Unzip_File import Unzip_File
-from pbx_gs_python_utils.utils.Zip_Folder import Zip_Folder
-
 from osbot_browser.browser.Render_Page import Render_Page
+from osbot_utils.utils.Files import Files
+from osbot_utils.utils.Unzip_File import Unzip_File
+from osbot_utils.utils.Zip_Folder import Zip_Folder
 
 
 class View_Examples:

@@ -1,5 +1,5 @@
 from gw_bot.helpers.Lambda_Helpers import slack_message
-from pbx_gs_python_utils.utils.Misc import Misc
+from osbot_utils.utils import Misc
 from osbot_browser.view_helpers.Base_View_Helper import Base_View_Helpers
 
 class Maps(Base_View_Helpers):

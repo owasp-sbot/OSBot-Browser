@@ -3,7 +3,7 @@
 #
 # from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 # from osbot_browser.view_helpers.Risk_Dashboard import Risk_Dashboard
-# from pbx_gs_python_utils.utils.Dev import Dev
+# from osbot_utils.utils.Dev import Dev
 #
 # class Test_risk_dashboard(TestCase):
 #

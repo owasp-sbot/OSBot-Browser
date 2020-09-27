@@ -6,6 +6,7 @@ from osbot_aws.apis.shell.Lambda_Shell import Lambda_Shell
 from osbot_aws.helpers.Lambda_Package import Lambda_Package
 from osbot_utils.decorators.Lists import group_by
 from osbot_utils.utils import Misc
+from osbot_utils.utils.Dev import Dev
 from osbot_utils.utils.Files import Files
 
 sys.path.append('../osbot_browser')
