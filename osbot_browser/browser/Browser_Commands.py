@@ -14,7 +14,7 @@ from osbot_utils.utils.Process import Process
 
 class Browser_Commands:
 
-    current_version = 'v0.44 (gw)'
+    current_version = 'v0.45 (gw)'
 
     @staticmethod
     def slack(team_id=None, channel=None, params=None):

@@ -51,7 +51,7 @@ class Test_Lambda_lambda_browser(Test_Helper):
         assert result == '*Here are the `Browser_Commands` commands available:*'
 
     def test_markdown(self):
-        markdown = Misc.random_string_and_numbers(prefix='# Created from Lambda ')
+        markdown = Misc.random_string_and_numbers(prefix='# Created from Lambda ... ')
         payload  = {"params": ['markdown', markdown, " \n normal text"]}
         png_data = self.lambda_browser.invoke(payload)
         self._save_png_file(png_data)
