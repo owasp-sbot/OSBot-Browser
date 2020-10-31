@@ -5,7 +5,7 @@ from osbot_aws.apis.Lambda import Lambda
 from osbot_utils.utils.Dev import Dev
 from osbot_utils.utils import Misc
 
-from gw_bot.helpers.Lambda_Helpers import slack_message
+from osbot_aws.helpers.Lambda_Helpers import slack_message
 from osbot_aws.Dependencies import load_dependencies
 
 

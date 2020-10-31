@@ -1,4 +1,4 @@
-from gw_bot.helpers.Lambda_Helpers import slack_message
+from osbot_aws.helpers.Lambda_Helpers import slack_message
 from osbot_utils.utils import Misc
 from osbot_browser.view_helpers.Base_View_Helper import Base_View_Helpers
 

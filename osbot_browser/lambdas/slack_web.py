@@ -3,7 +3,7 @@ from osbot_aws.Dependencies import load_dependencies
 
 def run(event, context):
     load_dependencies('syncer,requests,pyppeteer,websocket-client')
-    from gw_bot.helpers.Lambda_Helpers import slack_message
+    from osbot_aws.helpers.Lambda_Helpers import slack_message
 
     from osbot_browser.browser.sites.Web_Slack       import Web_Slack
     from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper

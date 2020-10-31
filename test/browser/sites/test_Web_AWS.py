@@ -1,6 +1,4 @@
-from unittest import TestCase
-
-from gw_bot.helpers.Test_Helper import Test_Helper
+from osbot_aws.helpers.Test_Helper import Test_Helper
 from osbot_browser.browser.sites.Web_AWS import Web_AWS
 
 
@@ -12,7 +10,6 @@ class Test_Web_AWS(Test_Helper):
 
 
     def test_setup(self):
-        from osbot_aws.apis.Secrets import Secrets
         self.result = self.aws.secrets_id
 
         #Secrets

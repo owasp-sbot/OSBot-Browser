@@ -1,10 +1,8 @@
-import json
-
 from osbot_aws.Dependencies import load_dependencies, load_dependency
 from osbot_aws.apis.Lambda  import Lambda
 
 from gw_bot.api.Slack_Commands_Helper import Slack_Commands_Helper
-from gw_bot.helpers.Lambda_Helpers                          import slack_message
+from osbot_aws.helpers.Lambda_Helpers import slack_message
 from osbot_browser.browser.Browser_Lamdba_Helper            import Browser_Lamdba_Helper
 from osbot_utils.utils import Misc
 from osbot_utils.utils.Files import Files

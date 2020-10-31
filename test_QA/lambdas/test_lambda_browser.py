@@ -7,7 +7,7 @@ from osbot_aws.apis.Lambda import Lambda
 from gw_bot.Deploy import Deploy
 from osbot_utils.utils import Misc
 
-from gw_bot.helpers.Test_Helper import Test_Helper
+from osbot_aws.helpers.Test_Helper import Test_Helper
 from osbot_browser.browser.Browser_Commands import Browser_Commands
 from osbot_browser.lambdas.lambda_browser   import run
 from osbot_utils.utils.Dev                  import Dev
@@ -296,6 +296,6 @@ result =  browser_helper.get_screenshot_png()
     #__chromium_revision__ = '737645'  # v82  latest
 
     def test_update_dependency(self):
-        from osbot_aws.Dependencies import upload_dependency, pip_install_dependency
+        from osbot_aws.Dependencies import upload_dependency
         #pip_install_dependency('pyppeteer2')
         upload_dependency('pyppeteer2')

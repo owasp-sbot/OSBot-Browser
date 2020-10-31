@@ -1,6 +1,5 @@
 from osbot_utils.utils import Misc
-from gw_bot.helpers.Lambda_Helpers import slack_message
-from osbot_aws.Dependencies import load_dependencies
+from osbot_aws.helpers.Lambda_Helpers import slack_message
 from time import sleep
 
 from osbot_aws.apis.shell.Lambda_Shell              import lambda_shell

@@ -1,6 +1,6 @@
 from osbot_aws.apis.Lambda import Lambda
 
-from gw_bot.helpers.Test_Helper import Test_Helper
+from osbot_aws.helpers.Test_Helper import Test_Helper
 from osbot_browser.lambdas.gw.xml_report import run
 from gw_bot.Deploy import Deploy
 from osbot_utils.utils.Files import Files

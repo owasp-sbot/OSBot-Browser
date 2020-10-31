@@ -1,6 +1,5 @@
 from osbot_aws.apis.Lambda import Lambda
-from osbot_aws.helpers.Lambda_Package import Lambda_Package
-from gw_bot.helpers.Test_Helper import Test_Helper
+from osbot_aws.helpers.Test_Helper import Test_Helper
 from gw_bot.Deploy              import Deploy
 from osbot_browser.lambdas.jira_web import run
 

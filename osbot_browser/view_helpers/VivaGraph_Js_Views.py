@@ -1,7 +1,4 @@
-from gw_bot.helpers.Lambda_Helpers import slack_message
-from osbot_aws.Dependencies import load_dependencies
 from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
-from osbot_utils.utils import Misc
 from osbot_utils.utils.Misc import to_int
 
 
