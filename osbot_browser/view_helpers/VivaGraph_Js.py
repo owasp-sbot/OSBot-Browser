@@ -68,7 +68,7 @@ class VivaGraph_Js:
             s3_key    = data
             s3_bucket = Globals.lambda_s3_bucket
             tmp_file  = S3().file_download_and_delete(s3_bucket, s3_key)
-            data = Json.load_json_and_delete(tmp_file)
+            data = Json.load_file_and_delete(tmp_file)
             return data
         return data
 
