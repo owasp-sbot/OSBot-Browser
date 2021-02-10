@@ -1,54 +1,83 @@
-import json
+from osbot_aws.Dependencies import load_dependencies, load_dependency
+from osbot_aws.apis.Lambda  import Lambda
 
-from osbot_aws.apis.Lambda import load_dependency, load_dependencies, Lambda
-
+from gw_bot.api.Slack_Commands_Helper import Slack_Commands_Helper
+from osbot_aws.helpers.Lambda_Helpers import slack_message
 from osbot_browser.browser.Browser_Lamdba_Helper            import Browser_Lamdba_Helper
-from pbx_gs_python_utils.utils.Files                        import Files
-from pbx_gs_python_utils.utils.Lambdas_Helpers              import slack_message
-from pbx_gs_python_utils.utils.Misc                         import Misc
-from pbx_gs_python_utils.utils.Process                      import Process
-from pbx_gs_python_utils.utils.slack.Slack_Commands_Helper  import Slack_Commands_Helper
+from osbot_utils.utils import Misc
+from osbot_utils.utils.Files import Files
+from osbot_utils.utils.Misc import to_int
+from osbot_utils.utils.Process import Process
 
 
 class Browser_Commands:
 
-    current_version = 'v0.41 (GSBot)'
+    current_version = 'v0.45 (gw)'
 
     @staticmethod
     def slack(team_id=None, channel=None, params=None):
+        target    = Misc.array_pop(params,0)
+        height    = Misc.to_int(Misc.array_pop(params, 0))
+        width     = Misc.to_int(Misc.array_pop(params, 0))
+        scroll_by = Misc.to_int(Misc.array_pop(params, 0))
+        delay     = Misc.to_int(Misc.array_pop(params, 0))
 
-
-        target = Misc.array_pop(params,0)
-        height = Misc.to_int(Misc.array_pop(params, 0))
-        width  = Misc.to_int(Misc.array_pop(params, 0))
-
-        if target is None: target = 'general'
-        if width  is None: width = 800
-        if height is None: height = 1000
+        if target    is None: target = 'general'
+        if width     is None: width = 800
+        if height    is None: height = 1000
+        if scroll_by is None: scroll_by = 0
+        if delay     is None: delay = 0
 
         target_url = '/messages/{0}'.format(target)
 
-        slack_message(":point_right: taking screenshot of slack channel: `{0}` with height `{1}` and width `{2}`".format(target, height,width), [], channel, team_id)
+        slack_message(":point_right: Taking screenshot of slack channel: `{0}` with height `{1}`, width `{2}`, scroll_by `{3}` and delay `{4}`".format(target, height,width,scroll_by,delay), [], channel, team_id)
 
-        payload = {'target' : target_url,
-                   'channel': channel,
-                   'team_id': team_id,
-                   'width'  : width,
-                   'height' : height}
+        payload = {'target'    : target_url,
+                   'channel'   : channel,
+                   'team_id'   : team_id,
+                   'width'     : width,
+                   'height'    : height,
+                   'scroll_by' : scroll_by,
+                   'delay'     : delay}
         aws_lambda      = Lambda('osbot_browser.lambdas.slack_web')
-        png_data        = aws_lambda.invoke(payload)
+        aws_lambda.invoke_async(payload)
 
-        browser_helper  = Browser_Lamdba_Helper()
-        return browser_helper.send_png_data_to_slack(team_id, channel, target, png_data)
 
     @staticmethod
-    def screenshot(team_id=None, channel=None, params=[]):
-        url          = params.pop(0).replace('<', '').replace('>', '')  # fix extra chars added by Slack
-        delay        = Misc.to_int(Misc.array_pop(params,0))
-        slack_message(":point_right: taking screenshot of url: {0}".format(url),[], channel,team_id)
-        browser_helper = Browser_Lamdba_Helper().setup()
-        png_data       = browser_helper.get_screenshot_png(url,full_page=True, delay=delay)
-        return browser_helper.send_png_data_to_slack(team_id,channel,url, png_data)
+    def screenshot(team_id=None, channel=None, params=None):
+        params = params or []
+        try:
+            url = None
+            if len(params) > 0:
+                url = params.pop(0).replace('<', '') \
+                                   .replace('>', '')                # fix extra chars added by Slack and the u00a0 unicode char.
+                if url == '_':                                      # special mode to not render
+                    url = None
+                else:
+                    message = ":point_right: taking screenshot of url: {0}".format(url)
+            if url is None:
+                message = ':point_right: no url provided, so showing what is currently on the browser'
+
+            width          = to_int(Misc.array_pop(params, 0))
+            height         = to_int(Misc.array_pop(params, 0))
+            delay          = to_int(Misc.array_pop(params, 0))
+
+            if width : message += ", with width `{0}`".format(width)
+            if height: message += ", with height `{0}` (min height)".format(height)
+            if delay : message += ", with delay of  `{0}` seconds".format(delay)
+            slack_message(message,[], channel)
+
+            browser_helper = Browser_Lamdba_Helper().setup()
+            if width:
+                browser_helper.api_browser.sync__browser_width(width,height)
+            png_data       = browser_helper.get_screenshot_png(url,full_page=True,delay=delay)
+            slack_message(f':point_right: got screenshot of size {len(png_data)}, sending it to Slack...', [], channel)
+            return browser_helper.send_png_data_to_slack(team_id,channel,url, png_data)
+        except Exception as error:
+            import traceback
+            message = f':red_circle: Browser Error: {error} \n {traceback.format_exc()}'
+            #message = f':red_circle: Browser Error: {error}'
+            return slack_message(message,[], channel,team_id)
 
     @staticmethod
     def lambda_status(team_id, channel, params):
@@ -80,7 +109,7 @@ class Browser_Commands:
 
     @staticmethod
     def render(team_id, channel, params):
-
+        load_dependencies('syncer,requests,pyppeteer,websocket-client');
         if params:
             target = params.pop(0)
             delay  = Misc.to_int(Misc.array_pop(params,0))
@@ -94,106 +123,67 @@ class Browser_Commands:
         slack_message(":point_right: rendering file `{0}`".format(target), [], channel, team_id)
         return Browser_Lamdba_Helper().setup().render_file(team_id, channel, target,clip=clip, delay=delay)
 
-        #png_file = browser_helper.render_page.screenshot_file_in_folder(browser_helper.web_root(), target, clip=clip)
-        #return browser_helper.send_png_file_to_slack(team_id, channel, target, png_file)
 
-        # return None
-        # load_dependency('syncer')
-        # load_dependency('requests')
-        # from osbot_browser.browser.API_Browser import API_Browser
-        # from osbot_browser.browser.Render_Page import Render_Page
-        #
-        # web_root = './web_root/'
-        # target   = url_path
-        #
-        # api_browser = API_Browser().sync__setup_browser()
-        # render_page = Render_Page(api_browser)
-        #
-        # browser_helper = Browser_Lamdba_Helper().setup()
-        # png_file = render_page.screenshot_file_in_folder(web_root, target, clip=clip)
-        #
-        # return browser_helper.send_png_file_to_slack(team_id, channel, 'markdown', png_file)
-        # #return Browser_Commands._send_to_slack__png_file(team_id, channel, target, png_file)
 
     # @staticmethod
     # def risks(team_id=None, channel=None, params=None):
-    #     path = '/gs/risk/r1-and-r2.html'
-    #     data = {}
-    #     if params and len(params) > 0:
-    #         fixed_params = ' '.join(params).replace('```','')
-    #         data = {}
-    #         for items in fixed_params.split(','):
-    #             values = items.split(':')
-    #             data[values[0].strip()] = values[1].strip()
+    #     load_dependency('syncer') ;
+    #     load_dependency('requests')
     #
-    #     js_code = "r1_and_r2.set_risks({0})".format(json.dumps(data))
-    #     clip = {'x': 1, 'y': 1, 'width': 915, 'height': 435}
-    #     browser = Browser_Lamdba_Helper().setup()
-    #     return browser.render_file(team_id, channel, path=path, js_code=js_code, clip=clip)
-
-        #return browser.open_local_page_and_get_screenshot(path, js_code=js_code, png_file=png_file)
-
-        #
-        #.set_risks({'r1_2': '1', 'r2_4': '0', 'r5_4': '2'})
-
-    @staticmethod
-    def risks(team_id=None, channel=None, params=None):
-        load_dependency('syncer') ;
-        load_dependency('requests')
-
-        from osbot_browser.view_helpers.Risk_Dashboard import Risk_Dashboard
-
-        jira_key = params.pop(0)
-
-        return ( Risk_Dashboard().create_dashboard_for_jira_key(jira_key)
-                                 .send_graph_name_to_slack(team_id, channel)
-                                 .send_screenshot_to_slack(team_id, channel))
-
-        # graph_name = 'graph_DGK'
-        # root_node = 'GSSP-6'
-        #
-        # return Risk_Dashboard().create_dashboard_for_graph(graph_name,root_node).send_screenshot_to_slack(team_id, channel)
-
-
-    @staticmethod
-    def risks_test_data(team_id=None, channel=None, params=None):
-        load_dependency('syncer') ;
-        load_dependency('requests')
-
-        from osbot_browser.view_helpers.Risk_Dashboard import Risk_Dashboard
-
-        return Risk_Dashboard().create_dashboard_with_test_data().send_screenshot_to_slack(team_id, channel)
-
-        #browser = Risk_Dashboard().create_dashboard_with_test_data().browser()
-
-        #clip = {'x': 1, 'y': 1, 'width': 915, 'height': 435}
-        #png_file =  browser.sync__screenshot(clip = clip)
-        #return Browser_Lamdba_Helper().send_png_file_to_slack(team_id, channel, 'markdown', png_file)
+    #     from osbot_browser.view_helpers.Risk_Dashboard import Risk_Dashboard
+    #
+    #     jira_key = params.pop(0)
+    #
+    #     return ( Risk_Dashboard().create_dashboard_for_jira_key(jira_key)
+    #                              .send_graph_name_to_slack(team_id, channel)
+    #                              .send_screenshot_to_slack(team_id, channel))
+    #
+    #     # graph_name = 'graph_DGK'
+    #     # root_node = 'GSSP-6'
+    #     #
+    #     # return Risk_Dashboard().create_dashboard_for_graph(graph_name,root_node).send_screenshot_to_slack(team_id, channel)
+    #
+    #
+    # @staticmethod
+    # def risks_test_data(team_id=None, channel=None, params=None):
+    #     load_dependency('syncer') ;
+    #     load_dependency('requests')
+    #
+    #     from osbot_browser.view_helpers.Risk_Dashboard import Risk_Dashboard
+    #
+    #     return Risk_Dashboard().create_dashboard_with_test_data().send_screenshot_to_slack(team_id, channel)
+    #
+    #     #browser = Risk_Dashboard().create_dashboard_with_test_data().browser()
+    #
+    #     #clip = {'x': 1, 'y': 1, 'width': 915, 'height': 435}
+    #     #png_file =  browser.sync__screenshot(clip = clip)
+    #     #return Browser_Lamdba_Helper().send_png_file_to_slack(team_id, channel, 'markdown', png_file)
 
 
-    @staticmethod
-    def vis_js(team_id=None, channel=None, params=None):
-        path = 'examples/vis-js.html'
-
-        params = ' '.join(params).replace('“','"').replace('”','"')
-        data = json.loads(params)
-
-        load_dependencies(['syncer', 'requests'])
-
-        nodes   = data.get('nodes'  )
-        edges   = data.get('edges'  )
-        options = data.get('options')
-        from osbot_browser.view_helpers.Vis_Js import Vis_Js
-        vis_js = Vis_Js()
-        vis_js.create_graph(nodes, edges, options)
-        #vis_js.show_jira_graph(graph_name)
-        return vis_js.send_screenshot_to_slack(team_id,channel)
-
-        # browser = Browser_Lamdba_Helper().setup()
-        #
-        # return browser.open_local_page_and_get_html(path,js_code=js_code)
-
-        #return browser.render_file(team_id, channel,path, js_code=js_code)
+    # @staticmethod
+    # def vis_js(team_id=None, channel=None, params=None):
+    #     path = 'examples/vis-js.html'
+    #
+    #     params = ' '.join(params).replace('“','"').replace('”','"')
+    #     data = json.loads(params)
+    #
+    #     load_dependency('syncer')
+    #     load_dependency('requests')
+    #
+    #     nodes   = data.get('nodes'  )
+    #     edges   = data.get('edges'  )
+    #     options = data.get('options')
+    #     from osbot_browser.view_helpers.Vis_Js import Vis_Js
+    #     vis_js = Vis_Js()
+    #     vis_js.create_graph(nodes, edges, options)
+    #     #vis_js.show_jira_graph(graph_name)
+    #     return vis_js.send_screenshot_to_slack(team_id,channel)
+    #
+    #     # browser = Browser_Lamdba_Helper().setup()
+    #     #
+    #     # return browser.open_local_page_and_get_html(path,js_code=js_code)
+    #
+    #     #return browser.render_file(team_id, channel,path, js_code=js_code)
 
 
     @staticmethod
@@ -221,6 +211,7 @@ class Browser_Commands:
 
     @staticmethod
     def go_js(team_id=None, channel=None, params=None):
+        load_dependencies('syncer,requests,pyppeteer,websocket-client')
         if len(params) < 2:
             text = ':red_circle: Hi, for the `go_js` command, you need to provide 2 parameters: '
             attachment_text = '*graph name* - the nodes and edges you want to view\n' \
@@ -237,6 +228,7 @@ class Browser_Commands:
 
     @staticmethod
     def graph(team_id=None, channel=None, params=None):
+        load_dependencies('syncer,requests,pyppeteer,websocket-client') # todo: remove this from here (should already not be needed)
         if len(params) < 2:
             text = ':red_circle: Hi, for the `graph` command, you need to provide 2 parameters: '
             attachment_text = '*graph name* - the nodes and edges you want to view\n' \
@@ -254,15 +246,19 @@ class Browser_Commands:
 
     @staticmethod
     def viva_graph(team_id=None, channel=None, params=None):
+        if len(params) == 1:
+            params.append('default')   # default to 'default' view
+
         if len(params) < 2:
             text = ':red_circle: Hi, for the `viva_graph` command, you need to provide 2 parameters: '
             attachment_text = '*graph name* - the nodes and edges you want to view\n' \
                               '*view name* - the view to render'
             return text, [{'text': attachment_text}]
 
+
         from osbot_browser.view_helpers.VivaGraph_Js_Views import VivaGraph_Js_Views
 
-        params[0], params[1] = params[1], params[0]
+        params[0], params[1] = params[1], params[0]    # swap params so that the view name goes first (since that is the method name
 
         (text, attachments) = Slack_Commands_Helper(VivaGraph_Js_Views).show_duration(True).invoke(team_id, channel, params)
 
@@ -311,6 +307,35 @@ class Browser_Commands:
 
         if team_id is None:
             return text
+
+
+
+
+
+    @staticmethod
+    def maps(team_id=None, channel=None, params=None):
+        load_dependency('syncer')
+        load_dependency('requests')
+        load_dependency('pyppeteer')
+        load_dependency('websocket-client')
+        from osbot_browser.view_helpers.Maps_Views import Maps_Views
+        (text,attachments) = Slack_Commands_Helper(Maps_Views).invoke('not-used', channel, params)
+        if team_id is None:
+            return text
+
+    @staticmethod
+    def sow(team_id=None, channel=None, params=None):
+        load_dependency('syncer')
+        load_dependency('requests')
+        load_dependency('pyppeteer')
+        load_dependency('websocket-client')
+        try:
+            from osbot_browser.view_helpers.Sow_Views import Sow_Views
+            (text, attachments) = Slack_Commands_Helper(Sow_Views).invoke('not-used', channel, params)
+            if channel is None:
+                return text
+        except Exception as error:
+            return f'[sow error] {error}'
 
     @staticmethod
     def version(team_id=None, channel=None, params=None):

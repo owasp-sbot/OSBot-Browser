@@ -1,31 +1,22 @@
-import base64
-import json
 import unittest
-from   unittest import TestCase
 
+from osbot_aws.helpers.Test_Helper import Test_Helper
+from osbot_aws.apis.Lambda import Lambda
 from osbot_browser.browser.Browser_Commands import Browser_Commands
-from pbx_gs_python_utils.utils.Dev import Dev
-from pbx_gs_python_utils.utils.Files import Files
+from osbot_utils.utils.Dev import Dev
+
+from gw_bot.Deploy import Deploy
+from osbot_utils.utils.Files import Files
 
 
-class Test_Browser_Commands(TestCase):
+class Test_Browser_Commands(Test_Helper):
 
     def setUp(self):
+        super().setUp()
         self.browser_commands = Browser_Commands()
-        self.png_file         = '/tmp/lambda_png_file.png'
-        self.team_id          = 'T7F3AUXGV'
-        self.channel          = 'DDKUZTK6X' #''GDL2EC3EE'
-        self.result           = None
+        self.team_id          = None #'T7F3AUXGV'
+        self.channel          = None #'DDKUZTK6X' #''GDL2EC3EE'
 
-    def tearDown(self):
-        if self.result is not None:
-            Dev.pprint(self.result)
-
-    def _save_png_data(self, png_data):
-        png_file = '/tmp/lambda_png_file.png'
-        if png_data:
-            with open(png_file, "wb") as fh:
-                fh.write(base64.decodebytes(png_data.encode()))
 
     def test_list(self):
         result = self.browser_commands.list(None, None, None)
@@ -38,6 +29,19 @@ class Test_Browser_Commands(TestCase):
         #os.environ['OSX_CHROME'] = 'True'
         url = 'https://www.google.co.uk'
         self.browser_commands.screenshot(self.team_id, self.channel, [url])
+
+    def test_screenshot_via_lambda(self):
+        #Deploy().deploy_lambda__browser()
+        url          = 'https://www.google.com/asd'
+        lambda_name  = 'osbot_browser.lambdas.lambda_browser'
+        lambda_browser = Lambda(lambda_name)
+        payload = {"params": ['screenshot', url]}
+        self.png_data = lambda_browser.invoke(payload)
+        from osbot_aws.apis.shell.Lambda_Shell import Lambda_Shell
+        auth_key = Lambda_Shell().get_lambda_shell_auth()
+        payload = {'lambda_shell': {'method_name': 'list_processes', 'method_kwargs': None, 'auth_key': auth_key}}
+
+        print(lambda_browser.invoke(payload))
 
     def test_slack(self):
         #os.environ['OSX_CHROME'] = 'True'
@@ -131,14 +135,35 @@ class Test_Browser_Commands(TestCase):
         self._save_png_data(result)
 
     def test_go_js(self):
-        graph_name = 'graph_XKW'
+        self.test_update_lambda()
+        graph_name = 'graph_J2O'
         params = [graph_name,'default']
         result = self.browser_commands.go_js(params=params)
         Dev.pprint(result)
-        self._save_png_data(result)
+        #self._save_png_data(result)
 
 
     def test_table(self):
-        params =['issue','GSOS-181']
+        #self.test_update_lambda()
+        params =['issue','Person-1']
         result = self.browser_commands.table(params=params)
         Dev.pprint(result)
+
+    def test_google_charts(self):
+        Deploy().setup()
+
+        channel = 'DJ8UA0RFT'
+        self.browser_commands.google_charts(None, channel,['default'])
+        #self.browser_commands.oss_today(None, channel)
+
+    def test_vis_js(self):
+        self.result = self.browser_commands.vis_js(params =[])
+
+    def test_sow(self):
+        result = self.browser_commands.sow(None, None,['view', 'SOW-135'])
+        Dev.pprint(result)
+        #self.browser_commands.oss_today(None, channel)
+
+
+    def test_update_lambda(self):
+        Deploy().setup().deploy_lambda__browser()

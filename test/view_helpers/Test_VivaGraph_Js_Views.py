@@ -1,45 +1,63 @@
-from unittest import TestCase
-
-from browser import Browser_Lamdba_Helper
+from gw_bot.Deploy import Deploy
+from osbot_aws.helpers.Test_Helper import Test_Helper
 from osbot_browser.view_helpers.VivaGraph_Js_Views import VivaGraph_Js_Views
 
 
-class Test_VivaGraph_Js_Views(TestCase):
+class Test_VivaGraph_Js_Views(Test_Helper):
 
     def setUp(self):
+        super().setUp()
         self.graph_name = 'graph_XKW'
         self.png_data   = None
 
-    def tearDown(self):
-        if self.png_data:
-            Browser_Lamdba_Helper(headless=False).save_png_data(self.png_data)
+    # def tearDown(self):
+    #     super().defau
+    #     if self.png_data:
+    #         Browser_Lamdba_Helper().save_png_data(self.png_data)
+
+
+
+    def test_deploy_lambda_function(self):
+        self.result = Deploy().deploy_lambda__browser()
 
     def test_default(self):
-        graph_name = 'graph_XKW'    # (7 nodes)
-        graph_name = 'graph_MKF'    # ( 20 nodes,  27 edges)
-        graph_name = 'graph_YT4'   # (199 nodes, 236 edges)
-        #graph_name = 'graph_VZ5'   # (367 nodes, 653 edges)
-        #graph_name = 'graph_EE3'    # fails in lambda in visjs (but works here :) )
-        self.png_data = VivaGraph_Js_Views.default(params=[graph_name])
+        graph_name = 'graph_X3X'
+        #graph_name = 'graph_I3H' #'graph_UUZ'
+        #graph_name = 'graph_24O'
+        #graph_name = 'graph_041'  # large one  (doesn't work headless)
+        #graph_name = 'graph_DR8'
+        #graph_name = 'graph_39B'   # large (all links from all tasks)
+        channel    = None #'CSK9RADE2'
+        headless   = False
+        screenshot = False
+        self.png_data = VivaGraph_Js_Views.default(params=[graph_name], screenshot=screenshot, headless=headless, channel=channel)
         #self.png_data = False
 
-        #return
+    def test_default__check_width(self):
+        graph_name    = 'graph_03K'
+        browser_width = 200
+        render_wait   = 0
+        screenshot    = False
+        vivagraph_js = VivaGraph_Js_Views.default(params=[graph_name,browser_width, render_wait], screenshot=screenshot)
+        assert vivagraph_js.browser_width == browser_width
+        assert  vivagraph_js.render_wait == render_wait
+
+
     def test_default__with_non_issue_nodes(self):
         graph_name = 'graph_THV'                    # create by an group_by filter
         self.png_data = VivaGraph_Js_Views.default(params=[graph_name])
 
 
-    def test_by_issue_type(self):
-        graph_name = 'graph_XKW'    # (7 nodes)
-        graph_name = 'graph_MKF'    # ( 20 nodes,  27 edges)
+    def test_by_no_key(self):
+        graph_name = 'graph_24O'    # ( 20 nodes,  27 edges)
+        #graph_name = 'graph_041'
+        self.png_data = VivaGraph_Js_Views.no_key(params=[graph_name],headless=True)
 
-        self.png_data = VivaGraph_Js_Views.by_issue_type(params=[graph_name])
-
-    def test_by_field(self):
-        graph_name = 'graph_XKW'    # (7 nodes)
-        graph_name = 'graph_MKF'    # ( 20 nodes,  27 edges)
-        field      = 'Labels' # ''Rating'
-        self.png_data = VivaGraph_Js_Views.by_field(params=[graph_name,field])
+    def test_by_node_value(self):
+        graph_name = 'graph_UUZ'
+        field      = 'Summary'
+        width      = 100
+        self.png_data = VivaGraph_Js_Views.node_value(params=[graph_name,field,width],headless=False)
         #self.png_data = False
 
     # def test_people(self):
@@ -56,6 +74,5 @@ class Test_VivaGraph_Js_Views(TestCase):
     def test_fixed_bug__broken_images(self):
         graph_name = 'graph_34F'
         self.png_data = VivaGraph_Js_Views.default(params=[graph_name],headless=False)
-
 
 

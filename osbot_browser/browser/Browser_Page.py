@@ -1,16 +1,24 @@
 from time import sleep
 
+from osbot_aws.Dependencies                      import load_dependency
 from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 
 
 class Browser_Page:
 
-    def __init__(self,headless=True, new_page=True):
-        self.headless        = headless
+    def __init__(self,headless=True, new_page=False):
+        self.headless       = headless
         self.browser        = None
         self.browser_helper = None
         self.new_page       = new_page
         self.page           = None
+
+    # def setup_with_dependencies(self):
+    #     load_dependency('syncer')
+    #     load_dependency('requests')
+    #     load_dependency('pyppeteer')
+    #     load_dependency('websocket-client')
+    #     return self.setup()
 
     def setup(self):
         self.browser_helper = Browser_Lamdba_Helper(headless=self.headless).setup()
@@ -50,7 +58,7 @@ class Browser_Page:
         return self.browser.sync__screenshot_base64(url=url, page=self.page, full_page=full_page, clip=clip, delay=delay )
 
     def text(self):
-        return self.browser.sync__page_text()
+        return self.browser.sync__page_text(self.page)
 
     def on_dialog__always_accept(self):
         self.browser.sync_on_dialog__always_accept(self.page)
@@ -108,7 +116,14 @@ class Browser_Page:
                 return True
             sleep(wait_for)
         return False
-        #return self.browser.sync__await_for_element(element, page=self.page,visible=visible, hidden=hidden)
+
+    def wait_for_element__id__is_equal_to(self, element_id, value, wait_for=0.25, max_attempts=20):
+        for i in range(0,max_attempts):
+            element_value=self.javascript_eval(f"document.getElementById('{element_id}').innerText")
+            if element_value == value:
+                return True
+            sleep(wait_for)
+        return False
 
     def wait_for_element__tag_name(self, element_id, exists=True, wait_for=0.25, max_attempts=20):
         for i in range(0,max_attempts):

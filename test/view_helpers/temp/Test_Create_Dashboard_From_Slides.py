@@ -3,7 +3,7 @@ from unittest import TestCase
 from osbot_aws.apis.Lambda import Lambda
 from osbot_gsuite.apis.GSheets import GSheets
 
-from pbx_gs_python_utils.utils.Dev import Dev
+from osbot_utils.utils.Dev import Dev
 
 
 
@@ -19,10 +19,9 @@ class Create_Dashboard_From_Slides:
             self._gsheets = GSheets(gsuite_secret_id=self.gsuite_secret_id)
         return self._gsheets
 
-    #@use_local_cache_if_available
     def get_r1_r2_r3_issues(self):
         params = ['search', 'label', 'R1,R2,R3']
-        return Lambda('gs.elk_to_slack').invoke({"params": params})
+        return Lambda('osbot_jira.lambdas.elk_to_slack').invoke({"params": params})
 
     def get_r1_r2_r3_model(self):
         print()

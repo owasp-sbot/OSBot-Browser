@@ -7,8 +7,8 @@ from osbot_browser.browser.API_Browser import API_Browser
 from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 from osbot_browser.browser.Render_Page import Render_Page
 from osbot_browser.browser.Web_Server import Web_Server
-from pbx_gs_python_utils.utils.Files import Files
-from pbx_gs_python_utils.utils.Json import Json
+from osbot_utils.utils.Files import Files
+from osbot_utils.utils.Json import Json
 
 
 class Base_View_Helpers:
@@ -44,12 +44,12 @@ class Base_View_Helpers:
 
     def get_graph_data(self, graph_name):
         params = {'params': ['raw_data', graph_name, 'details'], 'data': {}}
-        data = Lambda('lambdas.gsbot.gsbot_graph').invoke(params)
+        data = Lambda('osbot_jira.lambdas.graph').invoke(params)
         if type(data) is str:
             s3_key = data
-            s3_bucket = 'gs-lambda-tests'
+            s3_bucket = 'gw-bot-lambdas'
             tmp_file = S3().file_download_and_delete(s3_bucket, s3_key)
-            data = Json.load_json_and_delete(tmp_file)
+            data = Json.load_file_and_delete(tmp_file)
             return data
         return data
 

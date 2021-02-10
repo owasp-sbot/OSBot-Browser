@@ -1,10 +1,8 @@
 from syncer import sync
 
 from osbot_browser.browser.API_Browser import API_Browser
-from osbot_browser.browser.Web_Server import Web_Server, Web_Server_Temp_File
-from pbx_gs_python_utils.utils.Dev import Dev
-from pbx_gs_python_utils.utils.Files import Files
-from pbx_gs_python_utils.utils.Misc import Misc
+from osbot_browser.browser.Web_Server  import Web_Server, Web_Server_Temp_File
+from osbot_utils.utils.Files           import Files
 
 
 class Render_Page:
@@ -17,7 +15,7 @@ class Render_Page:
         if api_browser:
             self.api_browser = api_browser
         else:
-            self.api_browser = API_Browser(headless,headless)
+            self.api_browser = API_Browser(headless= headless)
 
     def render_file(self, html_file):
         return self.render_html(Files.contents(html_file))
@@ -60,7 +58,7 @@ class Render_Page:
         await self.api_browser.browser()                # make sure browser is connected
         await self.api_browser.open(url)                # open url
         await self.api_browser.js_execute(js_code)      # execute Javascript
-        return await self.api_browser.html()            # return Html (localy via PyQuery)
+        return await self.api_browser.html()            # return raw Html
 
     @sync
     async def get_screenshot_via_browser(self, url = None, png_file=None,full_page=True, clip=None,viewport=None, js_code=None,delay=None):

@@ -3,14 +3,15 @@ from time import sleep
 
 import requests
 
-from pbx_gs_python_utils.utils.Files import Files
-from pbx_gs_python_utils.utils.Misc  import Misc
-from pbx_gs_python_utils.utils.Http  import port_is_open
+from osbot_utils.utils import Misc
+from osbot_utils.utils.Files import Files
+from osbot_utils.utils.Http import port_is_open
 
 
 class Web_Server:
     def __init__(self, web_root=None):
         self.src_tmp     = '/tmp/temp_web_server'
+        self.python_path = 'python3'
         if web_root      : self.web_root = web_root
         else             : self.web_root = self.src_tmp + '/html'
         self.html_file   = Files.path_combine(self.web_root, 'index.html')
@@ -38,7 +39,8 @@ class Web_Server:
 
     def start(self):
         if Files.not_exists(self.web_root):  Files.folder_create(self.web_root)     # make sure root folder exists
-        self.server_proc = subprocess.Popen(["python3", "-m", "http.server", str(self.port)], cwd=self.web_root)
+
+        self.server_proc = subprocess.Popen([self.python_path, "-m", "http.server", str(self.port)], cwd=self.web_root)
         self.wait_for_server_started()
         return self
 

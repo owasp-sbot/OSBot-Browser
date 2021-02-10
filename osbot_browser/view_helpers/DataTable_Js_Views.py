@@ -1,9 +1,7 @@
 import json
 
-from osbot_aws.apis.Lambda import load_dependencies
-
-from pbx_gs_python_utils.utils.Dev import Dev
-from pbx_gs_python_utils.utils.Misc import Misc
+from osbot_aws.Dependencies import load_dependencies
+from osbot_utils.utils import Misc
 
 
 class DataTable_Js_Views:
@@ -47,7 +45,7 @@ class DataTable_Js_Views:
                                                     table_title  = "<b>{0}</b> <small><small><i>(data from graph)</i></small></small>".format(graph_name))
     @staticmethod
     def graph(team_id=None, channel=None, params=None):
-        load_dependencies(['syncer', 'requests']);
+        load_dependencies('syncer,requests,pyppeteer,websocket-client');
         graph_name = params.pop(0)
         headers      = ['Issue Type', 'Summary', 'Description', 'Status', 'Rating', 'Key']  # without issue links
         table_width  = "1500px"
@@ -59,7 +57,7 @@ class DataTable_Js_Views:
 
     @staticmethod
     def graph_simple(team_id=None, channel=None, params=None):
-        load_dependencies(['syncer', 'requests']);
+        load_dependencies('syncer,requests,pyppeteer,websocket-client');
         graph_name = params.pop(0)
         table_width = "1200px"
         headers     = ['Key', 'Summary', 'Status', 'Rating', 'Issue Type']  # without issue links
@@ -74,7 +72,7 @@ class DataTable_Js_Views:
 
     @staticmethod
     def graph_tasks(team_id=None, channel=None, params=None):
-        load_dependencies(['syncer', 'requests']);
+        load_dependencies('syncer,requests,pyppeteer,websocket-client');
         graph_name = params.pop(0)
         table_width = "1200px"
         headers = ['Key', 'Summary', 'Latest_Information','Status', 'Issue Type']  # without issue links
@@ -91,7 +89,7 @@ class DataTable_Js_Views:
 
     @staticmethod
     def graph_all_fields(team_id=None, channel=None, params=None):
-        load_dependencies(['syncer', 'requests']);
+        load_dependencies('syncer,requests,pyppeteer,websocket-client');
         graph_data = DataTable_Js_Views._get_data(params.pop(0))
 
         if graph_data:
@@ -110,7 +108,7 @@ class DataTable_Js_Views:
             return DataTable_Js_Views._create_table(headers, rows, team_id, channel)
 
     def issue(team_id=None, channel=None, params=None):
-        load_dependencies(['syncer', 'requests']);
+        load_dependencies('syncer,requests,pyppeteer,websocket-client');
 
 
         graph_data = DataTable_Js_Views._get_data(params.pop(0))
@@ -136,7 +134,7 @@ class DataTable_Js_Views:
     @staticmethod
     def test_data(team_id=None, channel=None, params=None):
 
-        load_dependencies(['syncer', 'requests']);
+        load_dependencies('syncer,requests,pyppeteer,websocket-client');
 
         from osbot_browser.view_helpers.DataTable_Js import DataTable_Js
         headers = ['Header AAA','Header BBB']

@@ -5,3 +5,5 @@ gs-dashboard.json
 r1-and-r2.coffee
 Test_GS_FY_Risk_Dashboards.py
 __pycache__
+_lambda_dependencies
+.env

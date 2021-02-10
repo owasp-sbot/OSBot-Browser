@@ -1,8 +1,8 @@
-from osbot_aws.apis.Lambda import load_dependencies
+from osbot_aws.Dependencies import load_dependencies
 from osbot_gsuite.apis.GCalendar import GCalendar
 
-from pbx_gs_python_utils.utils.Dev import Dev
-from pbx_gs_python_utils.utils.Lambdas_Helpers import slack_message
+from osbot_utils.utils.Dev import Dev
+
 
 gsuite_secret_id = 'gsuite_gsbot_user'
 
@@ -10,7 +10,7 @@ class Full_Calendar_Views:
 
     @staticmethod
     def _get_gcalendar():
-        load_dependencies(['syncer', 'requests', 'gmail']);
+        load_dependencies('syncer', 'requests', 'gmail');
         return GCalendar(gsuite_secret_id=gsuite_secret_id)
 
     @staticmethod

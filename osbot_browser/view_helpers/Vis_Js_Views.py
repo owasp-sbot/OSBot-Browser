@@ -1,17 +1,15 @@
-from osbot_aws.apis.Lambda import load_dependencies
-
-from pbx_gs_python_utils.utils.Dev import Dev
-from pbx_gs_python_utils.utils.Misc import Misc
+from osbot_aws.Dependencies import load_dependencies
 from osbot_browser.view_helpers.Edge_Format import Edge_Format
 from osbot_browser.view_helpers.Node_Format import Node_Format
+from osbot_utils.utils import Misc
 
 
 class Vis_Js_Views:
 
     @staticmethod
-    def default(team_id=None, channel=None, params=None, no_render=False, headless=True):
+    def default(team_id=None, channel=None, params=None, no_render=False, take_screenshot=True, headless=True):
 
-        load_dependencies(['syncer', 'requests']) ; from osbot_browser.view_helpers.Vis_Js import Vis_Js
+        load_dependencies('syncer,requests,pyppeteer,websocket-client') ; from osbot_browser.view_helpers.Vis_Js import Vis_Js
 
         graph_name = params.pop(0)
         vis_js = Vis_Js(headless=headless)                               # will start browser
@@ -24,7 +22,6 @@ class Vis_Js_Views:
             graph_name = graph_data.get('graph_name')
             for key, issue in graph_data.get('nodes').items():
                 nodes.append({'id': key, 'label': key})
-                # Dev.pprint(issue)
 
             for edge in graph_data.get('edges'):
                 from_node = edge[0]
@@ -38,7 +35,10 @@ class Vis_Js_Views:
         if no_render is True:
             return (graph_name,nodes, edges, graph_data,vis_js)
 
-        return vis_js.send_screenshot_to_slack(team_id, channel)
+        if take_screenshot:
+            return vis_js.send_screenshot_to_slack(team_id, channel)
+        else:
+            return vis_js
 
     @staticmethod
     def no_labels(team_id=None, channel=None, params=None):
@@ -55,29 +55,29 @@ class Vis_Js_Views:
         return vis_js.create_graph_and_send_screenshot_to_slack(graph_name, nodes,edges, None, team_id, channel)
 
     @staticmethod
-    def node_label(team_id=None, channel=None, params=None):
+    def node_label(team_id=None, channel=None, params=None,headless=True):
         if len(params) < 2:
             return "':red_circle: Hi, for the `node_label` view, you need to provide the label field name. Try: `Key`, `Summary`, `Rating`, `Status`"
 
         label_key  = ' '.join(params[1:])
 
-        (graph_name,nodes, edges, graph_data,vis_js) = Vis_Js_Views.default(params=params, no_render=True)
+        (graph_name,nodes, edges, graph_data,vis_js) = Vis_Js_Views.default(params=params, no_render=True,headless=headless)
         graph_name += ' | node_label | ' + label_key
+        if graph_data:
+            issues = graph_data.get('nodes')
+            for node in nodes:
+                issue = issues.get(node['label'])
+                if issue:
+                    value = str(issue.get(label_key))
+                    node['label'] = Misc.word_wrap(value,40)
 
-        issues = graph_data.get('nodes')
-        for node in nodes:
-            issue = issues.get(node['label'])
-            if issue:
-                value = str(issue.get(label_key))
-                node['label'] = Misc.word_wrap(value,40)
+            for edge in edges:
+                del edge['label']
 
-        for edge in edges:
-            del edge['label']
-
-        options = { 'nodes': {'shape' : 'box' },
-                    'edges': {'arrows': 'to'  }}
-        options = None
-        return vis_js.create_graph_and_send_screenshot_to_slack(graph_name, nodes,edges, options, team_id, channel)
+            options = { 'nodes': {'shape' : 'box' },
+                        'edges': {'arrows': 'to'  }}
+            options = None
+            return vis_js.create_graph_and_send_screenshot_to_slack(graph_name, nodes,edges, options, team_id, channel)
 
     # Issues layouts
 

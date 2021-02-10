@@ -3,56 +3,88 @@ import json
 import os
 from time import sleep
 
-from osbot_aws.apis.Lambda import load_dependency
+from pyppeteer.element_handle import ElementHandle
 from syncer import sync
 
-from pbx_gs_python_utils.utils.Dev          import Dev
-from pbx_gs_python_utils.utils.Files        import Files
-from pbx_gs_python_utils.utils.Http         import WS_is_open
-from pbx_gs_python_utils.utils.Json         import Json
-from pbx_gs_python_utils.utils.Process      import Process
+from osbot_browser.chrome.Chrome import Chrome
+from osbot_utils.utils.Dev import Dev
+from osbot_utils.utils.Files import Files
 
+# see https://github.com/puppeteer/puppeteer/blob/master/docs/api.md for all the functions available
 
 class API_Browser:
 
-    def __init__(self, headless = True, url_chrome = None):
-        self.file_tmp_last_chrome_session = '/tmp/browser-last_chrome_session.json'
-        #self.file_tmp_screenshot          = '/tmp/browser-page-screenshot.png'
+    def __init__(self, browser=None, headless=True):  # headless = True, new_browser=False, url_chrome = None):
         self.file_tmp_screenshot          = Files.temp_file('.png')
-        self._browser                     = None
+        self._browser                     = browser
         self.headless                     = headless
-        self.auto_close                   = headless                       # don't auto close when not running headless
-        self.url_chrome                   = url_chrome
         self.log_js_errors_to_console     = True
 
     async def browser(self):
         if self._browser is None:
-            self._browser = await self.browser_connect()
+            self._browser = await Chrome(self.headless).browser()
         return self._browser
 
-    async def browser_connect(self):
-        from pyppeteer import connect, launch                               # we can only import this here or we will have a conflict with the AWS headless version
-        url_chrome = None
-        if not self.url_chrome:
-            url_chrome = self.get_last_chrome_session().get('url_chrome')
-        if url_chrome and WS_is_open(url_chrome):
-            self._browser = await connect({'browserWSEndpoint': url_chrome})
-        else:
-            self._browser = await launch(headless=self.headless,
-                                         autoClose = self.auto_close,
-                                         args=['--no-sandbox',
-                                               '--single-process',
-                                               '--disable-dev-shm-usage'])
-            self.set_last_chrome_session({'url_chrome': self._browser.wsEndpoint})
-        return self._browser
-
-    async def browser_close(self):          # bug: this is not working 100% since there are still tons of "headless_shell <defunct>" proccess left (one per execution)
+    async def browser_close(self):
         browser = await self.browser()
         if browser is not None:
             pages = await browser.pages()
             for page in pages:              # not sure if this makes any difference
                await page.close()
             await browser.close()
+
+    async def element(self, page, selector):
+        if type(selector) is ElementHandle:      # for the cases when a selector is already a selector
+            return selector                     # todo: add better check that it is a selector
+        try:
+            return await page.querySelector(selector)
+        except:
+            return None
+
+    async def element_attribute(self, page, target, name):
+        element = await self.element(page, target)
+        if element:
+            return await page.evaluate('(element, name) => element.getAttribute(name)', element, name)
+
+    async def element_attributes(self, page, target):
+        element = await self.element(page, target)
+        if element:
+            return await page.evaluate('(element) => element.getAttributeNames().map((name)=>  { return { [name]: element.getAttribute(name) } } )', element)
+
+
+    async def element_property(self, page, target, property):
+        element = await self.element(page, target)
+        if element:
+            return await page.evaluate(f'(element) => element.{property}', element)
+        return None
+
+    async def elements(self, page, target):
+        if type(target) is list:             # cases when target is a list of elements
+            return target
+        try:
+            return await page.querySelectorAll(target)
+        except:
+            return None
+
+    async def elements_attribute(self, page, selector, name):
+        result = []
+        elements = await self.elements(page, selector)
+        if elements:
+            for element in elements:
+                result.append(await self.element_attribute(page, element, name))
+        return result
+
+    async def elements_attributes(self, page, selector):
+        result = []
+        for element in await self.elements(page, selector):
+            result.append(await self.element_attributes(page, element))
+        return result
+
+    async def elements_property(self, page, selector, property):
+        result = []
+        for element in await self.elements(page, selector):
+            result.append(await self.element_property(page, element, property))
+        return result
 
     async def js_execute(self, js_code,page=None):
         if js_code:
@@ -70,9 +102,6 @@ class API_Browser:
             params = js_code.get('params'  )                                 # get the name and params values
             if name and params:
                 return await self.js_invoke_function(name, params,page=page) # execute them as a js method
-
-            #from time import sleep                                          # we might need to add some kind of timeout or callback (to handle cases when actions need a bit more time to stabilize after the js execution)
-            #sleep(0.250)                                                    # but I think this is better done outside this function
 
     async def js_eval(self, code,page=None):
         if page is None:
@@ -111,13 +140,6 @@ class API_Browser:
             js_script = "{0} = undefined".format(variable)
         return await self.js_eval(js_script,page=page)
 
-
-    # async def js_invoke(self, method, *args):
-    #     page = await self.page()
-    #     jscode = "{0}({1})"
-    #     return await page.evaluate(method, *args)
-
-
     async def open(self, url, wait_until=None, page=None):
         if page is None:
             page = await self.page()
@@ -143,18 +165,23 @@ class API_Browser:
         page = pages.pop()
         return page
 
+    async def pages(self):
+        browser = await self.browser()
+        return await browser.pages()
+
     async def sleep(self, mseconds):
         page = await self.page()
         await page.waitFor(mseconds)
         return self
 
     async def html(self):
-        try:
-            from pyquery import PyQuery         # add it here since there was some import issues with running it in lambda (etree). Also this method should not be that useful inside an lambda
-            content = await self.html_raw()
-            return PyQuery(content)
-        except:
-            return await self.html_raw()
+        return await self.html_raw()
+        # try:
+        #     from pyquery import PyQuery         # add it here since there was some import issues with running it in lambda (etree). Also this method should not be that useful inside an lambda
+        #     content = await self.html_raw()
+        #     return PyQuery(content)
+        # except:
+        #     return await self.html_raw()
 
     async def html_raw(self):
         page = await self.page()
@@ -178,10 +205,9 @@ class API_Browser:
         if clip:
             full_page = False
         await page.screenshot({'path': file_screenshot,'fullPage': full_page, 'clip' : clip})
-        if self.auto_close:
-            await self.browser_close()
+        #if self.auto_close:
+        #    await self.browser_close()
         return file_screenshot
-
 
     async def url(self):
         page = await self.page()
@@ -197,51 +223,15 @@ class API_Browser:
         await page.setViewport(viewport)
         return self
 
-    def get_last_chrome_session(self):
-        if Files.exists(self.file_tmp_last_chrome_session):
-            return Json.load_json(self.file_tmp_last_chrome_session)
-        return {}
-
-    def set_last_chrome_session(self, data):
-        Json.save_json_pretty(self.file_tmp_last_chrome_session, data)
-        return self
+    async def xpath(self, page, xpath, return_error=False):
+        try:
+            return await page.xpath(xpath)
+        except Exception as error:
+            if return_error:
+                return {'error': error}
+            return None
 
     # helper sync functions
-
-    def sync__setup_browser(self):                                                          # weirdly this works but the version below (using @sync) doesn't (we get an 'Read-only file system' error)
-        import asyncio
-        if os.getenv('AWS_REGION') is None:                                                 # we not in AWS so run the normal browser connect using pyppeteer normal method
-            asyncio.get_event_loop().run_until_complete(self.browser_connect())
-            return self
-
-        load_dependency('pyppeteer')
-        path_headless_shell          = '/tmp/lambdas-dependencies/pyppeteer/headless_shell'     # path to headless_shell AWS Linux executable
-        os.environ['PYPPETEER_HOME'] = '/tmp'                                                   # tell pyppeteer to use this read-write path in Lambda aws
-
-        async def set_up_browser():
-            from pyppeteer import launch                                                        # import pyppeteer dependency
-            Process.run("chmod", ['+x', path_headless_shell])                                   # set the privs of path_headless_shell to execute
-            self._browser = await launch(executablePath=path_headless_shell,                    # lauch chrome (i.e. headless_shell)
-                                         args=['--no-sandbox'              ,
-                                               '--single-process'          ,
-                                               #'--disable-dev-shm-usage'
-                                               ])                             # two key settings or the requests will not work
-        asyncio.get_event_loop().run_until_complete(set_up_browser())
-        return self
-
-    # @sync
-    # async def sync__setup_aws_browser(self):
-    #
-    #     load_dependency('pyppeteer')
-    #     from pyppeteer import launch
-    #     path_headless_shell          = '/tmp/lambdas-dependencies/pyppeteer/headless_shell'
-    #     os.environ['PYPPETEER_HOME'] = '/tmp'
-    #     Process.run("chmod", ['+x', path_headless_shell])
-    #     self._browser = await launch(executablePath=path_headless_shell,
-    #                                  args=['--no-sandbox',
-    #                                        '--single-process'])
-    #     return self
-
     @sync
     async def sync__browser_width(self, width,height=None):
         if height is None: height = width
@@ -257,6 +247,74 @@ class API_Browser:
         await self._browser.close()
         return self
 
+    @sync
+    async def coverage_start(self, page):
+        await page.coverage.startJSCoverage()
+        await page.coverage.startCSSCoverage()
+
+    @sync
+    async def coverage_stop(self, page):
+        js_coverage = await page.coverage.stopJSCoverage()
+        css_coverage = await page.coverage.stopCSSCoverage()
+        return {'js_coverage': js_coverage, 'css_coverage': css_coverage}
+
+    @sync
+    async def sync__element(self, page, selector):
+        return await self.element(page, selector)
+
+    @sync
+    async def sync__element_attribute(self, page, selector, name):
+        return await self.element_attribute(page, selector, name)
+
+    @sync
+    async def sync__element_attributes(self, page, selector):
+        return await self.element_attributes(page, selector)
+
+    @sync
+    async def sync__element_html_inner(self, page, selector):
+        return await self.element_property(page, selector, 'innerHTML')
+
+    @sync
+    async def sync__element_html_outer(self, page, selector):
+        return await self.element_property(page, selector, 'outerHTML')
+
+    @sync
+    async def sync__element_property(self, page, selector, property):
+        return await self.element_property(page, selector, property)
+
+    @sync
+    async def sync__element_text(self, page, selector):
+        return await self.element_property(page, selector, 'textContent')
+
+    @sync
+    async def sync__elements_attribute(self, page, selector, name):
+        return await self.elements_attribute(page, selector, name)
+
+    @sync
+    async def sync__elements_attributes(self, page, selector):
+        return await self.elements_attributes(page, selector)
+
+    @sync
+    async def sync__elements_html_inner(self, page, selector):
+        return await self.elements_property(page, selector, 'innerHTML')
+
+    @sync
+    async def sync__elements_html_outer(self, page, selector):
+        return await self.elements_property(page, selector, 'outerHTML')
+
+    @sync
+    async def sync__elements_property(self, page, selector, property):
+        return await self.elements_property(page, selector, property)
+
+    @sync
+    async def sync__elements_text(self, page, selector):
+        return await self.elements_property(page, selector, 'textContent')
+
+    @sync
+    async def sync__elements_xpath(self, page, xpath, return_error=False):
+        return await self.xpath(page, xpath,return_error)
+
+        #return await self.elements_property(page, selector, 'textContent')
     @sync
     async def sync__js_execute(self, js_code,page=None):
         return await self.js_execute(js_code,page=page)
@@ -304,14 +362,18 @@ class API_Browser:
         return await self.page()
 
     @sync
+    async def sync__pages(self):
+        return await self.pages()
+
+    @sync
     async def sync__page_close(self,page):
         return await page.close()
 
     @sync
-    async def sync__page_text(self):
-        page = await self.page()
+    async def sync__page_text(self, page=None):
+        if page is None:
+            page = await self.page()
         return await page.evaluate('() => document.body.innerText')
-        #return await self.page().plainText()
 
     # @sync
     # async def sync__page__with_auto_dialog_accept(self):
@@ -340,9 +402,9 @@ class API_Browser:
         return await self.url()
 
     @sync
-    async def sync__query_selector_all(self, page, selector):
-        return await page.querySelectorAll(selector)
-
+    async def sync__setup_browser(self):
+        await self.browser()
+        return self
     @sync
     async def sync__screenshot(self, url=None, page=None, file_screenshot = None,clip=None,full_page=True):
         return await self.screenshot(url,page=page, file_screenshot = file_screenshot,clip=clip,full_page=full_page)
@@ -362,9 +424,26 @@ class API_Browser:
         except Exception as error:
             Dev.print("[Error][sync__await_for_element] {0}".format(error))
             return False
+
+    @sync
+    async def sync__set_upload_file(self, page, selector, file_path):
+        file_element = await self.element(page, selector)
+        return await file_element.uploadFile(file_path)
+
+
+    @sync
+    async def sync__wait_for_selector(self, page, selector):
+        await page.waitForSelector(selector)
+        return self
+
     @sync
     async def sync__wait_for_navigation(self, page=None):
         if page is None:
             page = await self.page()
         await page.waitForNavigation()
+        return self
+
+    @sync
+    async def sync_sleep(self, mili_seconds):
+        await self.sleep(mili_seconds)
         return self

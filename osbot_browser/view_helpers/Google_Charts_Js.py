@@ -1,15 +1,15 @@
 from osbot_browser.browser.API_Browser import API_Browser
 from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
 from osbot_browser.browser.Render_Page import Render_Page
-from pbx_gs_python_utils.utils.Files import Files
+from osbot_utils.utils.Files import Files
 
 
 class Google_Charts_Js:
 
-    def __init__(self):
+    def __init__(self, headless=True):
         self.web_page     = '/google_charts/simple.html'
         self.web_root     = Files.path_combine(Files.parent_folder(__file__),'../web_root')
-        self.api_browser  = API_Browser().sync__setup_browser()
+        self.api_browser  = API_Browser(headless=headless).sync__setup_browser()
         self.render_page  = Render_Page(api_browser=self.api_browser, web_root=self.web_root)
         self.table_width  = '100%'
         self.columns_defs = None
@@ -41,30 +41,36 @@ class Google_Charts_Js:
 
     def create_dashboard_screenshot(self):
         #clip = {'x': 1, 'y': 1, 'width': 945, 'height': 465}
-        clip = None
-        return self.browser().sync__screenshot(clip=clip)
+        return self.browser().sync__screenshot()
 
     # main datatable methods
 
-    def create_data_table(self):#, cols, rows):
+    def create_data_table(self, chart_type,options, data):#, cols, rows):
 
-        cols = [{'id': 'task', 'label': 'Task', 'type': 'string'},
-                {'id': 'hours', 'label': 'Hours per Day', 'type': 'number'}]
-        rows = [{'c': [{'v': 'Work'}, {'v': 11} ]} ,
-                {'c': [{'v': 'Play'}, {'v': 2  }]},
-                {'c': [{'v': 'Other'}, {'v': 5}]}
-                ]
+        # cols = [{'id': 'task', 'label': 'Task', 'type': 'string'},
+        #         {'id': 'hours', 'label': 'Hours per Day', 'type': 'number'},
+        #         {'id': 'hours', 'label': '2nd key', 'type': 'number'}]
+        # rows = [{'c': [{'v': 'Work' }, {'v': 11}, {'v': 2} ]},
+        #         {'c': [{'v': 'Play' }, {'v': 2 }]},
+        #         {'c': [{'v': 'Other'}, {'v': 5  }]}]
+        #
+        # data = { 'cols' : cols, 'rows' : rows}
 
-        data = { 'cols' : cols, 'rows' : rows}
-        options = {'title':'My first chart',
-                   'width': 500,
-                   'height':500  };
-        chart_type = 'LineChart' #'BarChart' # PieChart'
-        self.js_execute('window.data_table=new google.visualization.DataTable',data)
+
+         #'BarChart' # PieChart'
+        self.js_execute('window.data_table=new google.visualization.arrayToDataTable',data)
         self.js_execute('window.options = ', options)
 
         self.js_eval("""window.chart = new google.visualization.{0}(document.getElementById('chart_div'));
                         chart.draw(data_table, options);""".format(chart_type))
-        #dt = new
-        ##google.visualization.DataTable({
-        #    cols:
+
+    def create_chart(self,chart_type, options, width, height, data, clip):
+        if width  is None: width  = 800
+        if height is None: height = 500
+        if clip   is None: clip   = {'x': 100, 'y': 50, 'width': 580, 'height': 450}
+
+        options['height'] = height
+        options['width'] = width
+
+        self.create_data_table(chart_type,options, data)
+        return self.browser().sync__screenshot_base64(clip=clip)

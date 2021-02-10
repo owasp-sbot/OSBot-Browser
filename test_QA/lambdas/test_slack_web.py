@@ -1,23 +1,18 @@
 import base64
-import json
 import unittest
 
 from osbot_aws.apis.Lambda import Lambda
-from osbot_aws.helpers.Lambda_Package import Lambda_Package
+from osbot_aws.apis.Secrets import Secrets
+from osbot_utils.utils.Dev import Dev
 
-from osbot_browser.Deploy import Deploy
-from pbx_gs_python_utils.utils.Misc import Misc
-
-from osbot_browser.browser.Browser_Commands import Browser_Commands
-from osbot_browser.lambdas.lambda_browser   import run
-from pbx_gs_python_utils.utils.Dev          import Dev
+from gw_bot.Deploy import Deploy
 
 
 class test_jira_web(unittest.TestCase):
     def setUp(self):
         self.png_data = None
         self.result = None
-        self._lambda = Lambda_Package('osbot_browser.lambdas.slack_web')
+        self._lambda = Lambda('osbot_browser.lambdas.slack_web')
 
 
     def tearDown(self):
@@ -38,7 +33,7 @@ class test_jira_web(unittest.TestCase):
 
 
     def test_invoke(self):
-        self._lambda.update_code()
+        self.test_update_lambda()
         target = '/messages/random/'
 
         payload = { 'target': target   ,
@@ -47,22 +42,27 @@ class test_jira_web(unittest.TestCase):
                     'width'  : 800,
                     'height' : 1000 }
         self.result = self._lambda.invoke(payload)
-        self.png_data = self.result# self._lambda.invoke(payload)
+        #self.png_data = self.result# self._lambda.invoke(payload)
+        self.png_data = self.result
 
     def test_invoke_oss(self):
-        self._lambda.update_code()
-        target = '/messages/oss-helpdesk'
-        target = '/messages/oss-general'
+        self.test_update_lambda()
+        #target = '/messages/oss-helpdesk'
+        #target = '/messages/oss-general'
+        target  ='/messages/t-wardley-maps'
 
-        payload = {'target': target,
-                   'channel': 'DDKUZTK6X',  # gsbot
-                   #'team_id': 'T7F3AUXGV',  # GS-CST
-                   'team_id': 'TAULHPATC',  # OSS
-                   'width': 800,
-                   'height': 4000}
-        #self.result = self._lambda.invoke(payload)
-        self.png_data = self._lambda.invoke(payload)
+        payload = {'target'   : target      ,
+                   'channel'  : 'DJ8UA0RFT' ,   # OSS - gsbot
+                   'team_id'  : 'TAULHPATC' ,   # OSS
+                   'width'    : 1000        ,
+                   'height'   : 6000       ,
+                   'delay'    : 3           ,
+                   'scroll_by': 15000       }
+        self.result = self._lambda.invoke(payload)
+        #self.png_data = self._lambda.invoke(payload)
 
     def test_update_lambda(self):
-        self._lambda.update_code()
+        Deploy().setup().deploy_lambda__slack_web()
 
+    # def test_set_secret(self):
+    #     self.result = Secrets('gs_bot_slack_web_oss').value(

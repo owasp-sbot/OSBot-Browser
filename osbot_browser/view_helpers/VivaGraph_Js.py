@@ -1,25 +1,29 @@
 from time import sleep
 
+from osbot_aws.helpers.Lambda_Helpers import slack_message
+from osbot_aws.Globals     import Globals
 from osbot_aws.apis.Lambda import Lambda
-from osbot_aws.apis.S3 import S3
+from osbot_aws.apis.S3     import S3
 
-from osbot_browser.browser.API_Browser import API_Browser
+from osbot_browser.browser.API_Browser           import API_Browser
 from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
-from osbot_browser.browser.Render_Page import Render_Page
-from osbot_browser.browser.Web_Server import Web_Server
-from pbx_gs_python_utils.utils.Files import Files
-from pbx_gs_python_utils.utils.Json import Json
-from pbx_gs_python_utils.utils.Misc import Misc
-
+#from osbot_browser.browser.Render_Page           import Render_Page
+from osbot_browser.browser.Web_Server            import Web_Server
+from osbot_utils.utils.Files                     import path_combine, Files, save_bytes_as_file
+from osbot_utils.utils.Json                      import Json
+from osbot_utils.utils.Misc                      import json_dumps
 
 
 class VivaGraph_Js:
     def __init__(self, headless=True):
-        self.web_page    = '/vivagraph/simple.html'
-        self.web_root    = Files.path_combine(Files.parent_folder(__file__), '../web_root')
-        self.api_browser = API_Browser(headless=headless).sync__setup_browser()
-        self.web_server  = Web_Server(self.web_root)
-        self.render_page = Render_Page(api_browser=self.api_browser, web_server=self.web_server)
+        self.web_page      = '/vivagraph/simple.html'
+        self.jira_icons    = '/vivagraph/icons'
+        self.web_root      = path_combine(Files.parent_folder(__file__), '../web_root')
+        self.api_browser   = API_Browser(headless=headless).sync__setup_browser()
+        self.browser_width = None
+        self.render_wait   = None
+        self.web_server    = None # Web_Server(self.web_root)
+        #self.render_page   = None #Render_Page(api_browser=self.api_browser, web_server=self.web_server)
 
 
 
@@ -39,7 +43,9 @@ class VivaGraph_Js:
 
     def load_page(self,reload=False):
         if reload or self.web_page not in self.browser().sync__url():
-            self.render_page.open_file_in_browser(self.web_page)
+            url = self.web_server.url(self.web_page)
+            self.browser().sync__open(url)
+            #self.render_page.open_file_in_browser(self.web_page)
         return self
 
     def create_dashboard_screenshot(self):
@@ -47,18 +53,22 @@ class VivaGraph_Js:
         clip = None
         return self.browser().sync__screenshot(clip=clip)
 
-    def send_screenshot_to_slack(self, team_id, channel):
+    def send_screenshot_to_slack(self, team_id, channel):           # todo: refactor screenshot creation from this method
+        if self.browser_width:
+            self.browser().sync__browser_width(self.browser_width)
+        if self.render_wait:
+            sleep(self.render_wait)
         png_file = self.create_dashboard_screenshot()
         return Browser_Lamdba_Helper().send_png_file_to_slack(team_id, channel, 'risk dashboard', png_file)
 
     def get_graph_data(self, graph_name):
         params = {'params': ['raw_data', graph_name, 'details'], 'data': {}}
-        data = Lambda('lambdas.gsbot.gsbot_graph').invoke(params)
+        data = Lambda('osbot_jira.lambdas.graph').invoke(params)
         if type(data) is str:
-            s3_key = data
-            s3_bucket = 'gs-lambda-tests'
-            tmp_file = S3().file_download_and_delete(s3_bucket, s3_key)
-            data = Json.load_json_and_delete(tmp_file)
+            s3_key    = data
+            s3_bucket = Globals.lambda_s3_bucket
+            tmp_file  = S3().file_download_and_delete(s3_bucket, s3_key)
+            data = Json.load_file_and_delete(tmp_file)
             return data
         return data
 
@@ -68,27 +78,28 @@ class VivaGraph_Js:
     def invoke_js(self, name, params):
         return self.browser().sync_js_invoke_function(name,params)
 
-    def create_graph_and_send_screenshot_to_slack(self, nodes, edges, options=None, team_id=None, channel=None):
-        if len(nodes) >0:
-            self.create_graph(nodes, edges,options)
-            if          len(nodes) < 20 :                                            sleep(1)
-            elif  20 <  len(nodes) < 100: self.browser().sync__browser_width(1500) ; sleep(2)
-            elif 100 <  len(nodes) < 200: self.browser().sync__browser_width(2000) ; sleep(5)
-            elif        len(nodes) > 200: self.browser().sync__browser_width(3000) ; sleep(10)
+    def calculate_browser_width_and_wait(self, nodes):
+        if self.browser_width is None:
+            if         len(nodes) <  20 : self.browser_width = 400
+            elif 20  < len(nodes) < 100 : self.browser_width = 1100
+            elif 100 < len(nodes) < 300 : self.browser_width = 1500
+            else                        : self.browser_width = 3000
+        if self.render_wait is None:
+            if         len(nodes) < 100 : self.render_wait = 1
+            elif 100 < len(nodes) < 300 : self.render_wait = 4
+            else                        : self.render_wait = 6
+        return self
 
-            return self.send_screenshot_to_slack(team_id, channel)
-            #self.create_graph(nodes, edges,options,graph_name)
-            #return self.send_screenshot_to_slack(t§eam_id, channel)
+    #def create_graph_and_send_screenshot_to_slack(self, nodes, edges, options=None, team_id=None, channel=None):
+    #    if len(nodes) >0:
 
 
     # main methods
 
     def create_graph(self, nodes, edges,options=None):
-        self.web_server.start()
-        url = self.web_server.url(self.web_page)
-
-        self.render_page.get_page_html_via_browser(url)
-
+        #with  as web_server:
+        #self.web_server  = web_server
+        #self.render_page =  Render_Page(api_browser=self.api_browser, web_server=self.web_server)
         self.load_page(True)
         layout = {
                     "springLength" : 100,
@@ -99,60 +110,83 @@ class VivaGraph_Js:
 
         self.invoke_js("set_layout",layout)
         js_code = ""
-        #for key,issue in nodes.items():
+
         for node in nodes:
             key       = node.get('key'     )
             label     = node.get('label'   )
-            img_url   = node.get('img_url' )
-            img_size  = node.get('img_size')
+            img_url   = node.get('img_url' ) or 'icons/project.svg'
+            img_size  = node.get('img_size') or 50
             params = { "label" : label, "img_url": img_url, 'img_size':img_size}
-            js_code += 'graph.addNode("{0}",{1});'.format(key,Misc.json_dumps(params))
+            js_code += 'graph.addNode("{0}",{1});\n'.format(key, json_dumps(params))
         for edge in edges:
             js_code += 'graph.addLink("{0}","{1}");\n'.format(edge[0],edge[2])
         js_code += "run_graph()"
-        self.exec_js(js_code)
-        self.web_server.stop()
-        return 42
 
-    def resolve_icon_from_issue_type(self, issue,key):
+        self.exec_js(js_code)
+
+    def create_graph_and_send_screenshot_to_slack(self, nodes, edges, graph_name=None, screenshot=True, team_id=None, channel=None):
+        with Web_Server(self.web_root) as web_server:               # handle server start and stop
+            self.web_server = web_server
+            try:
+                message = f":point_right: Creating `{graph_name}` using VivaGraph JS engine with: *nodes* `{len(nodes)}` *edges* `{len(edges)}` *width* `{self.browser_width}` and *render_wait* `{self.render_wait}`\n"
+                slack_message(message,[], channel, team_id)
+                #slack_message(f':point_right: Creating graph in viva_graph with {len(nodes)} nodes', [], channel)
+                self.create_graph(nodes, edges)
+                #slack_message(f':point_right: Created graph in viva_graph with {len(nodes)} nodes', [], channel)
+                if screenshot:
+                    self.calculate_browser_width_and_wait(nodes)
+                    png_data = self.send_screenshot_to_slack(team_id, channel)
+                    return png_data
+                else:
+                    return self
+            except Exception as error:
+                message = f':red_circle: error in create_graph_and_send_screenshot_to_slack :{error}'
+                return slack_message(message, [], channel)
+
+    def get_nodes_edges_from_graph_data(self, graph_data):
+        edges = graph_data.get('edges')
+        nodes = []
+        for key, issue in graph_data.get('nodes').items():
+            if issue and issue.get("Image"):
+                (label, img_size, img_url) = (key, 20, issue.get("Image"))
+            else:
+                (label, img_size, img_url) = self.resolve_icon_from_key(key)
+            node = {
+                'key': key,
+                'label': label,
+                'img_url': img_url,
+                'img_size': img_size,
+            }
+            nodes.append(node)
+        return nodes,edges
+
+    def render_gs_graph(self, gs_graph):
+        graph_data = gs_graph.get_graph_data()
+        (nodes, edges) = self.get_nodes_edges_from_graph_data(graph_data)
+        png_data = self.create_graph_and_send_screenshot_to_slack(nodes, edges)
+        return png_data
+
+    def resolve_icon_from_key(self, key):       # todo: refactor to use Jira_Icons method
         label    = key
         img_size = 20
-        none_icon = 'icons/none.jpg'
-        mappings = {
-            'Risk'           : 'icons/risk_theme.svg',
-            'Risk Theme'     : 'icons/risk_theme.svg',
-            'Vulnerability'  : 'icons/vuln.png',
-            'GS-Project'     : 'icons/gs_project.svg',
-            'Business entity': 'icons/business_entity.svg',
-            'GS Service '    : 'icons/gs_service.svg',
-            'IT Asset'       : 'icons/it_asset.svg',
-            'IT System'      : 'icons/it_asset.svg',
-            'People'         : 'icons/people.svg',
-            'Programme'      : 'icons/programme.svg',
-            'Threat Model'   : 'icons/threat_model.svg',
-            'Key Result'     : 'icons/key-result.svg',
-            'Objective'      : 'icons/objective.svg',
-            'Task'           : 'icons/task.svg',
-            'Epic'           : 'icons/epic.svg',
-            'Data Journey'   : 'icons/data_journey.svg',
-            'Project'        : 'icons/project.svg',
-            'Fact'           : 'icons/fact.svg',
-            'Incident'       : 'icons/incident.png',
-            'Incident Task'  : 'icons/incident_task.png',
-            'User Access'    : 'icons/user_access.svg',
-            'Security Event' : 'icons/security_event.svg',
-        }
 
-        if issue and issue.get("Issue Type"):
-            issue_type = issue.get("Issue Type")
-            icon = mappings.get(issue_type, none_icon)
-
-            #if icon == none_icon:
-            #    Dev.pprint(key + ' ' + issue_type)
-
+        if '-' in key:                          # todo: find better solution to do this
+            project_key = key.split('-')[0]
+            icon = f'icons/{project_key}.png'
         else:
-            icon = 'icons/none.jpg'
-            #icon = 'https://dummyimage.com/100x40/2c2f87/FFFFFF&text={0}'.format(key)
-            #img_size = 10
+            icon = 'icons/dot.png'
 
         return label,img_size,icon
+
+
+    # todo: refactor this out of this class (since this is the class that is called from the lambda function)
+    # see class Jira_Icons
+    def save_jira_icons_locally(self):
+        from osbot_jira.api.jira_server.API_Jira_Rest import API_Jira_Rest
+        jira_rest_api = API_Jira_Rest()
+        icons = jira_rest_api.projects_icons()
+        for key, url in icons.items():
+            icon_path  = f'{self.web_root}{self.jira_icons}/{key}.png'
+            icon_bytes = jira_rest_api.request_get(url)
+            save_bytes_as_file(icon_bytes,icon_path)
+        return icons

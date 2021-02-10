@@ -1,31 +1,26 @@
-from time import sleep
-
-from osbot_aws.apis.Secrets import Secrets
-from pbx_gs_python_utils.utils.Dev import Dev
-from syncer import sync
-
-from osbot_browser.browser.Browser_Lamdba_Helper import Browser_Lamdba_Helper
+from osbot_aws.apis.Secrets             import Secrets
 from osbot_browser.browser.Browser_Page import Browser_Page
 
 
 class Web_Jira:
-    def __init__(self,headless=True, new_page=True):
+    def __init__(self,headless=True, new_page=False):
         self._browser               = None
         self._browser_helper        = None
         self.server_details         = None
         self.server_url             = None
-        self.secrets_id             = 'GS_BOT_GS_JIRA'
+        self.secrets_id             = 'gw-bot-jira-web'
         self.headless               = headless
         self.new_page               = new_page
         self.page : Browser_Page    = None
 
     def setup(self):
+
         self.page           = Browser_Page(headless = self.headless, new_page=self.new_page).setup()
         self.server_details = Secrets(self.secrets_id).value_from_json_string()
         self.server_url     = self.server_details.get('server')
 
         self.page.on_dialog__always_accept()
-        self.page.on_request__block_these(['jira.photobox.com','jeditor','tinymce'])
+        #self.page.on_request__block_these(['glasswall.atlassian.net','jeditor','tinymce'])
         return self
 
     # def browser(self):
@@ -45,32 +40,58 @@ class Web_Jira:
 
     def issue(self,issue_id):
         #(server, username, password) = self.server_details().values()
-        path =  '/browse/{0}?filter=-1'.format(issue_id)
+        path =  '/browse/{0}'.format(issue_id)
         self.open(path)
+
         #self.browser().sync__await_for_element('.jira-help-tip')
         #self.browser().sync__js_execute("$('.jira-help-tip').hide()")
 
         #self.page.click('#show-more-links-link')
-        self.page.javascript_eval("$('#show-more-links-link').click()")
+        #self.page.javascript_eval("$('#show-more-links-link').click()")
 
         return self
 
     def login(self):
         path = '/login.jsp?os_destination=/rest/helptips/1.0/tips'
+
         self.open(path)
         page_text = self.page.text()
 
-        if "Username" in page_text:
-            self.page.type('#login-form-username', self.server_details.get('username'))
-            self.page.type('#login-form-password', self.server_details.get('password'))
-            self.page.javascript_eval('document.forms[1].submit()')
-            self.page.wait_for_navigation()
+        if "Log in to your account" in page_text:
+            username = self.server_details.get('username')
+            password = self.server_details.get('password')
+            self.page.javascript_eval(f"document.forms[0].username.value='{username}'")
+            self.page.click('#login-submit')
+
+            self.page.wait_for_element__id__is_equal_to('login-submit', "Log in")
+            self.page.javascript_eval(f"document.forms[0].password.value='{password}'")
+            self.page.click('#login-submit')
+
+            self.page.wait_for_navigation()  # first redirection to page that says 'Please wait...'
+            self.page.wait_for_navigation()  # final redirection to page that shows []
+
+
+            #return self.page.wait_for_element__id()
+            #from time import sleep
+            #sleep(2)
+            #self.page.click('#login-submit')
+
+            #self.page.wait_for_navigation()
+            #sleep(4)
+
+            #self.page.wait_for_element__id('password')
+            #self.page.type('#password', self.server_details.get('password'))
+
+            #self.page.javascript_eval('document.forms[0].submit()')
+
 
 
     def logout(self):
+        #self.page.browser.sync__open('https://www.google.com')
         self.open('/logout')
-        if self.page.exists('#confirm-logout-submit'):
-            self.page.click('#confirm-logout-submit')
+        if self.page.exists('#logout-submit'):
+            self.page.click('#logout-submit')
+            self.page.wait_for_navigation()
         return self
 
     def open(self, path):
@@ -89,19 +110,35 @@ class Web_Jira:
         return self
 
     def fix_issue_remove_ui_elements(self):
-        js_code =   """
-                        $('.command-bar'            ).hide();
-                        $('#header'                 ).hide();
-                        $('.aui-sidebar'            ).hide()
-                        $('#viewissuesidebar'       ).hide();
-                        $('#attachmentmodule'       ).hide();
-                        $('#addcomment'             ).hide();                        
-                        $('#footer'                 ).hide();
-                        $('.aui-page-header-actions').hide();                        
-                                             
-                        $('#resolution-val'  )      .parent().hide();
-                        $('#priority-val'    )      .parent().hide();
-                        $('.remote-link'     ).eq(0).parent().hide();
-                    """
+        # js_code =   """
+        #                 $('.command-bar'            ).hide();
+        #                 $('#header'                 ).hide();
+        #                 $('.aui-sidebar'            ).hide()
+        #                 $('#viewissuesidebar'       ).hide();
+        #                 $('#attachmentmodule'       ).hide();
+        #                 $('#addcomment'             ).hide();
+        #                 $('#footer'                 ).hide();
+        #                 $('.aui-page-header-actions').hide();
+        #
+        #                 $('#resolution-val'  )      .parent().hide();
+        #                 $('#priority-val'    )      .parent().hide();
+        #                 $('.remote-link'     ).eq(0).parent().hide();
+        #             """
+        js_code = """   
+                        contains = function (selector, text)   {   var elements = document.querySelectorAll(selector);
+                                                                   return [].filter.call(elements, function(element){
+                                                                      return RegExp(text).test(element.textContent); });}
+                        remove = function(selector,text,index) {
+                                                                   target = contains(selector,text)[index]
+                                                                   if (target) {target.remove()} }
+
+                        remove('div' , 'updating the issue view', 11)
+                        remove('span','Activity' ,0)                            
+                        document.querySelector('[data-testid="Navigation"]').remove()
+                        document.querySelector('#jira-issue-header').children[0].children[0].children[0].children[0].children[0].children[1].remove()
+
+                        //external share
+                        contains('div', 'External Share').pop().parentElement.parentElement.parentElement.remove()
+                        """
         self.page.javascript_eval(js_code)
         return self
