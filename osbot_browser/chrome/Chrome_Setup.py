@@ -5,7 +5,7 @@ from pyppeteer.browser import Browser
 from osbot_browser.chrome.Chrome_Args   import Chrome_Args
 from osbot_utils.utils.Files            import temp_folder, file_exists
 from osbot_utils.utils.Http             import port_is_open
-from osbot_utils.utils.Json             import json_save, json_load
+from osbot_utils.utils.Json             import json_save, json_load_file
 from osbot_utils.utils.Misc             import date_now
 from osbot_utils.utils.Process          import chmod_x
 from pyppeteer                          import connect, launch
@@ -116,7 +116,7 @@ class Chrome_Setup:
 
     def get_last_chrome_session(self):
         if file_exists(self.file_tmp_last_chrome_session):
-            return json_load(self.file_tmp_last_chrome_session)
+            return json_load_file(self.file_tmp_last_chrome_session)
         return {}
 
     def process_id(self):
@@ -136,7 +136,7 @@ class Chrome_Setup:
                  'port'        : self._browser._connection.connection.remote_address[1],
                  'when'        : date_now()
                 }
-        json_save(self.file_tmp_last_chrome_session, data)
+        json_save(data, self.file_tmp_last_chrome_session)
         return self
 
     def user_data_dir(self):

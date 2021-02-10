@@ -5,7 +5,6 @@ from pyppeteer.browser              import Browser
 
 from osbot_browser.chrome.Chrome_Args import Chrome_Args
 from osbot_browser.chrome.Chrome_Setup import Chrome_Setup
-from osbot_utils.decorators.Sync    import sync
 
 class Chrome():
     def __init__(self, headless=True):
