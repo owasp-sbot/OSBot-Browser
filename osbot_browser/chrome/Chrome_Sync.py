@@ -1,5 +1,6 @@
+from syncer import sync
+
 from osbot_browser.chrome.Chrome import Chrome
-from osbot_utils.decorators.Sync import sync
 
 
 class Chrome_Sync:

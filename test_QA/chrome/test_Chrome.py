@@ -1,12 +1,13 @@
+from syncer import sync
+
 from osbot_browser.browser.Web_Server import Web_Server
 from osbot_browser.chrome.Chrome import Chrome
 from osbot_browser.chrome.Chrome_Setup import Chrome_Setup
 from osbot_browser.chrome.Chrome_Sync import Chrome_Sync
-from osbot_utils.decorators.Sync import sync
 from osbot_utils.testing.Unit_Test import Unit_Test
 from osbot_utils.utils.Files import temp_file, file_delete, file_contents, temp_folder, path_combine, file_exists
 from osbot_utils.utils.Http import port_is_open, GET, port_is_not_open
-from osbot_utils.utils.Json import json_load
+from osbot_utils.utils.Json import json_load_file
 from osbot_utils.utils.Misc import bytes_to_base64
 
 
@@ -62,7 +63,7 @@ class test_Chrome(Unit_Test):       # todo: move some of the tests to the Chrome
     async def test_get_last_chrome_session(self):
         self.chrome.keep_open()
         browser = await self.chrome.browser()
-        assert set(json_load(self.chrome.chrome_setup.file_tmp_last_chrome_session)) == {'process_args', 'process_id', 'port', 'when','url_chrome'}
+        assert set(json_load_file(self.chrome.chrome_setup.file_tmp_last_chrome_session)) == {'process_args', 'process_id', 'port', 'when','url_chrome'}
         await browser.close()
 
     @sync
