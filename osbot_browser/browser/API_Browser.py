@@ -16,6 +16,7 @@ class API_Browser:
 
     def __init__(self, browser=None, headless=True):  # headless = True, new_browser=False, url_chrome = None):
         self.file_tmp_screenshot          = Files.temp_file('.png')
+        self.file_tmp_pdf                 = Files.temp_file('.pdf')
         self._browser                     = browser
         self.headless                     = headless
         self.log_js_errors_to_console     = True
@@ -187,6 +188,28 @@ class API_Browser:
         page = await self.page()
         return await page.content()
 
+    # todo: refactor pdf and screenshot methods since most of the code is the same
+    async def pdf(self, url= None, page=None, full_page = True, file_pdf = None, clip=None, viewport=None, js_code=None, delay=None):
+        if url:
+            await self.open(url,page=page)
+
+        await self.js_execute(js_code)
+
+        if delay:
+            sleep(delay)
+
+        if file_pdf is None:
+            file_pdf = self.file_tmp_pdf
+
+        page = await self.page()
+        if viewport:
+            await self.viewport(viewport)
+        if clip:
+            full_page = False
+        await page.pdf({'path': file_pdf,'fullPage': full_page, 'clip' : clip})
+
+        return file_pdf
+
     async def screenshot(self, url= None, page=None, full_page = True, file_screenshot = None, clip=None, viewport=None, js_code=None, delay=None):
         if url:
             await self.open(url,page=page)
@@ -205,8 +228,7 @@ class API_Browser:
         if clip:
             full_page = False
         await page.screenshot({'path': file_screenshot,'fullPage': full_page, 'clip' : clip})
-        #if self.auto_close:
-        #    await self.browser_close()
+
         return file_screenshot
 
     async def url(self):

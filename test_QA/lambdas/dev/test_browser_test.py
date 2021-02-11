@@ -1,8 +1,9 @@
-from gw_bot.Deploy import Deploy
 from osbot_aws.apis.Lambda import Lambda
 
 from osbot_aws.helpers.Test_Helper import Test_Helper
 from osbot_aws.apis.shell.Lambda_Shell import Lambda_Shell
+
+from osbot_browser.Deploy import Deploy
 from osbot_browser.lambdas.dev.browser_test import run
 
 
