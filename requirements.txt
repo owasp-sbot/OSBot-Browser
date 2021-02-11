@@ -6,7 +6,7 @@ boto3
 pyyaml
 python-dotenv
 syncer
-pyppeteer2
+pyppeteer
 
 # for testing
 coveralls
