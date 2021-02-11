@@ -66,4 +66,4 @@ class Test_Am_Charts_Views(TestCase):
 
     def test_deploy_lambda_function(self):
 
-        Deploy('osbot_browser.lambdas.lambda_browser').deploy()
+        Deploy('osbot_browser.lambdas.lambda_browser').deploy_lambda()

@@ -217,11 +217,11 @@ class test_Chrome(Unit_Test):       # todo: move some of the tests to the Chrome
         chrome_sync.close()
 
     @sync
-    async def test_site__news_google_com(self):
-        chrome = Chrome().headless(False)
+    async def test_site__headless_news_google_com(self):
+        chrome = Chrome().headless(True)
         browser = await chrome.browser()
         page    = (await browser.pages()).pop()
-        await page.goto('https://www.google.com/asd')
+        await page.goto('https://www.google.com/AAAAAA')
         self.png_data = await page.screenshot()
 
     @sync
@@ -229,5 +229,5 @@ class test_Chrome(Unit_Test):       # todo: move some of the tests to the Chrome
         chrome = Chrome(headless=False)
         browser = await chrome.browser()
         page = (await browser.pages()).pop()
-        await page.goto('https://www.whatismybrowser.com/')
+        await page.goto('https://www.whatismybrowser.com')
         self.png_data = await page.screenshot()

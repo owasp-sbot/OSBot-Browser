@@ -1,18 +1,27 @@
+import os
+
+from osbot_aws.deploy.Deploy_Lambda import Deploy_Lambda
 from osbot_aws.helpers.Lambda_Package import Lambda_Package
 from osbot_utils.utils.Files import path_combine
 
 
 class Deploy:
-    def __init__(self, lambda_name):
-        self.package         = Lambda_Package(lambda_name)      # refactor to use Deploy Lambda
-        self.tmp_s3_bucket = 'gs-lambda-tests'
-        self.tmp_s3_key    = 'gsbot/{0}.zip'.format(lambda_name)
-        self.setup()
+    def __init__(self, handler):
+        self.deploy_lambda = Deploy_Lambda(handler)
+        self.deploy_lambda.package.aws_lambda.runtime = 'python3.7'
 
-    def setup(self):
-        (self.package.aws_lambda.set_s3_bucket(self.tmp_s3_bucket)
-                             .set_s3_key   (self.tmp_s3_key))
-        return self
+    def configure_environment_variables(self):
+        vars_to_add = ['OSBOT_LAMBDA_S3_BUCKET','OSBOT_LAMBDA_S3_KEY_PREFIX']
+        env_variables = {}
+        for var_to_add in vars_to_add:
+            env_variables[var_to_add] = os.environ.get(var_to_add)
+
+        self.update_environment_variables(env_variables)
+
+    def update_environment_variables(self, env_variables):
+        aws_lambda = self.deploy_lambda.package.aws_lambda
+        aws_lambda.env_variables = env_variables
+        aws_lambda.update_lambda_configuration()
 
     def deploy_lambda__browser(self, lambda_name='osbot_browser.lambdas.lambda_browser'):
         #package = self.get_package(lambda_name)
@@ -25,17 +34,19 @@ class Deploy:
         package.add_module('osbot_aws')
         package.add_osbot_utils()
         package.update()
+        self.configure_environment_variables()
         return package
 
 
-    def deploy_lambda__browser_dev(self, lambda_name):
+    def deploy_lambda__browser_dev(self):
         #package = self.get_package(lambda_name)
-        package = self.package
-        source_folder = path_combine(__file__, '../osbot_browser')  # to do check path
+        package = self.deploy_lambda.package
+        source_folder = path_combine(__file__, '../../osbot_browser')  # to do check path
         #package.add_module('osbot_browser')
         package.add_folder(source_folder, ignore='web_root')
-        package.add_module('osbot_aws')
-        package.add_module('osbot_utils')
+        package.add_osbot_utils()
+        package.add_osbot_aws()
+        self.configure_environment_variables()
         package.update()
         return package
     # don't use this version (on the OSS Fork)
