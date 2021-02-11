@@ -1,6 +1,6 @@
 # install using: pip3 install --upgrade -r requirements.txt
 git+https://github.com/owasp-sbot/OSBot-Utils.git
-git+https://github.com/owasp-sbot/OSBot-browser.git
+git+https://github.com/owasp-sbot/OSBot-AWS.git
 boto3
 pyyaml
 python-dotenv
