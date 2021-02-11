@@ -1,25 +1,15 @@
-import sys ;
+import sys
 
 import pytest
-from osbot_aws.apis.shell.Lambda_Shell import Lambda_Shell
-from osbot_aws.helpers.Test_Helper import Test_Helper
-from osbot_aws.apis.Lambda import Lambda
-from osbot_aws.helpers.Lambda_Package import Lambda_Package
-from osbot_utils.decorators.lists.group_by import group_by
-from osbot_utils.utils import Misc
-from osbot_utils.utils.Files import Files, file_open
-from osbot_utils.utils.Process import exec_open
+import base64
 
-from osbot_browser.Deploy import Deploy
+from syncer                            import sync
+from unittest                          import TestCase
+from osbot_utils.utils.Files           import Files
+from osbot_utils.utils.Process         import exec_open
+from osbot_browser.browser.API_Browser import API_Browser
 
 sys.path.append('../osbot_browser')
-
-import base64
-from syncer import sync
-from unittest import TestCase
-
-from osbot_browser.browser.API_Browser                import API_Browser
-
 
 class test_API_Browser(TestCase):
 

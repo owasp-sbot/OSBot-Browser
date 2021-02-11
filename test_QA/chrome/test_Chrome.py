@@ -37,10 +37,10 @@ class test_Chrome(Unit_Test):       # todo: move some of the tests to the Chrome
         assert self.chrome.chrome_setup.chrome_executable() is None
         chrome_1 = Chrome().keep_open()
         await chrome_1.browser()
-        assert 'Support/pyppeteer/local-chromium' in chrome_1.chrome_setup.chrome_executable()
+        assert '/pyppeteer/local-chromium' in chrome_1.chrome_setup.chrome_executable()
         chrome_2 = Chrome().keep_open()
         await chrome_2.browser()
-        assert 'Support/pyppeteer/local-chromium' in chrome_2.chrome_setup.chrome_executable()
+        assert '/pyppeteer/local-chromium' in chrome_2.chrome_setup.chrome_executable()
         await chrome_2.close()
 
 

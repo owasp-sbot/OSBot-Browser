@@ -20,7 +20,7 @@ class Chrome_Setup:
         self._browser         : Browser     = None
         self.chrome_args      : Chrome_Args = chrome_args
         self.options          : dict        = options
-        self.s3_chrome_binary : tuple       = ('gw-bot-lambdas','lambdas-dependencies/chromium-2_1_1')
+        self.s3_chrome_binary : tuple       = (os.environ.get('OSBOT_LAMBDA_S3_BUCKET' , 'gw-bot-lambdas') ,'lambdas-dependencies/chromium-2_1_1')
         self.file_tmp_last_chrome_session   = '/tmp/browser-last_chrome_session.json'
         self.slow_motion      : int         = 0
 

@@ -1,5 +1,4 @@
 from osbot_browser.chrome.Chrome_Sync import Chrome_Sync
-from osbot_utils.decorators.Method_Wrappers import catch
 from osbot_utils.testing.Unit_Test import Unit_Test
 
 
