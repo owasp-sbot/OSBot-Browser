@@ -1,11 +1,12 @@
 # install using: pip3 install --upgrade -r requirements.txt
 git+https://github.com/owasp-sbot/OSBot-Utils.git
-git+https://github.com/owasp-sbot/OSBot-AWS.git
+git+https://github.com/k8-proxy/OSBot-AWS.git
+git+https://github.com/filetrust/GW-Bot.git
 boto3
 pyyaml
 python-dotenv
 syncer
-pyppeteer
+pyppeteer2
 
 # for testing
 coveralls

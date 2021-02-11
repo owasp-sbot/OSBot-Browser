@@ -8,7 +8,6 @@ sys.path.append('../osbot_browser')
 from unittest import TestCase
 
 from osbot_browser.browser.Render_Page import Render_Page
-from osbot_utils.utils.Dev import Dev
 from osbot_utils.utils import Misc
 
 
