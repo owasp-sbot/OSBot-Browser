@@ -1,6 +1,6 @@
 # install using: pip3 install --upgrade -r requirements.txt
 git+https://github.com/owasp-sbot/OSBot-Utils.git
-git+https://github.com/k8-proxy/OSBot-browse
+git+https://github.com/k8-proxy/OSBot-browser.git
 boto3
 pyyaml
 python-dotenv
