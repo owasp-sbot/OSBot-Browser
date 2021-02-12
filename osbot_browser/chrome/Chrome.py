@@ -13,8 +13,11 @@ class Chrome():
         self.chrome_args    : Chrome_Args  = Chrome_Args()
         self.chrome_setup   : Chrome_Setup = Chrome_Setup(chrome_args=self.chrome_args,options=self.options)
 
+        # todo: move value below to a global config CONST value
         #self.osx_set_chrome_version('722234')  # 'HeadlessChrome/80.0.3987.0' (May 2020)
-        self.osx_set_chrome_version('800071')  # 'HeadlessChrome/86.0.4240.0' (Sep 2020)
+        #self.osx_set_chrome_version('800071')  # 'HeadlessChrome/86.0.4240.0' (Sep 2020)
+        self.osx_set_chrome_version('848005')  # 'HeadlessChrome/90.0.4403.0' (Feb 2021)
+
         self.headless(headless)
 
 

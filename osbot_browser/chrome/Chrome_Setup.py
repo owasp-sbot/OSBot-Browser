@@ -32,7 +32,7 @@ class Chrome_Setup:
 
     async def browser_setup_for_aws_execution(self):
         self.aws_download_headless_chrome_from_s3()
-        os.environ['PYPPETEER_HOME']    = '/tmp'    # tell pyppeteer to use this read-write path in Lambda aws
+        os.environ['PYPPETEER_HOME']    = '/tmp'                # tell pyppeteer to use this read-write path in Lambda aws
         self.chrome_args.args_set_user_data_dir(temp_folder())  # set userdata to folder inside /tmp (since that is writable)
         return await self.browser_launch_or_connect()
 

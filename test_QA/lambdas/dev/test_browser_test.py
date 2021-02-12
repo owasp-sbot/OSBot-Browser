@@ -1,8 +1,8 @@
 from osbot_aws.apis.Lambda import Lambda
 
-from osbot_aws.helpers.Test_Helper import Test_Helper
-from osbot_aws.apis.shell.Lambda_Shell import Lambda_Shell
-from osbot_utils.utils.Dev import pprint
+from osbot_aws.helpers.Test_Helper      import Test_Helper
+from osbot_aws.apis.shell.Lambda_Shell  import Lambda_Shell
+from osbot_utils.utils.Dev              import pprint
 
 from osbot_browser.Deploy import Deploy
 from osbot_browser.lambdas.dev.browser_test import run
@@ -15,11 +15,26 @@ class test_browser_test(Test_Helper):
         self.headless    = True
         self.lambda_name = 'osbot_browser.lambdas.dev.browser_test'
         self.handler     = run
-        self.aws_lambda     = Lambda(self.lambda_name)
+        self.aws_lambda  = Lambda(self.lambda_name)
 
-    def test_invoke_directly(self):
+    def test_invoke_directly__lambda_shell(self):
         # confirm 'lambda_sheel is working ok
         assert run({'lambda_shell': {'method_name':'ping', 'auth_key': Lambda_Shell().get_lambda_shell_auth()}}) == 'pong'
+
+
+    def test_invoke_directly__open_page(self):
+        payload = {'url'      : 'https://news.bbc.co.uk',
+                   'headless' : False ,
+                   'delay'    : 0 ,
+                   'js_code'  : "document.querySelectorAll('a')                       "
+                                "        .forEach((a)=>                               "
+                                "           {                                         "
+                                "               a.outerHTML = '<h2>CHANGED via JS<h2>'"
+                                "           })" }
+
+        #payload = {'url': 'https://www.google.com/', 'headless' : False }
+        self.png_data = run(payload)
+
 
     def test_lambda_invoke(self):
         params = {'lambda_shell': {'method_name': 'ping', 'auth_key': Lambda_Shell().get_lambda_shell_auth()}}
@@ -31,27 +46,27 @@ class test_browser_test(Test_Helper):
 
     def test_update_and_invoke(self):
         self.test_update_lambda()
-        self.result = self.aws_lambda.invoke({'url': 'https://www.google.com/'})
-        #self.png_data = self._lambda.invoke({})
-
-
-
-
-
-
-
-
-
-
-
-
+        self.png_data = self.aws_lambda.invoke({'url': 'https://www.google.com/'})
 
     def test_just_invoke(self):
-        #payload = {'url': 'http://localhost:42195'}
-        #payload = {'url': 'https://news.bbc.co.uk'}
-        #payload = {}
-        payload = {'url': 'https://www.google.com'}
+        payload = {'url': 'https://news.bbc.co.uk', 'delay': 2}
+        #payload = {'url': 'https://www.google.com/404'}
         self.png_data = self.aws_lambda.invoke(payload)
+
+    def test_invoke_on_lambda__exec_js(self):
+        payload = {'url'      : 'https://news.bbc.co.uk',
+                   'headless' : True ,
+                   'delay'    : 0 ,
+                   'js_code'  : "document.querySelectorAll('a')                       "
+                                "        .forEach((a)=>                               "
+                                "           {                                         "
+                                "               a.outerHTML = '<h2>CHANGED via JS<h2>'"
+                                "           })" }
+        self.png_data = self.aws_lambda.invoke(payload)
+
+
+
+
 
     def test_invoke_shell_get_event_logs(self):
         print()

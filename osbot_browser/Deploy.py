@@ -44,7 +44,7 @@ class Deploy:
         source_folder = path_combine(__file__, '../../osbot_browser')  # to do check path
         #package.add_module('osbot_browser')
         package.add_folder(source_folder, ignore='web_root')
-        package.add_osbot_utils()
+        #package.add_osbot_utils()
         package.add_osbot_aws()
         self.configure_environment_variables()
         package.update()

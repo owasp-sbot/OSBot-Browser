@@ -1,3 +1,4 @@
+import asyncio
 import base64
 import json
 import os
@@ -196,7 +197,7 @@ class API_Browser:
         await self.js_execute(js_code)
 
         if delay:
-            sleep(delay)
+            await asyncio.sleep(delay)
 
         if file_pdf is None:
             file_pdf = self.file_tmp_pdf
@@ -217,7 +218,7 @@ class API_Browser:
         await self.js_execute(js_code)
 
         if delay:
-            sleep(delay)
+            await asyncio.sleep(delay)
 
         if file_screenshot is None:
             file_screenshot = self.file_tmp_screenshot
@@ -432,8 +433,8 @@ class API_Browser:
         return await self.screenshot(url,page=page, file_screenshot = file_screenshot,clip=clip,full_page=full_page)
 
     @sync
-    async def sync__screenshot_base64(self, url=None, page=None, full_page=True, clip=None,delay=None):
-        screenshot_file = await self.screenshot(url=url,page=page, full_page=full_page, clip=clip, delay=delay)
+    async def sync__screenshot_base64(self, url=None, page=None, full_page=True, clip=None,delay=None, js_code=None):
+        screenshot_file = await self.screenshot(url=url,page=page, full_page=full_page, clip=clip, delay=delay, js_code=js_code)
         return base64.b64encode(open(screenshot_file, 'rb').read()).decode()
 
     @sync
