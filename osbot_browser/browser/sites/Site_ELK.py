@@ -25,7 +25,7 @@ class Site_ELK:
         self.setup()
 
     def setup(self):
-        login_details   = json.loads(Secrets(self.aws_secrets_id).value())
+        login_details   = json.loads(Secrets(id=self.aws_secrets_id).value())
         self.username   = login_details.get('username')
         self.password   = login_details.get('password')
         self.server_url = login_details.get('server_url')

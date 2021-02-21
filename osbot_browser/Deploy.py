@@ -11,7 +11,7 @@ class Deploy:
         self.deploy_lambda.package.aws_lambda.runtime = 'python3.7'
 
     def configure_environment_variables(self):
-        vars_to_add = ['OSBOT_LAMBDA_S3_BUCKET','OSBOT_LAMBDA_S3_KEY_PREFIX']
+        vars_to_add = ['OSBOT_LAMBDA_S3_BUCKET','OSBOT_LAMBDA_S3_FOLDER_LAMBDAS']
         env_variables = {}
         for var_to_add in vars_to_add:
             env_variables[var_to_add] = os.environ.get(var_to_add)
