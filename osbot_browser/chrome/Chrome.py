@@ -1,4 +1,6 @@
 import os
+from sys import platform
+
 import pyppeteer
 import pyppeteer.chromium_downloader
 from pyppeteer.browser              import Browser
@@ -18,8 +20,7 @@ class Chrome():
         #self.osx_set_chrome_version('800071')  # 'HeadlessChrome/86.0.4240.0' (Sep 2020)
         #self.osx_set_chrome_version('848005')  # 'HeadlessChrome/90.0.4403.0' (Feb 2021)
         #self.osx_set_chrome_version('884014')  # 'HeadlessChrome/90.0.4403.0' (Feb 2021)
-        if osx_chrome_version:
-            self.osx_set_chrome_version(osx_chrome_version)
+        self.osx_set_chrome_version(osx_chrome_version)
 
         self.headless(headless)
 
@@ -91,11 +92,12 @@ class Chrome():
 
     # see https://awesomeopensource.com/project/alixaxel/chrome-aws-lambda for a good list of value chrome_version values
     def osx_set_chrome_version(self, chrome_version):
-        from pathlib import Path
-        original_version = pyppeteer.__chromium_revision__
-        os.environ['PYPPETEER_CHROMIUM_REVISION']               = chrome_version
-        pyppeteer.__chromium_revision__                         = chrome_version
-        pyppeteer.chromium_downloader.REVISION                  = chrome_version
-        pyppeteer.chromium_downloader.chromiumExecutable["mac"] = Path(str(pyppeteer.chromium_downloader.chromiumExecutable["mac"]).replace(original_version, chrome_version))
-        pyppeteer.chromium_downloader.downloadURLs["mac"]       = str(pyppeteer.chromium_downloader.downloadURLs["mac"]).replace(original_version, chrome_version)
+        if platform == "darwin" and chrome_version:
+            from pathlib import Path
+            original_version = pyppeteer.__chromium_revision__
+            os.environ['PYPPETEER_CHROMIUM_REVISION']               = chrome_version
+            pyppeteer.__chromium_revision__                         = chrome_version
+            pyppeteer.chromium_downloader.REVISION                  = chrome_version
+            pyppeteer.chromium_downloader.chromiumExecutable["mac"] = Path(str(pyppeteer.chromium_downloader.chromiumExecutable["mac"]).replace(original_version, chrome_version))
+            pyppeteer.chromium_downloader.downloadURLs["mac"]       = str(pyppeteer.chromium_downloader.downloadURLs["mac"]).replace(original_version, chrome_version)
         return self
