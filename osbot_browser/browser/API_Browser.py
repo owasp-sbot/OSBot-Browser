@@ -275,6 +275,12 @@ class API_Browser:
             Dev.pprint("[Error][sync__await_for_element] {0}".format(error))
             return False
 
+    async def wait_for_navigation(self, page=None):
+        if page is None:
+            page = await self.page()
+        await page.waitForNavigation()
+        return self
+
     # helper sync functions
     @sync
     async def sync__browser_width(self, width,height=None):
@@ -476,10 +482,9 @@ class API_Browser:
 
     @sync
     async def sync__wait_for_navigation(self, page=None):
-        if page is None:
-            page = await self.page()
-        await page.waitForNavigation()
-        return self
+        return self.wait_for_element(page=page)
+
+
 
     @sync
     async def sync_sleep(self, mili_seconds):
