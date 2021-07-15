@@ -53,12 +53,22 @@ class API_Browser:
         if element:
             return await page.evaluate('(element) => element.getAttributeNames().map((name)=>  { return { [name]: element.getAttribute(name) } } )', element)
 
+    async def element_click(self, page, target):
+        element = await self.element(page=page, selector=target)
+        if element:
+            await element.click()
+
 
     async def element_property(self, page, target, property):
         element = await self.element(page, target)
         if element:
             return await page.evaluate(f'(element) => element.{property}', element)
         return None
+
+    async def element_type(self, page, target, value):
+        element = await self.element(page=page, selector=target)
+        if element:
+            await element.type(value)
 
     async def elements(self, page, target):
         if type(target) is list:             # cases when target is a list of elements
@@ -254,6 +264,17 @@ class API_Browser:
                 return {'error': error}
             return None
 
+
+    async def wait_for_element(self, selector, timeout=10000,page=None, visible=False ,hidden=False):
+        if page is None:
+            page = await self.page()
+        try:
+            await page.waitForSelector(selector, {'timeout': timeout ,'visible':visible, 'hidden': hidden})
+            return True
+        except Exception as error:
+            Dev.pprint("[Error][sync__await_for_element] {0}".format(error))
+            return False
+
     # helper sync functions
     @sync
     async def sync__browser_width(self, width,height=None):
@@ -439,14 +460,8 @@ class API_Browser:
 
     @sync
     async def sync__await_for_element(self, selector, timeout=10000,page=None, visible=False ,hidden=False):
-        if page is None:
-            page = await self.page()
-        try:
-            await page.waitForSelector(selector, {'timeout': timeout ,'visible':visible, 'hidden': hidden})
-            return True
-        except Exception as error:
-            Dev.print("[Error][sync__await_for_element] {0}".format(error))
-            return False
+        return await self.wait_for_element(selector=selector, timeout=timeout, page=page, visible=visible ,hidden=hidden)
+
 
     @sync
     async def sync__set_upload_file(self, page, selector, file_path):
