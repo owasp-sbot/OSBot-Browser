@@ -7,7 +7,7 @@ from osbot_browser.chrome.Chrome_Args import Chrome_Args
 from osbot_browser.chrome.Chrome_Setup import Chrome_Setup
 
 class Chrome():
-    def __init__(self, headless=True):
+    def __init__(self, headless=True, osx_chrome_version='884014'):
         self.options        : dict         = self.default_options()
         self._browser       : Browser      = None
         self.chrome_args    : Chrome_Args  = Chrome_Args()
@@ -16,7 +16,10 @@ class Chrome():
         # todo: move value below to a global config CONST value
         #self.osx_set_chrome_version('722234')  # 'HeadlessChrome/80.0.3987.0' (May 2020)
         #self.osx_set_chrome_version('800071')  # 'HeadlessChrome/86.0.4240.0' (Sep 2020)
-        self.osx_set_chrome_version('848005')  # 'HeadlessChrome/90.0.4403.0' (Feb 2021)
+        #self.osx_set_chrome_version('848005')  # 'HeadlessChrome/90.0.4403.0' (Feb 2021)
+        #self.osx_set_chrome_version('884014')  # 'HeadlessChrome/90.0.4403.0' (Feb 2021)
+        if osx_chrome_version:
+            self.osx_set_chrome_version(osx_chrome_version)
 
         self.headless(headless)
 
