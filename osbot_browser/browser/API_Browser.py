@@ -1,8 +1,6 @@
 import asyncio
 import base64
 import json
-import os
-from time import sleep
 
 from pyppeteer.element_handle import ElementHandle
 from syncer import sync
@@ -176,6 +174,68 @@ class API_Browser:
         pages = await browser.pages()
         page = pages.pop()
         return page
+
+    async def page_cookies(self):
+        page = await self.page()
+        return await page.cookies()
+
+    # todo: add suport for
+    #       in setup code:
+    #           await page.setRequestInterception(True);
+    #       inside the intercept_request(request) method
+    #           await request.continue_({'url': 'http://tarhet'})
+
+    async def page_capture_requests(self, page=None, on_request=None):
+        requests = []
+
+        async def intercept_request(request):
+            properties_to_capture = ['headers', 'method', 'postData', 'redirectChain', 'resourceType','url']
+            request_data          =  {}
+            for property_to_capture in properties_to_capture:
+                request_data[property_to_capture] = getattr(request, property_to_capture)
+            request_data['frame_name'] = request.frame.name
+            requests.append(request_data)
+
+            if on_request:
+                on_request(request_data)
+        if page is None:
+            page = await self.page()
+
+        page.on('request', lambda request: asyncio.ensure_future(intercept_request(request)))
+
+        return requests
+
+    async def page_capture_responses(self, page=None, on_response=None):
+        responses = []
+
+        async def intercept_response(response):
+            response_data = {}
+            try:
+                properties_to_capture = ['fromCache', 'headers', 'ok', 'status', 'url']
+                for property_to_capture in properties_to_capture:
+                    response_data[property_to_capture] = getattr(response, property_to_capture)
+                response_data['request_frame_name'] = response.request.frame.name
+                response_data['request_headers'   ] = response.request.headers
+                response_data['request_method'    ] = response.request.method
+                response_data['request_post_data' ] = response.request.postData
+                response_data['headers'           ] = response.headers
+
+                if 'text' in response.headers.get('content-type'):
+                    response_data['text'] = await response.text()
+            except Exception as error:
+                response_data['intercept_response_error'] = error
+                response_data['text'] = ''
+
+            responses.append(response_data)
+
+            if on_response:
+                on_response(response_data)
+        if page is None:
+            page = await self.page()
+
+        page.on('response'                         , lambda response: asyncio.ensure_future(intercept_response(response)))
+
+        return responses
 
     async def pages(self):
         browser = await self.browser()
