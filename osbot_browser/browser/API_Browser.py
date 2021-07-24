@@ -46,10 +46,25 @@ class API_Browser:
         if element:
             return await page.evaluate('(element, name) => element.getAttribute(name)', element, name)
 
-    async def element_attributes(self, page, target):
+    async def element_attributes(self, page, target, index_by_key=False):
         element = await self.element(page, target)
         if element:
-            return await page.evaluate('(element) => element.getAttributeNames().map((name)=>  { return { [name]: element.getAttribute(name) } } )', element)
+            js_code = '(element) => element.getAttributeNames().map((name)=>  { return { [name]: element.getAttribute(name) } } )'
+            attributes_list = await page.evaluate(js_code, element)
+            if index_by_key:
+                attributes = {}
+                for entry in attributes_list:
+                    for key, value in entry.items():
+                        attributes[key] = value
+                return attributes
+            else:
+                return attributes_list
+        else:
+            if index_by_key:
+                return {}
+            else:
+                return []
+
 
     async def element_click(self, page, target):
         element = await self.element(page=page, selector=target)
