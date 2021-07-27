@@ -71,6 +71,14 @@ class API_Browser:
         if element:
             await element.click()
 
+    async def element_inner_text(self, page, selector):
+        return await self.element_property(page, selector, 'innerText')
+
+    async def element_inner_html(self, page, selector):
+        return await self.element_property(page, selector, 'innerHTML')
+
+    async def element_outer_html(self, page, selector):
+        return await self.element_property(page, selector, 'outerHTML')
 
     async def element_property(self, page, target, property):
         element = await self.element(page, target)
@@ -339,6 +347,13 @@ class API_Browser:
                 return {'error': error}
             return None
 
+    #todo: not working (find solution to search for a specific text
+    #      with the code below I was getting "Inspected target navigated or closed'"
+    #      see https://stackoverflow.com/questions/46825300/wait-for-text-to-appear-when-using-puppeteer
+    # async def wait_for_text(self, expected_text, timeout=10000, page=None):
+    #     if page is None:
+    #         page = await self.page()
+    #     await page.waitForXPath(f"//*[@contains(., 'expected_text')]")
 
     async def wait_for_element(self, selector, timeout=10000,page=None, visible=False ,hidden=False):
         if page is None:
@@ -398,6 +413,10 @@ class API_Browser:
     @sync
     async def sync__element_html_inner(self, page, selector):
         return await self.element_property(page, selector, 'innerHTML')
+
+    @sync
+    async def sync__element_text_inner(self, page, selector):
+        return await self.element_property(page, selector, 'innerText')
 
     @sync
     async def sync__element_html_outer(self, page, selector):
