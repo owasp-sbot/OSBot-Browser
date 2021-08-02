@@ -6,7 +6,7 @@ from pyppeteer.element_handle import ElementHandle
 from syncer import sync
 
 from osbot_browser.chrome.Chrome import Chrome
-from osbot_utils.utils.Dev import Dev
+from osbot_utils.utils.Dev import Dev, pprint
 from osbot_utils.utils.Files import Files
 
 # see https://github.com/puppeteer/puppeteer/blob/master/docs/api.md for all the functions available
@@ -355,6 +355,9 @@ class API_Browser:
     #         page = await self.page()
     #     await page.waitForXPath(f"//*[@contains(., 'expected_text')]")
 
+    async def wait_for(self, duration_in_secs):
+        await asyncio.sleep(duration_in_secs)
+
     async def wait_for_element(self, selector, timeout=10000,page=None, visible=False ,hidden=False):
         if page is None:
             page = await self.page()
@@ -365,11 +368,16 @@ class API_Browser:
             Dev.pprint("[Error][sync__await_for_element] {0}".format(error))
             return False
 
-    async def wait_for_navigation(self, page=None):
-        if page is None:
-            page = await self.page()
-        await page.waitForNavigation()
-        return self
+    async def wait_for_navigation(self, page=None, timeout_in_ms=10000, show_error=False):
+        try:
+            if page is None:
+                page = await self.page()
+            await page.waitForNavigation({'timeout': timeout_in_ms})
+            return True
+        except Exception as error:
+            if show_error:
+                pprint(error)
+            return False
 
     # helper sync functions
     @sync
