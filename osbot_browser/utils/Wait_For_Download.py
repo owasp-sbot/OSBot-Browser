@@ -46,10 +46,13 @@ class Wait_For_Download:
 
     async def capture_screenshot(self):
         if self.capture_screenshots:
-            full_page         = True
-            screenshot_bytes  = await self.page.screenshot({'fullPage': full_page})
-            screenshot_base64 = bytes_to_base64(screenshot_bytes)
-            self.screenshots.append(screenshot_base64)
+            try:
+                full_page         = True
+                screenshot_bytes  = await self.page.screenshot({'fullPage': full_page})
+                screenshot_base64 = bytes_to_base64(screenshot_bytes)
+                self.screenshots.append(screenshot_base64)
+            except:
+                pass
 
     async def trigger_download(self, url, print_expected_error=False):
         try:
