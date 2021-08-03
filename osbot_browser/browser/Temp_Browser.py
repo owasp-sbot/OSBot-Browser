@@ -16,7 +16,7 @@ class Temp_Browser:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.api_browser.sync__close_browser()
+        self.api_browser.sync__close_browser()              # todo see if this really only continues when the process process has terminated
 
     def screenshot(self, save_to=None):
         return self.api_browser.sync__screenshot(file_screenshot=save_to)
@@ -31,4 +31,4 @@ class Temp_Browser:
         return self.api_browser.sync__url()
 
     def py_query(self):
-        return Py_Query(self.html)
+        return Py_Query(self.html())
