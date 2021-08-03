@@ -380,6 +380,11 @@ class API_Browser:
             return False
 
     # helper sync functions
+
+    @sync
+    async def sync__browser(self):
+        return await self.browser()
+
     @sync
     async def sync__browser_width(self, width,height=None):
         if height is None: height = width
@@ -557,6 +562,7 @@ class API_Browser:
     async def sync__setup_browser(self):
         await self.browser()
         return self
+
     @sync
     async def sync__screenshot(self, url=None, page=None, file_screenshot = None,clip=None,full_page=True):
         return await self.screenshot(url,page=page, file_screenshot = file_screenshot,clip=clip,full_page=full_page)

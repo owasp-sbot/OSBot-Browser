@@ -6,6 +6,8 @@ pyyaml
 python-dotenv
 syncer
 pyppeteer
+pyquery
+pyjsparser
 
 # for testing
 coveralls

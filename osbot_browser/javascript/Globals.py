@@ -1,0 +1,78 @@
+from osbot_browser.javascript.ArrayExpression import ArrayExpression
+from osbot_browser.javascript.AssignmentExpression import AssignmentExpression
+from osbot_browser.javascript.BinaryExpression import BinaryExpression
+from osbot_browser.javascript.BlockStatement import BlockStatement
+from osbot_browser.javascript.BreakStatement import BreakStatement
+from osbot_browser.javascript.CallExpression import CallExpression
+from osbot_browser.javascript.CatchClause import CatchClause
+from osbot_browser.javascript.ConditionalExpression import ConditionalExpression
+from osbot_browser.javascript.DoWhileStatement import DoWhileStatement
+from osbot_browser.javascript.EmptyStatement import EmptyStatement
+from osbot_browser.javascript.ExpressionStatement import ExpressionStatement
+from osbot_browser.javascript.ForInStatement import ForInStatement
+from osbot_browser.javascript.ForStatement import ForStatement
+from osbot_browser.javascript.FunctionDeclaration import FunctionDeclaration
+from osbot_browser.javascript.FunctionExpression import FunctionExpression
+from osbot_browser.javascript.Identifier import Identifier
+from osbot_browser.javascript.IfStatement import IfStatement
+from osbot_browser.javascript.Literal import Literal
+from osbot_browser.javascript.LogicalExpression import LogicalExpression
+from osbot_browser.javascript.MemberExpression import MemberExpression
+from osbot_browser.javascript.NewExpression import NewExpression
+from osbot_browser.javascript.Not_Supported_Type import Not_Supported_Type
+from osbot_browser.javascript.ObjectExpression import ObjectExpression
+from osbot_browser.javascript.Program import Program
+from osbot_browser.javascript.Property import Property
+from osbot_browser.javascript.ReturnStatement import ReturnStatement
+from osbot_browser.javascript.SequenceExpression import SequenceExpression
+from osbot_browser.javascript.SwitchCase import SwitchCase
+from osbot_browser.javascript.SwitchStatement import SwitchStatement
+from osbot_browser.javascript.ThisExpression import ThisExpression
+from osbot_browser.javascript.ThrowStatement import ThrowStatement
+from osbot_browser.javascript.TryStatement import TryStatement
+from osbot_browser.javascript.UnaryExpression import UnaryExpression
+from osbot_browser.javascript.UpdateExpression import UpdateExpression
+from osbot_browser.javascript.VariableDeclaration import VariableDeclaration
+from osbot_browser.javascript.VariableDeclarator import VariableDeclarator
+from osbot_browser.javascript.WhileStatement import WhileStatement
+
+NOT_SUPPORTED_TYPE = "Not_Supported_Type"
+
+supported_types = { "AssignmentExpression"  : AssignmentExpression  ,
+                    "ArrayExpression"       : ArrayExpression       ,
+                    "BinaryExpression"      : BinaryExpression      ,
+                    "BlockStatement"        : BlockStatement        ,
+                    "BreakStatement"        : BreakStatement        ,
+                    "CallExpression"        : CallExpression        ,
+                    "CatchClause"           : CatchClause           ,
+                    "ConditionalExpression" : ConditionalExpression ,
+                    "DoWhileStatement"      : DoWhileStatement      ,
+                    "EmptyStatement"        : EmptyStatement        ,
+                    "ExpressionStatement"   : ExpressionStatement   ,
+                    "ForStatement"          : ForStatement          ,
+                    "FunctionDeclaration"   : FunctionDeclaration   ,
+                    "FunctionExpression"    : FunctionExpression    ,
+                    "Identifier"            : Identifier            ,
+                    "IfStatement"           : IfStatement           ,
+                    "ForInStatement"        : ForInStatement        ,
+                    "Literal"               : Literal               ,
+                    "LogicalExpression"     : LogicalExpression     ,
+                    "MemberExpression"      : MemberExpression      ,
+                    "NewExpression"         : NewExpression         ,
+                    "ObjectExpression"      : ObjectExpression      ,
+                    "SequenceExpression"    : SequenceExpression    ,
+                    "SwitchCase"            : SwitchCase            ,
+                    "SwitchStatement"       : SwitchStatement       ,
+                    "ReturnStatement"       : ReturnStatement       ,
+                    "ThisExpression"        : ThisExpression        ,
+                    "ThrowStatement"        : ThrowStatement        ,
+                    "TryStatement"          : TryStatement          ,
+                    "UnaryExpression"       : UnaryExpression       ,
+                    "UpdateExpression"      : UpdateExpression      ,
+                    "VariableDeclaration"   : VariableDeclaration   ,
+                    "VariableDeclarator"    : VariableDeclarator    ,
+                    "Program"               : Program               ,
+                    "Property"              : Property              ,
+                    "WhileStatement"        : WhileStatement        ,
+                    NOT_SUPPORTED_TYPE      : Not_Supported_Type       # special one to capture the notes currently not supported
+                    }
