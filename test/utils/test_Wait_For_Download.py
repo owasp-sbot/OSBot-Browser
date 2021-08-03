@@ -1,5 +1,8 @@
 from unittest                               import TestCase
 from urllib.parse                           import urljoin
+
+from osbot_utils.utils.Dev import pprint
+
 from osbot_utils.utils.Files                import file_contents, file_exists
 from osbot_utils.utils.Misc                 import random_string
 from osbot_browser.utils.Wait_For_Download  import Wait_For_Download
@@ -45,7 +48,17 @@ class test_Wait_For_Download(TestCase):
                     with Wait_For_Download(page=temp_browser.page()) as _:
                         _.sync_trigger_download(full_link)
                         _.sync_get_file()
-                        assert _.status is True
+                        assert _.status             is True
+                        assert _.wait_count        > 0
+                        assert len(_.screenshots) == 0
+                        assert file_exists(_.downloaded_file)
+
+                    with Wait_For_Download(page=temp_browser.page(), capture_screenshots=True) as _:
+                        _.sync_trigger_download(full_link)
+                        _.sync_get_file()
+                        assert _.status             is True
+                        assert _.wait_count        > 0
+                        assert len(_.screenshots) == 1
                         assert file_exists(_.downloaded_file)
 
 
