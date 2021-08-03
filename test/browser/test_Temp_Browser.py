@@ -11,6 +11,7 @@ from osbot_browser.browser.Temp_Browser import Temp_Browser
 
 class test_Temp_Browser(TestCase):
 
+    # todo: Javascript below shows 2 missing types : LabeledStatement , ContinueStatement
     def test__enter__exit__(self):
         headless = True
         with Temp_Browser(headless=headless) as browser:

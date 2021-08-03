@@ -1,7 +1,7 @@
 import requests
 from osbot_utils.utils.Json import json_parse
 
-from osbot_utils.utils.Misc import base64_to_str
+from osbot_utils.utils.Misc import base64_to_str, list_set
 
 from osbot_browser.py_query.Py_Query_Dom import Py_Query_Dom
 from osbot_utils.decorators.lists.index_by import index_by
@@ -74,13 +74,15 @@ class Py_Query:
                 result.append(Py_Query(pyquery=item))
         return result
 
-    def indexed_by_attribute(self, attribute_name):
+    def indexed_by_attribute(self, attribute_name, return_unique_list=False):
         result = {}
         items = self.items()
         for item in items:
             attribute_value = item.attribute(attribute_name)
             if attribute_value:
                 result[attribute_value] = item
+        if return_unique_list:
+            return list_set(result)
         return result
 
     def print(self):
