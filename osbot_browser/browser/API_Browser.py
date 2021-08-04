@@ -13,9 +13,7 @@ from osbot_utils.utils.Files import Files
 
 class API_Browser:
 
-    def __init__(self, browser=None, headless=True):  # headless = True, new_browser=False, url_chrome = None):
-        self.file_tmp_screenshot          = Files.temp_file('.png')
-        self.file_tmp_pdf                 = Files.temp_file('.pdf')
+    def __init__(self, browser=None, headless=True):
         self._browser                     = browser
         self.headless                     = headless
         self.log_js_errors_to_console     = True
@@ -293,7 +291,7 @@ class API_Browser:
             await asyncio.sleep(delay)
 
         if file_pdf is None:
-            file_pdf = self.file_tmp_pdf
+            file_pdf = Files.temp_file('.pdf')
 
         page = await self.page()
         if viewport:
@@ -314,7 +312,7 @@ class API_Browser:
             await asyncio.sleep(delay)
 
         if file_screenshot is None:
-            file_screenshot = self.file_tmp_screenshot
+            file_screenshot = Files.temp_file('.png')
 
         page = await self.page()
         if viewport:
