@@ -3,14 +3,14 @@ from unittest.mock import patch, call
 
 from osbot_utils.utils.Misc import list_set
 
-from osbot_browser.py_query.Py_Query import Py_Query_from_requests_get, Py_Query
+from osbot_browser.py_query.Py_Query import py_query_from_GET, Py_Query
 from osbot_browser.py_query.Py_Query_Dom import Py_Query_Dom
 
 
 class test_Py_Query_Dom(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.py_query = Py_Query_from_requests_get('https://httpbin.org/')
+        cls.py_query = py_query_from_GET('https://httpbin.org/')
 
     def setUp(self):
         self.py_query_dom = Py_Query_Dom(self.py_query)

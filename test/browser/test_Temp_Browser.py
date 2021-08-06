@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from osbot_browser.javascript.Javascript_Parser import JS_Parser_from_url
+from osbot_browser.javascript.Javascript_Parser import js_parser_from_url
 from osbot_utils.utils.Misc import list_set
 
 from osbot_utils.utils.Dev import pprint
@@ -25,7 +25,7 @@ class test_Temp_Browser(TestCase):
             assert py_query.query('form').attributes() == {'action': '/search', 'method': 'GET', 'role': 'search'}
             scripts_urls = list_set(py_query.query('script').indexed_by_attribute('src'))
             first_script = scripts_urls[0]
-            js_parser = JS_Parser_from_url(first_script)
+            js_parser = js_parser_from_url(first_script)
 
             assert len(js_parser.var_names       ()) > 300
             assert len(js_parser.function_names  ()) > 10

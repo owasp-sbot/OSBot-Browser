@@ -25,12 +25,16 @@ class Base_Node:
         return self.__class__.__name__
 
     def process_nodes(self, nodes_ast):
+        results = []
         for node_ast in nodes_ast:
-            self.process_node(node_ast)
+            results.append(self.process_node(node_ast))
+        return results
 
     def process_node(self, node_ast):
         if node_ast:
-            self.nodes_dom.append(self.process_type(node_ast))
+            result = self.process_type(node_ast)
+            self.nodes_dom.append(result)
+            return result
 
     def process_type(self, js_ast):
         from osbot_browser.javascript.Globals import NOT_SUPPORTED_TYPE

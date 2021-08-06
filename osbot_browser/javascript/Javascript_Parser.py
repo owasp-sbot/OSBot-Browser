@@ -1,3 +1,4 @@
+from osbot_browser.javascript.VariableDeclarator import VariableDeclarator
 from osbot_utils.utils.Http import GET
 
 from osbot_browser.javascript.Program import Program
@@ -57,6 +58,16 @@ class Javascript_Parser:
         for node in nodes:
             print(f"raw: {node.raw} | value: {node.value} | regex: {node.regex}")
 
+    def get_variables(self):
+        variables = {}
+        node_id   = "VariableDeclarator"
+        nodes     = self.all_nodes.get(node_id)
+        for node in nodes:
+            variable : VariableDeclarator = node
+            if variable.name:
+                variables[variable.name] = variable.value
+        return variables
+
     def function_names(self, min_name_size=0):
         node_id = "FunctionDeclaration"
         names   = []
@@ -101,6 +112,10 @@ class Javascript_Parser:
         return unique(names)
 
 
-def JS_Parser_from_url(url):
+def js_parser_from_js(js_code):
+    return Javascript_Parser().process_js_code(js_code)
+
+def js_parser_from_url(url):
     js_code = GET(url)
     return Javascript_Parser().process_js_code(js_code)
+

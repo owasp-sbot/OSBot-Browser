@@ -21,4 +21,5 @@ class Literal(Base_Node):
         assert type(self.raw) == str
 
     def __repr__(self):
-        return f"<Literal raw={self.raw} | value={self.value}>"
+        return self.raw
+        #return f"<Literal raw={self.raw} | value={self.value}>"

@@ -14,4 +14,4 @@ class Identifier(Base_Node):
         pass
 
     def __repr__(self):
-        return f"<Identifier name={self.name}>"
+        return self.name

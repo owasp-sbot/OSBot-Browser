@@ -177,7 +177,7 @@ class Py_Query:
 def Py_Query_from_html(html):                # allows to handle the case when html is or an error is raise my PyQuery
     return Py_Query(html=html)
 
-def Py_Query_from_requests_get(url):
+def py_query_from_GET(url):
     response = requests.get(url)
     return Py_Query(response.text)
 

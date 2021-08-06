@@ -10,7 +10,7 @@ from osbot_utils.decorators.methods.cache_on_tmp import cache_on_tmp
 
 from osbot_utils.utils.Http import GET
 
-from osbot_browser.py_query.Py_Query import Py_Query_from_requests_get
+from osbot_browser.py_query.Py_Query import py_query_from_GET
 
 JS_SIMPLE_CODE_1 = "var answer = 6 * 7;"
 
@@ -26,7 +26,7 @@ class test_Javascript_Parser(TestCase):
     @cache_on_tmp()
     def get_test_code_2(self):
         base_url = 'https://httpbin.org/'
-        py_query = Py_Query_from_requests_get('https://httpbin.org/')
+        py_query = py_query_from_GET('https://httpbin.org/')
         js_srcs = []
         for key in py_query.query('script').indexed_by_attribute('src'):
             js_srcs.append(urljoin(base_url, key))
