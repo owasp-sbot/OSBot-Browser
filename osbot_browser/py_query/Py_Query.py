@@ -155,14 +155,11 @@ class Py_Query:
                 result.append(item.tag)
         return result
 
-    def text(self):
+    def text(self,selector=None):
         if self.pyquery:
+            if selector:
+                return self.query(selector).text()
             return self.pyquery.text()
-        return ''
-
-    def title(self):                            # todo: move to separate class (one more focused the page's content)
-        if self.pyquery:
-            return self.query('title').text()
         return ''
 
     def value(self, value=None):
@@ -173,6 +170,17 @@ class Py_Query:
 
     def __repr__(self):
         return f'(Py_Query) tag: { self.tag()} | size: {self.size()} | attributes: {len(self.attributes())} | elements: {len(self.elements())} | children: {len(self.children())} \n\n {self.html()}'
+
+
+    # todo: move to separate class (one more focused the page's content)
+    # misc html helpers and page content
+
+    def body(self):
+        return self.query('body')
+
+    def title(self):
+        return self.text('title')
+
 
 def py_query_from_html(html):                # allows to handle the case when html is or an error is raise my PyQuery
     return Py_Query(html=html)
