@@ -8,7 +8,7 @@ from osbot_utils.utils.Misc import random_string
 from osbot_utils.utils.Dev import pprint
 from pyquery import PyQuery
 
-from osbot_browser.py_query.Py_Query import Py_Query, Py_Query_from_html
+from osbot_browser.py_query.Py_Query import Py_Query, py_query_from_html
 
 
 class test_Py_Query(TestCase):
@@ -201,8 +201,8 @@ class test_Py_Query(TestCase):
             # 'order=spam&order2=baked%20beans'
 
     def test_Py_Query_from_html(self):
-        py_query = Py_Query_from_html('<html>aaa</html>')
+        py_query = py_query_from_html('<html>aaa</html>')
         assert type(py_query) is Py_Query
         assert py_query.html() == '<html>aaa</html>'
-        empty_py_query = Py_Query_from_html('')
+        empty_py_query = py_query_from_html('')
         assert str(empty_py_query.error) == str(ParserError('Document is empty'))

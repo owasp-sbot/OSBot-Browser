@@ -174,7 +174,7 @@ class Py_Query:
     def __repr__(self):
         return f'(Py_Query) tag: { self.tag()} | size: {self.size()} | attributes: {len(self.attributes())} | elements: {len(self.elements())} | children: {len(self.children())} \n\n {self.html()}'
 
-def Py_Query_from_html(html):                # allows to handle the case when html is or an error is raise my PyQuery
+def py_query_from_html(html):                # allows to handle the case when html is or an error is raise my PyQuery
     return Py_Query(html=html)
 
 def py_query_from_GET(url):
