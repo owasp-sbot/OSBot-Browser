@@ -317,25 +317,28 @@ class API_Browser:
         return file_pdf
 
     async def screenshot(self, url= None, page=None, full_page = True, file_screenshot = None, clip=None, viewport=None, js_code=None, delay=None):
-        if url:
-            await self.open(url,page=page)
+        try:
+            if url:
+                await self.open(url,page=page)
 
-        await self.js_execute(js_code)
+            await self.js_execute(js_code)
 
-        if delay:
-            await asyncio.sleep(delay)
+            if delay:
+                await asyncio.sleep(delay)
 
-        if file_screenshot is None:
-            file_screenshot = Files.temp_file('.png')
+            if file_screenshot is None:
+                file_screenshot = Files.temp_file('.png')
 
-        page = await self.page()
-        if viewport:
-            await self.viewport(viewport)
-        if clip:
-            full_page = False
-        await page.screenshot({'path': file_screenshot,'fullPage': full_page, 'clip' : clip})
+            page = await self.page()
+            if viewport:
+                await self.viewport(viewport)
+            if clip:
+                full_page = False
+            await page.screenshot({'path': file_screenshot,'fullPage': full_page, 'clip' : clip})
 
-        return file_screenshot
+            return file_screenshot
+        except Exception as error:
+            pprint(f"Error in API_Browser.screenshot: f{error}")            # todo: add support for logging
 
     async def url(self):
         page = await self.page()
