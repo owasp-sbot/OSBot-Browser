@@ -226,7 +226,7 @@ class API_Browser:
 
         return requests
 
-    async def page_capture_responses(self, page=None, on_response=None):
+    async def page_capture_responses(self, page=None, on_response=None, capture_text=True):
         responses = []
 
         async def intercept_response(response):
@@ -241,7 +241,7 @@ class API_Browser:
                 response_data['request_post_data' ] = response.request.postData
                 response_data['headers'           ] = response.headers
 
-                if 'text' in response.headers.get('content-type'):
+                if capture_text and 'text' in response.headers.get('content-type'):
                     response_data['text'] = await response.text()
             except Exception as error:
                 response_data['intercept_response_error'] = error
@@ -279,6 +279,18 @@ class API_Browser:
     async def html_raw(self):
         page = await self.page()
         return await page.content()
+
+    async def on_dialog__always_accept(self,page=None):
+
+        async def close_dialog(dialog):
+            print("on close_dialog: {0}".format(dialog))
+            await dialog.accept()
+
+        if page is None:
+            page = await self.page()
+
+        page.on('dialog', lambda dialog: close_dialog(dialog))
+        return page
 
     # todo: refactor pdf and screenshot methods since most of the code is the same
     async def pdf(self, url= None, page=None, full_page = True, file_pdf = None, clip=None, viewport=None, js_code=None, delay=None):
@@ -491,14 +503,8 @@ class API_Browser:
         return await self.new_page()
 
     @sync
-    async def sync_on_dialog__always_accept(self,page):
-
-        async def close_dialog(dialog):
-            print("on close_dialog: {0}".format(dialog))
-            await dialog.accept()
-
-        page.on('dialog', lambda dialog: close_dialog(dialog))
-        return page
+    async def sync_on_dialog__always_accept(self,page=None):
+        await self.on_dialog__always_accept(page)
 
     @sync
     async def sync_on_request(self, page, on_request):

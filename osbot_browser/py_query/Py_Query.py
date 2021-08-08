@@ -8,10 +8,14 @@ from osbot_utils.decorators.lists.index_by import index_by
 from pyquery import PyQuery
 
 class Py_Query:
-    def __init__(self, html='', pyquery=None):
+    pyquery : PyQuery
+
+    def __init__(self, html='', pyquery=None, selector=None):
         self.original_html = html
         self.error         = None
         self.pyquery       = pyquery or self.set_pyquery_from_html(html)
+        if selector:
+            self.pyquery = self.query(selector).pyquery
 
 
     def attribute(self, key):
