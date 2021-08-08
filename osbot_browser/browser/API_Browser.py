@@ -31,7 +31,9 @@ class API_Browser:
                await page.close()
             await browser.close()
 
-    async def element(self, page, selector):
+    async def element(self, page=None, selector=None):
+        if page is None:
+            page = await self.page()
         if type(selector) is ElementHandle:      # for the cases when a selector is already a selector
             return selector                     # todo: add better check that it is a selector
         try:
