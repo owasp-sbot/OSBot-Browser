@@ -607,3 +607,9 @@ class API_Browser:
     async def sync_sleep(self, mili_seconds):
         await self.sleep(mili_seconds)
         return self
+
+
+# helper methods that receive the values as params (i.e. no need for self
+def print_intercepted_requests(requests):
+    for request in requests:
+        print(f"{request.get('method')} | {request.get('url')} | {request.get('postData')}")
