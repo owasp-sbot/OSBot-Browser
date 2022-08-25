@@ -9,7 +9,7 @@ from osbot_browser.chrome.Chrome_Args import Chrome_Args
 from osbot_browser.chrome.Chrome_Setup import Chrome_Setup
 
 class Chrome():
-    def __init__(self, headless=True, osx_chrome_version='884014'):
+    def __init__(self, headless=True, osx_chrome_version='884014'):     # '1034914' is the latest version, but it was having a bug with the screenshots (very large height)
         self.options        : dict         = self.default_options()
         self._browser       : Browser      = None
         self.chrome_args    : Chrome_Args  = Chrome_Args()
@@ -20,6 +20,7 @@ class Chrome():
         #self.osx_set_chrome_version('800071')  # 'HeadlessChrome/86.0.4240.0' (Sep 2020)
         #self.osx_set_chrome_version('848005')  # 'HeadlessChrome/90.0.4403.0' (Feb 2021)
         #self.osx_set_chrome_version('884014')  # 'HeadlessChrome/90.0.4403.0' (Feb 2021)
+        # self.osx_set_chrome_version('884014')  # 'HeadlessChrome/90.0.4403.0' (Feb 2021)
         self.osx_set_chrome_version(osx_chrome_version)
 
         self.headless(headless)
@@ -90,6 +91,7 @@ class Chrome():
         from osbot_browser.chrome.Chrome_Sync import Chrome_Sync
         return Chrome_Sync(self)
 
+    # here is a good place to find the vesions of the latest releases https://registry.npmmirror.com/binary.html?path=chromium-browser-snapshots/Mac/
     # see https://awesomeopensource.com/project/alixaxel/chrome-aws-lambda for a good list of value chrome_version values
     def osx_set_chrome_version(self, chrome_version):
         if platform == "darwin" and chrome_version:
