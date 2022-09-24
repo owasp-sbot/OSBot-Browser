@@ -10,26 +10,33 @@ class Plotly_Network_Graph:
     def __init__(self):
         self.figure                      = None
         self.nx_graph                    = None
-        self.png_path                    = f"/tmp/plotly.jpg"
+        self.jpg_scale                   = 1.0
+        self.jpg_path                    = f"/tmp/plotly.jpg"
         self.title                       = 'Plotly Graph'
         self.nx_positions                = None
         self.nx_spring_layout_k          = 1.00
         self.nx_spring_layout_iterations = 50# 500
-        self.pl_edge_width               = 0.5
-        self.pl_edge_color               = '#888'
-        self.pl_edge_shape               = 'spline'
+        self.pl_edge_line_width           = 0.5
+        self.pl_edge_line_color          = 'black'
+        self.pl_edge_line_shape          = 'spline' #['linear', 'spline', 'hv', 'vh', 'hvh', 'vhv']
         self.pl_edge_text_color          = 'black'
+        self.pl_edge_line_simplify       = True
+        self.pl_edge_line_smoothing      = 1 # 0 and 1.3 - Has an effect only if `shape` is set to "spline" Sets the amount of smoothing
         self.pl_edge_text_size           = 7
         self.pl_node_text_size           = 6
-        self.pl_node_mode                = 'markers+text'
         self.pl_node_text_position       = "top center"
         self.pl_node_show_scale          = False
-        self.pl_node_size                = 6
-        self.pl_node_color               = "black"
+        self.pl_node_marker_size         = 6
+        self.pl_node_marker_color        = "black"
         self.pl_show_legend              = False
         self.pl_edges_lines              = None
         self.pl_edges_texts              = None
-        self.pl_nodes                    = None
+        self.pl_nodes_texts              = None
+        self.pl_nodes_markers            = None
+        self.show_edges_lines            = True
+        self.show_edges_texts            = True
+        self.show_nodes_markers          = True
+        self.show_nodes_texts            = True
 
 
     def nx_create_positions_from_graph(self):
@@ -42,9 +49,11 @@ class Plotly_Network_Graph:
         return self
 
     def pl_create_edges_lines(self):
-        kwargs = {"line"      : dict(width=self.pl_edge_width                ,
-                                     color=self.pl_edge_color                ,
-                                     shape=self.pl_edge_shape                ),
+        kwargs = {"line"      : dict(width     = self.pl_edge_line_width,
+                                     color     = self.pl_edge_line_color,
+                                     shape     = self.pl_edge_line_shape,
+                                     simplify  = self.pl_edge_line_simplify,
+                                     smoothing = self.pl_edge_line_smoothing),
                   "mode"      : 'lines'                                      }
         self.pl_edges_lines = go.Scatter(**kwargs)
         edges    = self.nx_graph.edges()
@@ -58,7 +67,7 @@ class Plotly_Network_Graph:
             trace_ys += [y0, y1, None]
         self.pl_edges_lines['x'] = trace_xs
         self.pl_edges_lines['y'] = trace_ys
-        return self
+        return self.pl_edges_lines
 
 
     def pl_create_edges_texts(self):
@@ -81,32 +90,65 @@ class Plotly_Network_Graph:
         self.pl_edges_texts['text'    ]          = texts
         self.pl_edges_texts['textfont']['color'] = self.pl_edge_text_color
         self.pl_edges_texts['textfont']['size' ] = self.pl_edge_text_size
-        return self
+        return self.pl_edges_texts
+
+    # def pl_create_nodes_markers(self):
+    #     kwargs = {  "mode"          : 'markers'                                   ,
+    #                 "textposition"  : self.pl_node_text_position                  ,
+    #                 "textfont"      : dict(color    = [] , size=[]               ),
+    #                 "marker"        : dict(showscale= self.pl_node_show_scale,
+    #                                        size     = self.pl_node_marker_size,
+    #                                        color    = self.pl_node_marker_color)}
+    #
+    #     self.pl_nodes_markers = go.Scatter(**kwargs)
+    #
+    #     node_trace_xs = []
+    #     node_trace_ys = []
+    #     nodes = self.nx_graph.nodes()
+    #     for node in nodes:
+    #         x, y = self.nx_graph.nodes[node]['pos']
+    #         node_trace_xs.append(x)
+    #         node_trace_ys.append(y)
+    #     self.pl_nodes_markers['x'] = node_trace_xs
+    #     self.pl_nodes_markers['y'] = node_trace_ys
+    #     return self.pl_nodes_markers
 
     def pl_create_nodes(self):
-        kwargs = {  "x"             : []                                          ,
-                    "y"             : []                                          ,
-                    "text"          : []                                          ,
-                    "mode"          : self.pl_node_mode                           ,
-                    "textposition"  : self.pl_node_text_position                  ,
-                    "textfont"      : dict(color    = [] , size=[]               ),
-                    "marker"        : dict(showscale= self.pl_node_show_scale    ,
-                                           size     = self.pl_node_size          ,
-                                           color    = self.pl_node_color         )}
+        if self.show_nodes_markers and self.show_nodes_texts:
+            mode = 'text+markers'
+        elif self.show_nodes_markers:
+            mode = 'markers'
+        else:
+            mode = 'text'
+        kwargs = {  "mode"          : mode                          ,
+                    "textposition"  : self.pl_node_text_position    ,
+                    "textfont"      : dict(color    = [] , size=[] ),
+                    "marker"        : dict(showscale= self.pl_node_show_scale,
+                                           size     = self.pl_node_marker_size,
+                                           color    = self.pl_node_marker_color)}
 
-        self.pl_nodes = go.Scatter(**kwargs)
+        self.pl_nodes_texts = go.Scatter(**kwargs)
+        nx_nodes      = self.nx_graph.nodes()
+        node_texts    = []
+        node_texts_xs = []
+        node_texts_ys = []
+        node_sizes    = []
+        node_colors   = []
+        for nx_node in nx_nodes:
+            nx_node_data = nx_nodes[nx_node]
+            x, y         = nx_node_data.get('pos')
+            node_texts   .append(nx_node_data.get('text'      , ''                    ))
+            node_colors  .append(nx_node_data.get('text_color', self.pl_node_marker_color))
+            node_sizes   .append(nx_node_data.get('text_size' , self.pl_node_text_size))
+            node_texts_xs.append(x)
+            node_texts_ys.append(y)
 
-        node_trace_xs = []
-        node_trace_ys = []
-        nodes = self.nx_graph.nodes()
-        for node in nodes:
-            print(nodes[node])
-            x, y = self.nx_graph.nodes[node]['pos']
-            node_trace_xs.append(x)
-            node_trace_ys.append(y)
-        self.pl_nodes['x'] = node_trace_xs
-        self.pl_nodes['y'] = node_trace_ys
-        return self
+        self.pl_nodes_texts['x'       ]          = node_texts_xs
+        self.pl_nodes_texts['y'       ]          = node_texts_ys
+        self.pl_nodes_texts['text'    ]          = node_texts
+        self.pl_nodes_texts['textfont']['color'] = node_colors
+        self.pl_nodes_texts['textfont']['size' ] = node_sizes
+        return self.pl_nodes_texts
 
     def pl_set_node_traces_properties(self):
         colors = []
@@ -124,9 +166,9 @@ class Plotly_Network_Graph:
             texts .append(node_text)
             sizes .append(text_size)
 
-        self.pl_nodes['text']              = texts
-        self.pl_nodes['textfont']['color'] = colors
-        self.pl_nodes['textfont']['size' ] = sizes
+        self.pl_nodes_texts['text']              = texts
+        self.pl_nodes_texts['textfont']['color'] = colors
+        self.pl_nodes_texts['textfont']['size'] = sizes
         return self
 
     def pl_figure_layout(self):
@@ -142,23 +184,29 @@ class Plotly_Network_Graph:
     def create_plotly_figure(self):
         self.nx_create_positions_from_graph()
         self.assign_positions_to_graph()
-        self.pl_create_edges_lines()
-        self.pl_create_edges_texts()
-        self.pl_create_nodes()
-        self.pl_set_node_traces_properties()
+        data = []
+        if self.show_edges_lines:
+            data.append(self.pl_create_edges_lines())
+        if self.show_edges_texts:
+            data.append(self.pl_create_edges_texts())
+        #if self.show_nodes_markers:
+        #    data.append(self.pl_create_nodes_markers())
+        if self.show_nodes_texts or self.show_nodes_markers:
+            data.append(self.pl_create_nodes())
+        #self.pl_set_node_traces_properties()
 
         #
-        kwargs =  { "data"  : [self.pl_edges_lines, self.pl_edges_texts, self.pl_nodes ],
-                    "layout": self.pl_figure_layout()                                   }
+        kwargs =  { "data"  : data                    ,
+                    "layout": self.pl_figure_layout() }
 
         self.figure = go.Figure(**kwargs)
         return self
 
 
-    def save_as_jpg(self, scale=1):
+    def save_as_jpg(self):
         if self.figure:
-            image_bytes = self.figure.to_image(format='jpg', scale=scale)
-            file_create_bytes(path=self.png_path, bytes=image_bytes)
+            image_bytes = self.figure.to_image(format='jpg', scale=self.jpg_scale)
+            file_create_bytes(path=self.jpg_path, bytes=image_bytes)
         return self
 
     def set_graph(self, nx_graph):
