@@ -16,7 +16,7 @@ class Plotly_Network_Graph:
         self.nx_positions                = None
         self.nx_spring_layout_k          = 1.00
         self.nx_spring_layout_iterations = 50# 500
-        self.pl_edge_line_width           = 0.5
+        self.pl_edge_line_width          = 0.5
         self.pl_edge_line_color          = 'black'
         self.pl_edge_line_shape          = 'spline' #['linear', 'spline', 'hv', 'vh', 'hvh', 'vhv']
         self.pl_edge_text_color          = 'black'
@@ -24,10 +24,11 @@ class Plotly_Network_Graph:
         self.pl_edge_line_smoothing      = 1 # 0 and 1.3 - Has an effect only if `shape` is set to "spline" Sets the amount of smoothing
         self.pl_edge_text_size           = 7
         self.pl_node_text_size           = 6
+        self.pl_node_text_color          = "black"
         self.pl_node_text_position       = "top center"
         self.pl_node_show_scale          = False
         self.pl_node_marker_size         = 6
-        self.pl_node_marker_color        = "black"
+        self.pl_node_marker_color        = "blue"
         self.pl_show_legend              = False
         self.pl_edges_lines              = None
         self.pl_edges_texts              = None
@@ -37,6 +38,7 @@ class Plotly_Network_Graph:
         self.show_edges_texts            = True
         self.show_nodes_markers          = True
         self.show_nodes_texts            = True
+        self.on_add_node                 = None
 
 
     def nx_create_positions_from_graph(self):
@@ -92,27 +94,6 @@ class Plotly_Network_Graph:
         self.pl_edges_texts['textfont']['size' ] = self.pl_edge_text_size
         return self.pl_edges_texts
 
-    # def pl_create_nodes_markers(self):
-    #     kwargs = {  "mode"          : 'markers'                                   ,
-    #                 "textposition"  : self.pl_node_text_position                  ,
-    #                 "textfont"      : dict(color    = [] , size=[]               ),
-    #                 "marker"        : dict(showscale= self.pl_node_show_scale,
-    #                                        size     = self.pl_node_marker_size,
-    #                                        color    = self.pl_node_marker_color)}
-    #
-    #     self.pl_nodes_markers = go.Scatter(**kwargs)
-    #
-    #     node_trace_xs = []
-    #     node_trace_ys = []
-    #     nodes = self.nx_graph.nodes()
-    #     for node in nodes:
-    #         x, y = self.nx_graph.nodes[node]['pos']
-    #         node_trace_xs.append(x)
-    #         node_trace_ys.append(y)
-    #     self.pl_nodes_markers['x'] = node_trace_xs
-    #     self.pl_nodes_markers['y'] = node_trace_ys
-    #     return self.pl_nodes_markers
-
     def pl_create_nodes(self):
         if self.show_nodes_markers and self.show_nodes_texts:
             mode = 'text+markers'
@@ -120,12 +101,12 @@ class Plotly_Network_Graph:
             mode = 'markers'
         else:
             mode = 'text'
-        kwargs = {  "mode"          : mode                          ,
-                    "textposition"  : self.pl_node_text_position    ,
-                    "textfont"      : dict(color    = [] , size=[] ),
+        kwargs = {  "mode"          : mode                                    ,
+                    "textposition"  : self.pl_node_text_position              ,
+                    "textfont"      : dict(color    = [] , size=[] )          ,
                     "marker"        : dict(showscale= self.pl_node_show_scale,
-                                           size     = self.pl_node_marker_size,
-                                           color    = self.pl_node_marker_color)}
+                                           size     = []                     ,
+                                           color    = []                     )}
 
         self.pl_nodes_texts = go.Scatter(**kwargs)
         nx_nodes      = self.nx_graph.nodes()
@@ -134,42 +115,61 @@ class Plotly_Network_Graph:
         node_texts_ys = []
         node_sizes    = []
         node_colors   = []
+        marker_colors = []
+        marker_sizes  = []
         for nx_node in nx_nodes:
-            nx_node_data = nx_nodes[nx_node]
-            x, y         = nx_node_data.get('pos')
-            node_texts   .append(nx_node_data.get('text'      , ''                    ))
-            node_colors  .append(nx_node_data.get('text_color', self.pl_node_marker_color))
-            node_sizes   .append(nx_node_data.get('text_size' , self.pl_node_text_size))
-            node_texts_xs.append(x)
-            node_texts_ys.append(y)
+            nx_node_data    = nx_nodes[nx_node]
+            x, y            = nx_node_data.get('pos')
+
+            node_add_args = { "x"                : x                                                           ,
+                              "y"                : y                                                           ,
+                              "nx_node"          : nx_node                                                     ,
+                              "nx_node_data"     : nx_node_data                                                ,
+                              "node_text"        : nx_node_data.get('text', '')                                ,
+                              "node_text_color"  : nx_node_data.get('text_color'  , self.pl_node_text_color  ) ,
+                              "node_text_size"   : nx_node_data.get('text_size'   , self.pl_node_text_size   ) ,
+                              "node_marker_color": nx_node_data.get('marker_color', self.pl_node_marker_color) ,
+                              "node_marker_size" : nx_node_data.get('marker_size' , self.pl_node_marker_size ) }
+
+            if self.on_add_node:
+                self.on_add_node(node_add_args)
+            node_texts   .append(node_add_args.get('node_text'        ))
+            node_colors  .append(node_add_args.get('node_text_color'  ))
+            node_sizes   .append(node_add_args.get('node_text_size'   ))
+            marker_colors.append(node_add_args.get('node_marker_color'))
+            marker_sizes .append(node_add_args.get('node_marker_size'))
+            node_texts_xs.append(node_add_args.get('x'))
+            node_texts_ys.append(node_add_args.get('y'))
 
         self.pl_nodes_texts['x'       ]          = node_texts_xs
         self.pl_nodes_texts['y'       ]          = node_texts_ys
         self.pl_nodes_texts['text'    ]          = node_texts
         self.pl_nodes_texts['textfont']['color'] = node_colors
         self.pl_nodes_texts['textfont']['size' ] = node_sizes
+        self.pl_nodes_texts['marker'  ]['color'] = marker_colors
+        self.pl_nodes_texts['marker'  ]['size' ] = marker_sizes
         return self.pl_nodes_texts
 
-    def pl_set_node_traces_properties(self):
-        colors = []
-        texts  = []
-        sizes  = []
-
-        for node, adjacencies in enumerate(self.nx_graph.adjacency()):
-            node_key   = adjacencies[0]
-            node       = self.nx_graph.nodes[node_key]
-            node_text  = node.get('value'    ) or node_key
-            text_size  = node.get('text_size') or self.pl_node_text_size
-            color      = node.get('color'    ) or 'blue'
-            node_text  = node_text
-            colors.append(color)
-            texts .append(node_text)
-            sizes .append(text_size)
-
-        self.pl_nodes_texts['text']              = texts
-        self.pl_nodes_texts['textfont']['color'] = colors
-        self.pl_nodes_texts['textfont']['size'] = sizes
-        return self
+    # def pl_set_node_traces_properties(self):
+    #     colors = []
+    #     texts  = []
+    #     sizes  = []
+    #
+    #     for node, adjacencies in enumerate(self.nx_graph.adjacency()):
+    #         node_key   = adjacencies[0]
+    #         node       = self.nx_graph.nodes[node_key]
+    #         node_text  = node.get('value'    ) or node_key
+    #         text_size  = node.get('text_size') or self.pl_node_text_size
+    #         color      = node.get('color'    ) or 'blue'
+    #         node_text  = node_text
+    #         colors.append(color)
+    #         texts .append(node_text)
+    #         sizes .append(text_size)
+    #
+    #     self.pl_nodes_texts['text']              = texts
+    #     self.pl_nodes_texts['textfont']['color'] = colors
+    #     self.pl_nodes_texts['textfont']['size'] = sizes
+    #     return self
 
     def pl_figure_layout(self):
         kwargs = {  "title"      :  self.title                                                              ,
