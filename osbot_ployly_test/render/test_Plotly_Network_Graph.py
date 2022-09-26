@@ -24,7 +24,7 @@ class test_Plotly_Network_Graph(TestCase):
         graph = nx.Graph()
         graph.add_nodes_from([1,2,3,4,5,6,7,"ABC"])
         graph.add_edges_from([(1,2), (1,3), (1,4), (2,3)])
-        self.network_graph.create_png_from_nx_graph(graph)
+        self.network_graph.create_jpg_from_nx_graph(graph)
 
 
 

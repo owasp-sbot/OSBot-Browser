@@ -42,7 +42,8 @@ class Plotly_Network_Graph:
 
 
     def nx_create_positions_from_graph(self):
-        self.nx_positions = nx.spring_layout(self.nx_graph, k=self.nx_spring_layout_k, iterations=self.nx_spring_layout_iterations)
+        if self.nx_graph:
+            self.nx_positions = nx.spring_layout(self.nx_graph, k=self.nx_spring_layout_k, iterations=self.nx_spring_layout_iterations)
         return self
 
     def assign_positions_to_graph(self):
@@ -221,15 +222,12 @@ class Plotly_Network_Graph:
         self.title = title
         return self
 
-    def create_png_from_nx_graph(self, nx_graph):
+    def create_jpg_from_nx_graph(self, nx_graph):
         self.set_graph(nx_graph)
-        with Duration(prefix="create_plotly_figure: "):
+        with Duration(prefix=" >> create_plotly_figure: ", print_result=False):
             self.create_plotly_figure()
-        with Duration(prefix="save_as_jpg:"):
-            self.save_as_jpg()
-        # (self.set_graph(graph)
-        #      .create_plotly_figure()
-        #      .save_as_jpg())
+        with Duration(prefix=" >> save_as_jpg:", print_result=False):
+           self.save_as_jpg()
         return self
 
 
