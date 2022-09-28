@@ -210,6 +210,9 @@ class Plotly_Network_Graph:
             file_create_bytes(path=self.jpg_path, bytes=image_bytes)
         return self
 
+    def set_figure(self, figure):
+        self.figure = figure
+
     def set_graph(self, nx_graph):
         self.nx_graph = nx_graph
         return self
