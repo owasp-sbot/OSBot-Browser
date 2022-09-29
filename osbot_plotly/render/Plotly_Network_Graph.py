@@ -82,10 +82,8 @@ class Plotly_Network_Graph:
         trace_xs = []
         trace_ys = []
         for edge in edges:
-            edge_data = edges[edge]
             x0, y0    = nodes[edge[0]]['pos']
             x1, y1    = nodes[edge[1]]['pos']
-            texts.append(edge_data.get('text', '123'))
             trace_xs.append((x0+x1) / 2)
             trace_ys.append((y0+y1) / 2)
         self.pl_edges_texts['x'] = trace_xs
