@@ -1,30 +1,37 @@
 from io import StringIO
 from unittest import TestCase
 
-from pandas._typing import ReadCsvBuffer
+import PIL
+import numpy as np
+from PIL.ImageDraw import ImageDraw, Draw
+from PIL.ImageFont import ImageFont, truetype
+from plotly.graph_objs import Scatter, Scatterpolar, Histogram, Pie, Scatter3d, Image
+from plotly.subplots import make_subplots
 
 from osbot_utils.utils.Dev import pprint
 from osbot_utils.utils.Files import file_create_bytes
-from osbot_utils.utils.Http import GET_json, GET
+from osbot_utils.utils.Http import GET_json, GET, GET_to_file, GET_bytes_to_file
 
 
 class test_Plotly(TestCase):
 
-    def save_png(self, fig):
+    def save_jpg(self, fig):
         format = 'jpg'
         scale = 1
         image_bytes = fig.to_image(format=format, scale=scale)
         png_path = f"/tmp/plotly.{format}"
         file_create_bytes(path=png_path, bytes=image_bytes)
+        return png_path
 
     def test_123(self):
         import plotly.express as px
         fig = px.bar(x=["a", "b", "c","d"], y=[1, 3, 3,5])
         #fig.write_html('first_figure.html', auto_open=True)
-        image_bytes = fig.to_image()
-        png_path = "/tmp/plotly.png"
-        result = file_create_bytes(path=png_path, bytes=image_bytes)
-        pprint(result)
+        self.save_jpg(fig)
+        # image_bytes = fig.to_image()
+        # png_path = "/tmp/plotly.png"
+        # result = file_create_bytes(path=png_path, bytes=image_bytes)
+        # pprint(result)
 
     def test_sankey(self):
         import plotly.graph_objects as go
@@ -45,9 +52,10 @@ class test_Plotly(TestCase):
 
         #fig.update_layout(title_text="Basic Sankey Diagram", font_size=10)
         #fig.show()
-        image_bytes = fig.to_image()
-        png_path = "/tmp/plotly.png"
-        result = file_create_bytes(path=png_path, bytes=image_bytes)
+        self.save_jpg(fig)
+        # image_bytes = fig.to_image()
+        # png_path = "/tmp/plotly.png"
+        # result = file_create_bytes(path=png_path, bytes=image_bytes)
 
     def test_sankey_2(self):
         import plotly.graph_objects as go
@@ -91,7 +99,7 @@ class test_Plotly(TestCase):
             title_text="Energy forecast for 2050<br>Source: Department of Energy & Climate Change, Tom Counsell via <a href='https://bost.ocks.org/mike/sankey/'>Mike Bostock</a>",
             font_size=10)
 
-        self.save_png(fig)
+        self.save_jpg(fig)
 
 
     def test_plotly_table_1(self):
@@ -119,7 +127,7 @@ class test_Plotly(TestCase):
             ))
         ])
 
-        self.save_png(fig)
+        self.save_jpg(fig)
 
     def test_table_2(self):
         import plotly.graph_objects as go
@@ -150,7 +158,7 @@ class test_Plotly(TestCase):
                 font=dict(color='darkslategray', size=11)
             ))
         ])
-        self.save_png(fig)
+        self.save_jpg(fig)
 
     def test_gant_chart(self):
         import plotly.express as px
@@ -165,7 +173,7 @@ class test_Plotly(TestCase):
         fig = px.timeline(df, x_start="Start", x_end="Finish", y="Task", color="Completion_pct")
         fig.update_yaxes(autorange="reversed")
 
-        self.save_png(fig)
+        self.save_jpg(fig)
 
 
     def test_sunburst(self):
@@ -206,7 +214,7 @@ class test_Plotly(TestCase):
             grid=dict(columns=2, rows=1),
             margin=dict(t=0, l=0, r=0, b=0)
         )
-        self.save_png(fig)
+        self.save_jpg(fig)
 
 
     def test_webgl_1(self):
@@ -224,7 +232,7 @@ class test_Plotly(TestCase):
         fig = px.scatter(df, x="x", y="y", render_mode='webgl')
 
         fig.update_traces(marker_line=dict(width=1, color='DarkSlateGray'))
-        self.save_png(fig)
+        self.save_jpg(fig)
 
     def test_webgl_2(self):
         import plotly.graph_objects as go
@@ -243,7 +251,7 @@ class test_Plotly(TestCase):
             )
 
         fig.update_layout(showlegend=False)
-        self.save_png(fig)
+        self.save_jpg(fig)
 
 
     def test_icicle_chart(self):
@@ -262,7 +270,7 @@ class test_Plotly(TestCase):
         fig.update_traces(root_color='lightgrey')
         fig.update_layout(margin=dict(t=50, l=25, r=25, b=25))
 
-        self.save_png(fig)
+        self.save_jpg(fig)
 
     def test_treemap_1(self):
         import plotly.express as px
@@ -270,7 +278,7 @@ class test_Plotly(TestCase):
         fig = px.treemap(df, path=[px.Constant("all"), 'day', 'time', 'sex'], values='total_bill')
         fig.update_traces(root_color="lightgrey")
         fig.update_layout(margin=dict(t=50, l=25, r=25, b=25))
-        self.save_png(fig)
+        self.save_jpg(fig)
 
     def test_treemap_2(self):
         import plotly.express as px
@@ -282,7 +290,7 @@ class test_Plotly(TestCase):
                          color_continuous_scale='RdBu',
                          color_continuous_midpoint=np.average(df['lifeExp'], weights=df['pop']))
         fig.update_layout(margin=dict(t=50, l=25, r=25, b=25))
-        self.save_png(fig)
+        self.save_jpg(fig)
 
     def test_figure_factory_table(self):
         import plotly.figure_factory as ff
@@ -294,7 +302,7 @@ class test_Plotly(TestCase):
         fig = ff.create_table(df_sample)
 
 
-        self.save_png(fig)
+        self.save_jpg(fig)
 
 
     def test_table_with_graph(self):
@@ -335,7 +343,7 @@ class test_Plotly(TestCase):
             xaxis2={'domain': [0.6, 1.]},
             yaxis2={'anchor': 'x2', 'title': 'Goals'}
         )
-        self.save_png(fig)
+        self.save_jpg(fig)
 
     # todo: see if we really need IGRAPH
     def test_igraph(self):
@@ -370,12 +378,13 @@ class test_Plotly(TestCase):
                                  y=Ye,
                                  mode='lines',
                                  line=dict(color='rgb(210,210,210)', width=1),
-                                 hoverinfo='none'
+                                 hoverinfo='none' ,
+                                 name='edges'
                                  ))
         fig.add_trace(go.Scatter(x=Xn,
                                  y=Yn,
                                  mode='markers',
-                                 name='bla',
+                                 name='an circle',
                                  marker=dict(symbol='circle-dot',
                                              size=18,
                                              color='#6175c1',  # '#DB4551',
@@ -386,7 +395,7 @@ class test_Plotly(TestCase):
                                  opacity=0.8
                                  ))
 
-        self.save_png(fig)
+        self.save_jpg(fig)
 
 
     def test_radar_graph(self):
@@ -419,7 +428,7 @@ class test_Plotly(TestCase):
             showlegend=False
         )
 
-        self.save_png(fig)
+        self.save_jpg(fig)
 
     def test_polar_graph(self):
         import plotly.express as px
@@ -433,4 +442,111 @@ class test_Plotly(TestCase):
                                color="strength", symbol="strength", size="frequency",
                                color_discrete_sequence=px.colors.sequential.Plasma_r)
 
-        self.save_png(fig)
+        self.save_jpg(fig)
+
+    def test_subplots(self):
+        specs = [[{},{},{}],
+                 [{},{},{}],
+                 [{},{},{}],
+                 [{},{},{}],
+                 [{"type": "pie"}, {"type": "pie"},{"type": "pie"}],        # available types:xy , scene , polar, ternary, mapbox , domain  (see https://plotly.com/python/subplots/#subplots-types for more details)
+                 [{"type": "scene",  "rowspan": 2}, {"colspan": 2, "rowspan": 2}, None] ,
+                 [{},{},{}],
+                 [{},{},{}]]
+        titles = ("Plot 1", "Plot 2", "Plot 3", "Plot 4", None, "Plot 6")
+        widths = [0.2, 0.3, 0.5]
+        fig = make_subplots(rows=8, cols=3, specs=specs, subplot_titles=titles, column_widths=widths)
+
+        # adding traces
+        scater_1 = Scatter(x=[1, 2, 3, 4, 5], y=[5, 6, 7, 8, 9])
+        scater_2 = Scatter(x=[3, 4, 5, 6, 7], y=[10, 11, 12, 9, 8])
+        scater_3 = Scatter(x=[4, 5, 6, 7, 8], y=[6, 7, 8, 9, 10])
+
+        fig.add_trace(scater_1, row=1, col=1)       # same repeated in 3 cells , same row
+        fig.add_trace(scater_1, row=1, col=2)
+        fig.add_trace(scater_1, row=1, col=3)
+
+        fig.add_trace(scater_2, row=2, col=1)       # individually added
+        fig.add_trace(scater_3, row=2, col=2)
+
+        fig.add_trace(scater_1, row=2, col=3)       # all in same cell
+        fig.add_trace(scater_2, row=2, col=3)
+        fig.add_trace(scater_3, row=2, col=3)
+
+        # adding histograms
+        histogram_1 = Histogram(x=np.random.randn(500))
+        histogram_2 = Histogram(x=np.random.randn(500))
+
+        fig.add_trace(histogram_1, row=3 , col=1)
+        fig.add_trace(histogram_2, row=3, col=2)
+        fig.add_trace(histogram_2, row=3, col=3)
+        fig.add_trace(histogram_1, row=4, col=1)
+        fig.add_trace(histogram_2, row=4, col=1)
+
+        fig.add_trace(scater_1   , row=4, col=2)
+        fig.add_trace(histogram_1, row=4, col=2)
+
+        # pie (needs spec with {"type": "pie"} on correct cell)
+        labels = ['Oxygen', 'Hydrogen', 'Carbon_Dioxide', 'Nitrogen']
+        values_1 = [4500, 2500, 1053, 500]
+        values_2 = [1000, 2000, 3000, 500]
+        pie_1  = Pie(labels=labels, values=values_1)
+        pie_2  = Pie(labels=labels, values=values_2)
+
+        fig.add_trace(pie_1, row=5, col=1)
+        fig.add_trace(pie_2, row=5, col=2)
+        fig.add_trace(pie_1, row=5, col=3)
+        fig.add_trace(pie_2, row=5, col=3)
+
+        # adding traces to the cell that has rowspan=2 and rowspan=2
+        fig.add_trace(scater_1, row=6, col=2)
+
+        # 3d trace
+        trace_3d = Scatter3d(x=[2, 3, 1], y=[0, 0, 0],z=[0.5, 1, 2], mode="lines")
+        fig.add_trace(trace_3d, row = 6, col = 1)
+
+
+        # adding images
+        fig.add_layout_image(source="https://images.plot.ly/language-icons/api-home/python-logo.png",
+                             x=0.8, y=0.2, sizex=0.2, sizey=0.72, xanchor="left", yanchor="top")
+
+        # this doesn't seem to work
+        #fig.add_layout_image(source="https://images.plot.ly/language-icons/api-home/python-logo.png",
+        #                    row=3, col=3)
+
+        import plotly.express as px
+
+        imgR    = np.random.rand(20, 40)
+        img_rgb = np.array([[[255, 0, 0], [0, 255, 0], [0, 0, 255]]], dtype=np.uint8)
+        image_1 = px.imshow(imgR)
+        image_2 = px.imshow(img_rgb)
+        fig.add_trace(image_1.data[0], row=8, col=1)
+        fig.add_trace(image_2.data[0], row=8, col=2)
+
+        local_file = GET_bytes_to_file('https://images.plot.ly/language-icons/api-home/python-logo.png')
+        #img = PIL.Image.open('/tmp/jira_graph.png')
+        img = PIL.Image.open(local_file)
+        image_1 = Image(z=img)
+
+        fig.add_trace(image_1                , row=8, col=3)
+        fig.update_xaxes(showticklabels=False, row=8, col=3)
+        fig.update_yaxes(showticklabels=False, row=8, col=3)
+
+        # updating xaxes
+        fig.update_xaxes(title_text="xaxis 3 title", showgrid=False, row=2, col=1)
+        fig.update_xaxes(title_text="xaxis 4 title", type="log", row=2, col=2)
+
+        fig.update_layout(height=800, width=1216, title_text="Subplots")
+        fig.update_layout(showlegend=False)
+        fig.update(layout_coloraxis_showscale=False)
+
+
+
+        png_path = self.save_jpg(fig)
+
+        image = PIL.Image.open(png_path)
+        draw = Draw(image)
+        font = truetype('Avenir.ttc', 36)
+
+        draw.text((200, 10), "Dynamic Text (using PIL)", font=font, fill=(1, 1, 1))
+        image.save(png_path)

@@ -1,6 +1,7 @@
 from unittest import TestCase
 import plotly.express as px
 import networkx as nx
+
 from osbot_plotly.render.Plotly_Network_Graph import Plotly_Network_Graph
 from osbot_utils.utils.Dev import pprint
 
@@ -25,6 +26,9 @@ class test_Plotly_Network_Graph(TestCase):
         graph.add_nodes_from([1,2,3,4,5,6,7,"ABC"])
         graph.add_edges_from([(1,2), (1,3), (1,4), (2,3)])
         self.network_graph.create_jpg_from_nx_graph(graph)
+
+
+
 
 
 
