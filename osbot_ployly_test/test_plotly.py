@@ -449,7 +449,7 @@ class test_Plotly(TestCase):
                  [{},{},{}],
                  [{},{},{}],
                  [{},{},{}],
-                 [{"type": "pie"}, {"type": "pie"},{"type": "pie"}],        # available types:xy , scene , polar, ternary, mapbox , domain  (see https://plotly.com/python/subplots/#subplots-types for more details)
+                 [{"type": "pie"}, {"type": "pie"},{"type": "pie"}],        # available types: xy , scene , polar, ternary, mapbox , domain  (see https://plotly.com/python/subplots/#subplots-types for more details)
                  [{"type": "scene",  "rowspan": 2}, {"colspan": 2, "rowspan": 2}, None] ,
                  [{},{},{}],
                  [{},{},{}]]
@@ -535,6 +535,8 @@ class test_Plotly(TestCase):
         # updating xaxes
         fig.update_xaxes(title_text="xaxis 3 title", showgrid=False, row=2, col=1)
         fig.update_xaxes(title_text="xaxis 4 title", type="log", row=2, col=2)
+
+
 
         fig.update_layout(height=800, width=1216, title_text="Subplots")
         fig.update_layout(showlegend=False)
