@@ -1,8 +1,11 @@
+import math
+
 import networkx
 import plotly.graph_objects as go
 ##import networkx as nx
 from osbot_linkedin.plotly.NX_Graph import NX_Graph
 from osbot_utils.testing.Duration import Duration
+from osbot_utils.utils.Dev import pprint
 from osbot_utils.utils.Files import file_create_bytes
 
 
@@ -40,6 +43,7 @@ class Plotly_Network_Graph:
         self.pl_edges_texts              = None
         self.pl_nodes_texts              = None
         self.pl_nodes_markers            = None
+        self.show_edges_arrows           = False
         self.show_edges_lines            = True
         self.show_edges_texts            = False
         self.show_nodes_markers          = True
@@ -96,6 +100,48 @@ class Plotly_Network_Graph:
         self.pl_edges_lines['y'] = trace_ys
         return self.pl_edges_lines
 
+    def pl_create_edges_arrows(self):
+        edges = self.nx_graph.edges()
+        nodes = self.nx_graph.nodes
+
+        for edge, edge_data in edges.items():
+            edge_from_id = edge[0]
+            edge_to_id   = edge[1]
+            x0, y0    = nodes[edge_from_id]['pos']
+            x1, y1    = nodes[edge_to_id  ]['pos']
+
+
+            x0 = (x0 + x1) / 2          # this works quite effectively
+            y0 = (y0 + y1) / 2          # which creates an arrow with the correct alignment (with half the size of the full line)
+                                        # the code below was an attempt of creating a smaller arrow, which didn't work
+
+            # angle = math.atan2(y1 - y0, x1 - x0)
+            # pprint(angle)
+            # length = 0.1
+            #
+            # x0 = x0 + length *  math.cos(angle)
+            # y0 = y0 + length * math.sin(angle)
+
+            annotation_kwargs = {
+                "ax"         : x0     ,
+                "ay"         : y0     ,
+                "axref"      : 'x'    ,
+                "ayref"      : 'y'    ,
+                "x"          : x1     ,
+                "y"          : y1     ,
+                "xref"       : 'x'    ,
+                "yref"       : 'y'    ,
+                "showarrow"  : True   ,
+                "arrowhead"  : 5      ,
+                "arrowsize"  : 2      ,
+                "arrowwidth" : self.pl_edge_line_width  ,
+                "arrowcolor" : self.pl_edge_line_color  ,
+                "standoff"   : 2      ,
+
+
+            }
+            self.figure.add_annotation(**annotation_kwargs)
+        return self
 
     def pl_create_edges_texts(self):
         texts  = []
@@ -207,10 +253,10 @@ class Plotly_Network_Graph:
         data = []
         if self.show_edges_lines:
             data.append(self.pl_create_edges_lines())
+
         if self.show_edges_texts:
             data.append(self.pl_create_edges_texts())
-        #if self.show_nodes_markers:
-        #    data.append(self.pl_create_nodes_markers())
+
         if self.show_nodes_texts or self.show_nodes_markers:
             data.append(self.pl_create_nodes())
         #self.pl_set_node_traces_properties()
@@ -220,6 +266,10 @@ class Plotly_Network_Graph:
                     "layout": self.pl_figure_layout() }
 
         self.figure = go.Figure(**kwargs)
+
+        if self.show_edges_arrows:               # arrows are added as annotations
+            self.pl_create_edges_arrows()
+
         return self.figure
 
 
