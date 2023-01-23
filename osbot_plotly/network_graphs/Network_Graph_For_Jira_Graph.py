@@ -15,7 +15,7 @@ class Network_Graph_For_Jira_Graph:
         self.jira_graph_jql       = jira_graph_jql or Jira_Graph_Jql()
         self.plotly_network_graph = Plotly_Network_Graph()
         self.title                = "Visualisation of a Jira_Graph"
-        self.use_nx_digraph       = False
+        self.use_directed_graph   = False
         #self.jira_graph           = None
         self.nx_graph             = None
         self.root_id              = None
@@ -23,12 +23,25 @@ class Network_Graph_For_Jira_Graph:
         self.node_text_field      = 'Key' # Summary
         self.set_plotly_setting()
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    def is_tree(self):
+        return networkx.is_tree(self.nx_graph)
+
     def set_jira_graph_jql(self, jira_graph_jql):
         self.jira_graph_jql = jira_graph_jql
         return self
 
     def set_node_text_field(self, node_text_field):
         self.node_text_field = node_text_field
+        return self
+
+    def set_on_add_nx_node(self, on_add_nx_node):
+        self.on_add_nx_node = on_add_nx_node
         return self
 
     def set_title(self, value):
@@ -84,8 +97,8 @@ class Network_Graph_For_Jira_Graph:
             node_add_args['node_text_color'   ] = maker_color
             node_add_args['node_marker_color' ] = maker_color
 
-    def create_nx_graph(self):
-        if self.use_nx_digraph:
+    def new_nx_graph(self):
+        if self.use_directed_graph:
             self.nx_graph = networkx.DiGraph()  # todo, understand the side effects of this
         else:
             self.nx_graph = networkx.Graph()
@@ -93,9 +106,9 @@ class Network_Graph_For_Jira_Graph:
 
     def create_jira_graph(self, jql, link_types, depth):
         (self.jira_graph_jql.set_jql(jql)
-         .set_link_types(link_types)
-         .set_depth(depth)
-         .render_jira_graph())
+             .set_link_types(link_types)
+             .set_depth(depth)
+             .render_jira_graph())
         return self
 
     # todo: remove then having better solution to cache the jira_graph_jql results
@@ -104,23 +117,28 @@ class Network_Graph_For_Jira_Graph:
         return self.jira_graph_jql.jira_graph.nodes, self.jira_graph_jql.jira_graph.edges
 
     def create_networkx_graph(self): #, nodes, edges):
-        self.create_nx_graph()
+        self.new_nx_graph()
         nodes = self.jira_graph_jql.get_nodes()
         edges = self.jira_graph_jql.get_edges()
+        issues = self.jira_graph_jql.get_issues()
         #self.nx_graph = networkx.Graph()
 
         nx_graph = self.nx_graph
         for node_id in nodes:
-            kwargs_add_node = { "text": node_id} # "text_color":'black', "text_size":10 }
+            text = issues.get(node_id,{}).get(self.node_text_field, node_id)
+            kwargs_add_node = { "text": text}
             if self.on_add_nx_node:
-                self.on_add_nx_node(node_id, kwargs_add_node)
+                self.on_add_nx_node(node_id, issues, kwargs_add_node)
             nx_graph.add_node(node_id,**kwargs_add_node)
 
         for (from_id, link_type, to_id) in edges:
             nx_graph.add_edge(from_id,to_id, text=link_type)
-        return self
+        return self.nx_graph
+
 
     def create_jpg_from_graph(self):
+        if self.nx_graph is None:
+            self.create_networkx_graph()
         (self.plotly_network_graph.set_title(self.title)
              .create_jpg_from_nx_graph(self.nx_graph))
         return self
