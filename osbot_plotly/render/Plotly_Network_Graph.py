@@ -3,7 +3,7 @@ import math
 import networkx
 import plotly.graph_objects as go
 ##import networkx as nx
-from osbot_linkedin.plotly.NX_Graph import NX_Graph
+from osbot_plotly.NX_Graph import NX_Graph
 from osbot_utils.testing.Duration import Duration
 from osbot_utils.utils.Dev import pprint
 from osbot_utils.utils.Files import file_create_bytes
