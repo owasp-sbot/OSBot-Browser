@@ -4,19 +4,16 @@ import networkx
 import plotly.graph_objects as go
 ##import networkx as nx
 from osbot_plotly.NX_Graph import NX_Graph
+from osbot_plotly.render.Plotly_Base import Plotly_Base
 from osbot_utils.testing.Duration import Duration
 from osbot_utils.utils.Dev import pprint
 from osbot_utils.utils.Files import file_create_bytes
 
 
-class Plotly_Network_Graph:
+class Plotly_Network_Graph(Plotly_Base):
 
     def __init__(self):
-        self.figure                      = None
-        self.nx_graph                    = networkx.Graph()
-        self.jpg_scale                   = 1.0
-        self.jpg_path                    = f"/tmp/plotly.jpg"
-        self.title                       = 'Plotly Graph'
+        super().__init__()
         self.nx_positions                = None
         self.nx_spring_layout_k          = 0.5                          # Optimal distance between nodes
         self.nx_spring_layout_iterations = 50                           # Maximum number of iterations taken
@@ -50,11 +47,6 @@ class Plotly_Network_Graph:
         self.show_nodes_texts            = True
         self.on_add_node                 = None
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        pass
 
     def nx_create_positions_from_graph(self):
         if self.nx_graph is not None:
@@ -273,31 +265,10 @@ class Plotly_Network_Graph:
         return self.figure
 
 
-    def new_nx_graph(self):
-        self.nx_graph = NX_Graph()#networkx.Graph()
-        return self.nx_graph
-
-    def save_as_jpg(self):
-        if self.figure:
-            image_bytes = self.figure.to_image(format='jpg', scale=self.jpg_scale)
-            file_create_bytes(path=self.jpg_path, bytes=image_bytes)
-        return self
-
-    def set_figure(self, figure):
-        self.figure = figure
-
-    def set_graph(self, nx_graph):
-        if nx_graph is not None:
-            self.nx_graph = nx_graph
-        return self
 
     def set_nx_spring_layout_k(self, value):
         self.nx_spring_layout_k = value
         return
-
-    def set_title(self, title):
-        self.title = title
-        return self
 
     def create_jpg_from_nx_graph(self, nx_graph=None):
         self.set_graph(nx_graph)

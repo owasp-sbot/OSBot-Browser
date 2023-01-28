@@ -125,8 +125,11 @@ class Network_Graph_For_Jira_Graph:
 
         nx_graph = self.nx_graph
         for node_id in nodes:
-            text = issues.get(node_id,{}).get(self.node_text_field, node_id)
-            kwargs_add_node = { "text": text}
+            issue   = issues.get(node_id,{})
+            text    = issue.get(self.node_text_field, node_id)
+            project = issue.get('Project')
+            status  = issue.get('Status')
+            kwargs_add_node = { "text": text, 'project': project, 'status': status, 'key': node_id}
             if self.on_add_nx_node:
                 self.on_add_nx_node(node_id, issues, kwargs_add_node)
             nx_graph.add_node(node_id,**kwargs_add_node)
