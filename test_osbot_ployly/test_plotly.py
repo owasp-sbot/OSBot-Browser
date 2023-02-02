@@ -3,6 +3,7 @@ from unittest import TestCase
 
 import PIL
 import numpy as np
+import pandas as pd
 from PIL.ImageDraw import ImageDraw, Draw
 from PIL.ImageFont import ImageFont, truetype
 from plotly.graph_objs import Scatter, Scatterpolar, Histogram, Pie, Scatter3d, Image
@@ -302,6 +303,27 @@ class test_Plotly(TestCase):
         fig = ff.create_table(df_sample)
 
 
+        self.save_jpg(fig)
+
+    def test_table_width(self):
+        import plotly.graph_objects as go
+        import pandas as pd
+        import ssl
+        ssl._create_default_https_context = ssl._create_unverified_context
+        df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/2014_usa_states.csv')
+
+        pprint(df.columns)
+
+        fig = go.Figure(data=[go.Table(
+            columnwidth= [50,50,100,500],
+            header=dict(values=list(df.columns),
+                        fill_color='paleturquoise',
+                        align='left'),
+            cells=dict(values=[df.Rank, df.State, df.Postal, df.Population],
+                       fill_color='lavender',
+                       align='left'))
+        ])
+        #fig.update_layout(width=5000)
         self.save_jpg(fig)
 
 
