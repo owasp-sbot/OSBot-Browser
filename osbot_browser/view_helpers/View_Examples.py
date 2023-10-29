@@ -1,7 +1,7 @@
 from osbot_browser.browser.Render_Page import Render_Page
+from osbot_utils.testing.Temp_Zip import Temp_Zip
+from osbot_utils.testing.Unzip_File import Unzip_File
 from osbot_utils.utils.Files import Files
-from osbot_utils.utils.Unzip_File import Unzip_File
-from osbot_utils.utils.Zip_Folder import Zip_Folder
 
 
 class View_Examples:
@@ -26,7 +26,7 @@ class View_Examples:
         return self
 
     def render_file_from_zip(self, target):
-        with Zip_Folder(self.path_views) as zip_file:
+        with Temp_Zip(self.path_views) as zip_file:
             with Unzip_File(zip_file,'/tmp/test_render_from_zip', True) as web_root:
                 return self.render_page.screenshot_file_in_folder(web_root, target, self.tmp_img)
 

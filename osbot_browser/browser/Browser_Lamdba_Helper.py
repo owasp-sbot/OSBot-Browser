@@ -4,7 +4,7 @@ import os
 from osbot_aws.Dependencies import load_dependencies
 from osbot_aws.apis.Lambda import Lambda
 from osbot_aws.apis.S3 import S3
-from osbot_utils.utils.Files import Files
+from osbot_utils.utils.Files import Files, parent_folder, path_combine, current_folder
 
 
 class Browser_Lamdba_Helper:
@@ -84,12 +84,12 @@ class Browser_Lamdba_Helper:
 
     def web_root(self):
         if os.getenv('AWS_REGION') is not None:            # if we are in AWS
-            return Files.path_combine('.','./osbot_browser/web_root')
-        if 'test/browser' in Files.current_folder():       # if we are in an unit test
-            return  Files.path_combine('.','../../osbot_browser/web_root')
-        if 'test_QA/browser' in Files.current_folder():    # todo: find a better way to handle the path when executing from UnitTests
-            return  Files.path_combine('.','../../osbot_browser/web_root')
-        parent_folder = Files.folder_name(__file__)
-        if 'serverless-render/osbot_browser/browser' in parent_folder:
-            return Files.path_combine(parent_folder,'../web_root')
+            return path_combine('.','./osbot_browser/web_root')
+        if 'test/browser' in current_folder():       # if we are in an unit test
+            return  path_combine('.','../../osbot_browser/web_root')
+        if 'test_QA/browser' in current_folder():    # todo: find a better way to handle the path when executing from UnitTests
+            return  path_combine('.','../../osbot_browser/web_root')
+        folder = parent_folder(__file__)
+        if 'serverless-render/osbot_browser/browser' in folder:
+            return path_combine(folder,'../web_root')
         return None
